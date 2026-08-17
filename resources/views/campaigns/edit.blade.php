@@ -1,0 +1,100 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex items-center gap-4">
+            <a href="{{ route('campaigns.index') }}" class="text-secondary hover:text-primary transition-colors bg-surface border border-border p-2 rounded-lg hover:shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div>
+                <h2 class="font-semibold text-2xl text-primary leading-tight">
+                    Edit Campaign
+                </h2>
+                <p class="text-sm text-secondary mt-1">Perbarui data campaign: <strong class="text-primary">{{ $campaign->nama_campaign }}</strong></p>
+            </div>
+        </div>
+    </x-slot>
+
+    <div class="max-w-4xl mx-auto space-y-6">
+        <form method="POST" action="{{ route('campaigns.update', $campaign) }}" class="bg-surface rounded-2xl border border-border p-6 shadow-sm space-y-6">
+            @csrf
+            @method('PUT')
+
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="bg-status-danger/10 text-status-danger p-4 rounded-xl text-sm mb-4">
+                    <ul class="list-disc list-inside">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Nama Campaign -->
+                <div class="md:col-span-2">
+                    <x-input-label for="nama_campaign" value="Nama Campaign *" />
+                    <x-text-input id="nama_campaign" name="nama_campaign" type="text" class="mt-1 block w-full" value="{{ old('nama_campaign', $campaign->nama_campaign) }}" required />
+                </div>
+
+                <!-- Klien / PIC -->
+                <div>
+                    <x-input-label for="client_id" value="Klien / PIC *" />
+                    <select id="client_id" name="client_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
+                        <option value="">-- Pilih Klien --</option>
+                        @foreach($clients as $client)
+                            <option value="{{ $client->id }}" {{ old('client_id', $campaign->client_id) == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Platform -->
+                <div>
+                    <x-input-label for="platform" value="Platform *" />
+                    <select id="platform" name="platform" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
+                        <option value="TikTok" {{ old('platform', $campaign->platform) == 'TikTok' ? 'selected' : '' }}>TikTok</option>
+                        <option value="Instagram" {{ old('platform', $campaign->platform) == 'Instagram' ? 'selected' : '' }}>Instagram</option>
+                        <option value="Omnichannel" {{ old('platform', $campaign->platform) == 'Omnichannel' ? 'selected' : '' }}>Omnichannel (Gabungan)</option>
+                    </select>
+                </div>
+
+                <!-- Tanggal Mulai -->
+                <div>
+                    <x-input-label for="tanggal_mulai" value="Tanggal Mulai *" />
+                    <x-text-input id="tanggal_mulai" name="tanggal_mulai" type="date" class="mt-1 block w-full" value="{{ old('tanggal_mulai', $campaign->tanggal_mulai) }}" required />
+                </div>
+
+                <!-- Tanggal Selesai -->
+                <div>
+                    <x-input-label for="tanggal_selesai" value="Tanggal Selesai *" />
+                    <x-text-input id="tanggal_selesai" name="tanggal_selesai" type="date" class="mt-1 block w-full" value="{{ old('tanggal_selesai', $campaign->tanggal_selesai) }}" required />
+                </div>
+
+                <!-- Status -->
+                <div class="md:col-span-2">
+                    <x-input-label for="status" value="Status *" />
+                    <select id="status" name="status" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
+                        <option value="Draft" {{ old('status', $campaign->status) == 'Draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="Aktif" {{ old('status', $campaign->status) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="Selesai" {{ old('status', $campaign->status) == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                        <option value="Arsip" {{ old('status', $campaign->status) == 'Arsip' ? 'selected' : '' }}>Arsip</option>
+                    </select>
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="md:col-span-2">
+                    <x-input-label for="deskripsi" value="Deskripsi / Keterangan Tambahan" />
+                    <textarea id="deskripsi" name="deskripsi" rows="4" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm">{{ old('deskripsi', $campaign->deskripsi) }}</textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-4 border-t border-border mt-6 gap-3">
+                <a href="{{ route('campaigns.index') }}" class="px-4 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors bg-body border border-border rounded-xl">
+                    Batal
+                </a>
+                <x-primary-button>
+                    Perbarui Campaign
+                </x-primary-button>
+            </div>
+        </form>
+    </div>
+</x-app-layout>
