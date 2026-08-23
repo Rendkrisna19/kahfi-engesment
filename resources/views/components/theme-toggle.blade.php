@@ -9,7 +9,7 @@
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
         var themeToggleBtn = document.getElementById('theme-toggle');
 
-        if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        if (document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark')) {
             themeToggleLightIcon.classList.remove('hidden');
         } else {
             themeToggleDarkIcon.classList.remove('hidden');
@@ -19,11 +19,13 @@
             themeToggleDarkIcon.classList.toggle('hidden');
             themeToggleLightIcon.classList.toggle('hidden');
 
-            if (document.documentElement.getAttribute('data-theme') === 'light') {
+            if (document.documentElement.getAttribute('data-theme') === 'light' && !document.documentElement.classList.contains('dark')) {
                 document.documentElement.setAttribute('data-theme', 'dark');
+                document.documentElement.classList.add('dark');
                 localStorage.setItem('theme', 'dark');
             } else {
                 document.documentElement.setAttribute('data-theme', 'light');
+                document.documentElement.classList.remove('dark');
                 localStorage.setItem('theme', 'light');
             }
         });
