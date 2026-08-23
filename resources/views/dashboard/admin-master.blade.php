@@ -171,18 +171,34 @@
                 </div>
             </div>
 
-            <!-- Avg SAW Score -->
+            <!-- Total Views Increase -->
             <div class="bg-surface rounded-2xl p-4 border border-border shadow-xs flex flex-col justify-between hover:border-brand-blue/30 transition">
                 <div class="flex items-center justify-between text-secondary">
-                    <span class="text-xs font-semibold">Rata Skor SAW</span>
-                    <span class="p-1.5 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                    <span class="text-xs font-semibold">Kenaikan Views</span>
+                    <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                     </span>
                 </div>
                 <div class="mt-2">
-                    <h3 class="text-xl font-extrabold text-purple-600 dark:text-purple-400">{{ number_format($avgSawScore, 4) }}</h3>
-                    <span class="text-[10px] text-purple-500 font-semibold">⭐ Bobot SAW</span>
+                    <h3 class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">+{{ number_format($totalViewsIncrease) }}</h3>
+                    <span class="text-[10px] text-emerald-500 font-semibold">🚀 Pasca Update</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Grafik Update Kenaikan Views (Line Chart) -->
+        <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-primary">Grafik Update Kenaikan Views 📈</h3>
+                    <p class="text-xs text-secondary">Tren pertumbuhan akumulasi tayangan dan kenaikan views pasca update data</p>
+                </div>
+                <span class="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-xl border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                    +{{ number_format($totalViewsIncrease) }} Views Baru
+                </span>
+            </div>
+            <div class="relative h-64 w-full">
+                <canvas id="viewsGrowthLineChart"></canvas>
             </div>
         </div>
 
@@ -222,18 +238,22 @@
             </div>
         </div>
 
-        <!-- Top Content Ranking Section -->
-        <div class="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden">
+        <!-- Top Content Ranking Section (Top 20 with show 5 initial) -->
+        <div class="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden" x-data="{ showAllTop: false }">
             <div class="p-6 border-b border-border flex justify-between items-center bg-body/25">
                 <div>
-                    <h3 class="text-lg font-bold text-primary">Top 5 Content Ranking 🏆</h3>
-                    <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan preferensi skor SAW</p>
+                    <h3 class="text-lg font-bold text-primary">Top Content Ranking 🏆</h3>
+                    <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan total tayangan (Views)</p>
                 </div>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-lg">
+                    Menampilkan <span x-text="showAllTop ? '{{ $topContent->count() }}' : '{{ min(5, $topContent->count()) }}'"></span> dari {{ $topContent->count() }} Konten
+                </span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-body/50 text-xs uppercase text-secondary">
                         <tr>
+                            <th class="px-6 py-4 font-semibold">Rank</th>
                             <th class="px-6 py-4 font-semibold">Platform</th>
                             <th class="px-6 py-4 font-semibold">Campaign</th>
                             <th class="px-6 py-4 font-semibold">Akun</th>
@@ -241,13 +261,17 @@
                             <th class="px-6 py-4 font-semibold text-right">Likes</th>
                             <th class="px-6 py-4 font-semibold text-right">Comments</th>
                             <th class="px-6 py-4 font-semibold text-right">ER (%)</th>
-                            <th class="px-6 py-4 font-semibold text-right">SAW Score</th>
                             <th class="px-6 py-4 font-semibold text-center">Detail</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
-                        @forelse($topContent as $content)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        @forelse($topContent as $index => $content)
+                        <tr x-show="showAllTop || {{ $index }} < 5" class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="w-6 h-6 rounded-full inline-flex items-center justify-center text-xs font-extrabold {{ $index == 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-300' : ($index == 1 ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-300' : ($index == 2 ? 'bg-amber-800/10 text-amber-900 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-800/30' : 'bg-body text-secondary')) }}">
+                                    {{ $index + 1 }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-1 bg-body border border-border rounded-lg text-xs font-semibold">
                                     {{ ucfirst($content->platform) }}
@@ -255,11 +279,10 @@
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-primary">{{ $content->campaign->nama_campaign ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-secondary font-bold">@​{{ $content->username ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-right font-medium text-primary">{{ number_format($content->views) }}</td>
+                            <td class="px-6 py-4 text-sm text-right font-bold text-brand-blue">{{ number_format($content->views) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->likes) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->comments) }}</td>
                             <td class="px-6 py-4 text-sm text-right font-bold text-status-success">{{ number_format($content->engagement_rate, 2) }}%</td>
-                            <td class="px-6 py-4 text-sm text-right font-black text-brand-blue">{{ number_format($content->saw_score, 4) }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('laporan.show', $content->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20 rounded-xl text-xs font-bold transition-colors">
                                     Detail
@@ -274,6 +297,15 @@
                     </tbody>
                 </table>
             </div>
+
+            @if($topContent->count() > 5)
+            <div class="p-4 text-center border-t border-border bg-body/20">
+                <button @click="showAllTop = !showAllTop" class="inline-flex items-center gap-2 text-xs font-bold text-brand-blue hover:text-brand-blue-hover transition-colors px-4 py-2 rounded-xl bg-brand-blue/10 hover:bg-brand-blue/20">
+                    <span x-text="showAllTop ? 'Tampilkan 5 Konten Ringkas' : 'Lihat Semua (Top {{ $topContent->count() }} Konten)'"></span>
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{'rotate-180': showAllTop}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+            </div>
+            @endif
         </div>
 
         <!-- Charts Row (Campaign views list) -->
@@ -323,6 +355,72 @@
             const textColor = isDarkMode ? '#94a3b8' : '#475569';
             const gridColor = isDarkMode ? '#334155' : '#f1f5f9';
 
+            // Views Growth Line Chart
+            const growthCtx = document.getElementById('viewsGrowthLineChart');
+            if (growthCtx) {
+                const growthData = {!! json_encode($viewsTrendData) !!};
+                const labels = growthData.map(item => item.date_label || 'Update');
+                const totalViewsData = growthData.map(item => item.total_views);
+                const increaseData = growthData.map(item => item.views_increase);
+
+                new Chart(growthCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labels.length > 0 ? labels : ['Belum Ada Data'],
+                        datasets: [
+                            {
+                                label: 'Total akumulasi Views',
+                                data: totalViewsData.length > 0 ? totalViewsData : [0],
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 4
+                            },
+                            {
+                                label: 'Kenaikan Views (Pasca Update)',
+                                data: increaseData.length > 0 ? increaseData : [0],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { color: textColor, font: { family: "'Montserrat', sans-serif", size: 11 } }
+                            },
+                            tooltip: {
+                                backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+                                titleColor: isDarkMode ? '#f8fafc' : '#0f172a',
+                                bodyColor: isDarkMode ? '#94a3b8' : '#475569',
+                                borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: { color: textColor }
+                            },
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: { color: textColor }
+                            }
+                        }
+                    }
+                });
+            }
+
             // Common doughnut chart generator
             function createDoughnut(canvasId, titleLabel, chartData) {
                 const ctx = document.getElementById(canvasId);
@@ -361,7 +459,7 @@
                                 position: 'bottom',
                                 labels: {
                                     color: textColor,
-                                    font: { family: "'Outfit', 'Inter', sans-serif", size: 11 }
+                                    font: { family: "'Montserrat', sans-serif", size: 11 }
                                 }
                             },
                             tooltip: {

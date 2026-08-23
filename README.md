@@ -37,32 +37,40 @@
 Ikuti langkah-langkah berikut untuk menjalankan proyek dari repositori baru (clone):
 
 ### 1. Clone Repositori
+
 ```bash
 git clone <repository-url>
 cd kahfi-engagement
 ```
 
 ### 2. Install Dependensi PHP (Composer)
+
 ```bash
 composer install
 ```
 
 ### 3. Install Dependensi Frontend (Node.js / NPM)
+
 ```bash
 npm install
 ```
 
 ### 4. Setup File Konfigurasi Environment (`.env`)
+
 Salin file `.env.example` menjadi `.env`:
+
 ```bash
 cp .env.example .env
 ```
+
 *Catatan pada Windows PowerShell:*
+
 ```powershell
 copy .env.example .env
 ```
 
 Buka file `.env` dan atur konfigurasi database serta Apify Token Anda:
+
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -76,30 +84,37 @@ APIFY_TOKEN=your_apify_api_token_here
 ```
 
 ### 5. Generate Application Key
+
 ```bash
 php artisan key:generate
 ```
 
 ### 6. Migrasi Database & Seeding RBAC (PENTING)
+
 Jalankan perintah berikut untuk membuat struktur tabel dan mengisi data awal Role, Permission, serta akun default:
+
 ```bash
 php artisan migrate:fresh --seed
 ```
 
 ### 7. Buat Symbolic Link Storage
+
 ```bash
 php artisan storage:link
 ```
 
 ### 8. Jalankan Server & Asset Bundler
+
 Buka dua terminal terpisah:
 
 **Terminal 1 (Laravel Dev Server):**
+
 ```bash
 php artisan serve
 ```
 
 **Terminal 2 (Vite Asset Bundler):**
+
 ```bash
 npm run dev
 ```
@@ -112,11 +127,11 @@ Buka browser dan akses aplikasi di: `http://127.0.0.1:8000`
 
 Setelah menjalankan `php artisan db:seed` / `migrate:fresh --seed`, akun berikut siap digunakan:
 
-| Role | Email | Password | Hak Akses Utama |
-| :--- | :--- | :--- | :--- |
-| **Admin Master** | `admin@master.com` | `password` | Full Akses ke seluruh sistem, RBAC, dan User Access |
-| **Admin** | `admin@admin.com` | `password` | Operasional Konten, Update SAW, Kelola Campaign, Laporan |
-| **Client** | `client@client.com` | `password` | Hanya dapat melihat Campaign & Laporan milik sendiri |
+| Role                   | Email                 | Password     | Hak Akses Utama                                          |
+| :--------------------- | :-------------------- | :----------- | :------------------------------------------------------- |
+| **Admin Master** | `admin@master.com`  | `password` | Full Akses ke seluruh sistem, RBAC, dan User Access      |
+| **Admin**        | `admin@admin.com`   | `password` | Operasional Konten, Update SAW, Kelola Campaign, Laporan |
+| **Client**       | `client@client.com` | `password` | Hanya dapat melihat Campaign & Laporan milik sendiri     |
 
 ---
 
@@ -125,6 +140,7 @@ Setelah menjalankan `php artisan db:seed` / `migrate:fresh --seed`, akun berikut
 Sistem menggunakan paket **Spatie Laravel-Permission**.
 
 ### List Permission Bawaan:
+
 - `dashboard.view`
 - `users.view`, `users.create`, `users.edit`, `users.delete`
 - `roles.view`, `roles.create`, `roles.edit`, `roles.delete`
@@ -136,6 +152,7 @@ Sistem menggunakan paket **Spatie Laravel-Permission**.
 - `profile.edit`
 
 ### Cara Mengatur Hak Akses via UI:
+
 1. Login sebagai **Admin Master**.
 2. Buka menu **Master Data** -> **Roles & Hak Akses**.
 3. Pilih role yang ingin diubah lalu klik **Edit**.
@@ -167,4 +184,5 @@ kahfi-engagement/
 ---
 
 ## 📄 Lisensi
+
 Hak Cipta © 2026 **Kahfi Engagement Team**. All Rights Reserved.

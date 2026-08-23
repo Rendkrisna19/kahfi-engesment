@@ -160,31 +160,7 @@
             </div>
 
             <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- SAW Score Card -->
-                <div class="bg-surface rounded-2xl border border-border p-6 shadow-sm flex flex-col justify-center items-center text-center">
-                    <h3 class="text-lg font-bold text-primary mb-1">Nilai Preferensi SAW</h3>
-                    <p class="text-sm text-secondary mb-6">Simple Additive Weighting (Share 35%, Comment 25%, Like 20%, View 10%, Save 10%)[cite: 1]</p>
-                    
-                    <div class="relative w-48 h-48 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-100 dark:text-gray-800" />
-                            @php
-                                $score = (float) ($link->saw_score ?? 0);
-                                // Normalisasi persentase SAW (skor 0 - 1)
-                                $percentage = min(max($score * 100, 0), 100);
-                                $circumference = 2 * pi() * 40;
-                                $strokeDashoffset = $circumference - ($percentage / 100) * $circumference;
-                            @endphp
-                            <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-brand-blue" stroke-dasharray="{{ $circumference }}" stroke-dashoffset="{{ $strokeDashoffset }}" stroke-linecap="round" />
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <span class="text-3xl font-black text-primary">{{ number_format($score, 4) }}</span>
-                            <span class="text-xs text-secondary mt-1">Skor Preferensi</span>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="grid grid-cols-1 gap-6">
                 <!-- Bar Chart -->
                 <div class="bg-surface rounded-2xl border border-border p-6 shadow-sm">
                     <h3 class="text-lg font-bold text-primary mb-6">Distribusi Engagement</h3>

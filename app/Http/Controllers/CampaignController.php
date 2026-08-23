@@ -25,19 +25,19 @@ class CampaignController extends Controller
     {
         $user = $request->user();
 
-        $query = Campaign::with('client');
+        $query = Campaign::with(['client', 'userAccess.user']);
 
-        if ($user->role === 'Admin Master') {
+        if ($user->role === 'Admin Master' || $user->hasRole('Admin Master')) {
 
             $query->orderBy('tanggal_mulai', 'desc');
-        } elseif ($user->role === 'Admin') {
+        } elseif ($user->role === 'Admin' || $user->hasRole('Admin')) {
 
             $query->whereHas('userAccess', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
 
             $query->orderBy('tanggal_mulai', 'desc');
-        } elseif ($user->role === 'Client') {
+        } elseif ($user->role === 'Client' || $user->hasRole('Client')) {
 
             $query->where('client_id', $user->id)
                 ->orderBy('tanggal_mulai', 'desc');
@@ -65,7 +65,12 @@ class CampaignController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('campaigns.create', compact('clients'));
+        $admins = User::whereIn('role', ['Admin', 'Admin Master'])
+            ->where('status', 'Aktif')
+            ->orderBy('name')
+            ->get();
+
+        return view('campaigns.create', compact('clients', 'admins'));
     }
 
 
@@ -110,9 +115,31 @@ class CampaignController extends Controller
                 'required',
                 'in:Draft,Aktif,Selesai,Arsip',
             ],
+
+            'admin_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'admin_ids.*' => [
+                'integer',
+                'exists:users,id',
+            ],
         ]);
 
-        Campaign::create($validated);
+        $adminIds = $validated['admin_ids'] ?? [];
+        unset($validated['admin_ids']);
+
+        $campaign = Campaign::create($validated);
+
+        if (!empty($adminIds)) {
+            foreach ($adminIds as $adminId) {
+                \App\Models\UserCampaignAccess::create([
+                    'user_id' => $adminId,
+                    'campaign_id' => $campaign->id,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('campaigns.index')
@@ -127,9 +154,16 @@ class CampaignController extends Controller
             ->orderBy('name')
             ->get();
 
+        $admins = User::whereIn('role', ['Admin', 'Admin Master'])
+            ->where('status', 'Aktif')
+            ->orderBy('name')
+            ->get();
+
+        $assignedAdminIds = $campaign->userAccess()->pluck('user_id')->toArray();
+
         return view(
             'campaigns.edit',
-            compact('campaign', 'clients')
+            compact('campaign', 'clients', 'admins', 'assignedAdminIds')
         );
     }
 
@@ -178,9 +212,33 @@ class CampaignController extends Controller
                 'required',
                 'in:Draft,Aktif,Selesai,Arsip',
             ],
+
+            'admin_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'admin_ids.*' => [
+                'integer',
+                'exists:users,id',
+            ],
         ]);
 
+        $adminIds = $validated['admin_ids'] ?? [];
+        unset($validated['admin_ids']);
+
         $campaign->update($validated);
+
+        // Sync access
+        $campaign->userAccess()->delete();
+        if (!empty($adminIds)) {
+            foreach ($adminIds as $adminId) {
+                \App\Models\UserCampaignAccess::create([
+                    'user_id' => $adminId,
+                    'campaign_id' => $campaign->id,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('campaigns.index')

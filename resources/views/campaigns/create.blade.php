@@ -80,7 +80,26 @@
                 <!-- Deskripsi -->
                 <div class="md:col-span-2">
                     <x-input-label for="deskripsi" value="Deskripsi / Keterangan Tambahan" />
-                    <textarea id="deskripsi" name="deskripsi" rows="4" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" placeholder="Opsional...">{{ old('deskripsi') }}</textarea>
+                    <textarea id="deskripsi" name="deskripsi" rows="3" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" placeholder="Opsional...">{{ old('deskripsi') }}</textarea>
+                </div>
+
+                <!-- Penugasan Admin (Akses Engagement) -->
+                <div class="md:col-span-2">
+                    <x-input-label value="Penugasan Admin (Akses Engagement Campaign)" />
+                    <p class="text-xs text-secondary mt-0.5 mb-2">Pilih user Admin yang ditugaskan untuk mengelola dan mengakses data engagement campaign ini.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-4 bg-body border border-border rounded-xl max-h-48 overflow-y-auto">
+                        @forelse($admins as $admin)
+                            <label class="flex items-center gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-surface border border-transparent hover:border-border transition-colors">
+                                <input type="checkbox" name="admin_ids[]" value="{{ $admin->id }}" {{ in_array($admin->id, old('admin_ids', [])) ? 'checked' : '' }} class="rounded border-border text-brand-blue focus:ring-brand-blue w-4 h-4">
+                                <div class="truncate">
+                                    <span class="block text-xs font-bold text-primary truncate">{{ $admin->name }}</span>
+                                    <span class="text-[10px] text-secondary truncate">@​{{ $admin->username }} ({{ $admin->role }})</span>
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-xs text-secondary col-span-3">Belum ada user dengan role Admin terdaftar.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
 

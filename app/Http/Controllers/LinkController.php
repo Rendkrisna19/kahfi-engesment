@@ -215,6 +215,33 @@ class LinkController extends Controller
     }
 
     /**
+     * Menghapus multiple record link (Bulk Delete)
+     */
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:links,id'
+        ]);
+
+        $links = Link::whereIn('id', $request->ids)->get();
+        $count = $links->count();
+
+        if ($count === 0) {
+            return redirect()->back()->with('error', 'Pilih minimal satu link untuk dihapus.');
+        }
+
+        $campaignIds = $links->pluck('campaign_id')->unique();
+        Link::whereIn('id', $request->ids)->delete();
+
+        foreach ($campaignIds as $cId) {
+            $this->calculateSawScoresForCampaign($cId);
+        }
+
+        return redirect()->back()->with('success', "Berhasil menghapus {$count} link konten.");
+    }
+
+    /**
      * Menjalankan Scraping Apify API untuk Link berstatus Pending dan Kalkulasi SAW
      */
     public function refreshData(Request $request)
@@ -332,10 +359,10 @@ class LinkController extends Controller
                             $username = $item['ownerUsername'] ?? $item['ownerFullName'] ?? 'IG User';
                         }
 
-                        // Hitung Engagement Rate
+                        // Hitung Engagement Rate: (Likes + Comments + Shares) / Views * 100
                         $er = 0;
                         if ($views > 0) {
-                            $er = (($likes + $comments + $shares + $saves) / $views) * 100;
+                            $er = (($likes + $comments + $shares) / $views) * 100;
                         }
 
                         // Calculate SAW Score (dummy logic)

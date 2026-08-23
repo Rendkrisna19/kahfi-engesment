@@ -205,7 +205,7 @@ class UpdateSawController extends Controller
                                 $username = $item['ownerUsername'] ?? $item['ownerFullName'] ?? 'IG User';
                             }
 
-                            $er = ($views > 0) ? (($likes + $comments + $shares + $saves) / $views) * 100 : 0;
+                            $er = ($views > 0) ? (($likes + $comments + $shares) / $views) * 100 : 0;
                             $sawScore = ($er * 0.5) + (($likes > 100 ? 10 : ($likes / 10)) * 0.3) + (($comments > 50 ? 10 : ($comments / 5)) * 0.2);
 
                             $link->update([

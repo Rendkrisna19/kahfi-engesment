@@ -186,6 +186,7 @@ Route::middleware(['auth', 'can:operasional-konten.view'])
         });
 
         Route::middleware('can:operasional-konten.delete')->group(function () {
+            Route::delete('/bulk-delete', [\App\Http\Controllers\LinkController::class, 'destroyBulk'])->name('operasional-konten.destroy-bulk');
             Route::delete('/{operasional_konten}', [\App\Http\Controllers\LinkController::class, 'destroy'])->name('operasional-konten.destroy');
         });
     });

@@ -61,6 +61,7 @@
                             <th scope="col" class="px-6 py-4 font-semibold">Nama Campaign</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Platform</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Klien / PIC</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">Admin Ditugaskan</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Periode</th>
                             <th scope="col" class="px-6 py-4 font-semibold">Status</th>
                             <th scope="col" class="px-6 py-4 font-semibold text-right">Aksi</th>
@@ -96,6 +97,17 @@
                                         {{ substr($campaign->client->name ?? '?', 0, 1) }}
                                     </div>
                                     <span class="text-sm">{{ $campaign->client->name ?? 'Tidak ada Klien' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1 max-w-[200px]">
+                                    @forelse($campaign->userAccess as $access)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20">
+                                            {{ $access->user->name ?? 'Admin' }}
+                                        </span>
+                                    @empty
+                                        <span class="text-xs text-secondary italic">Semua Admin Master</span>
+                                    @endforelse
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-xs">
@@ -136,7 +148,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center">
                                     <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 text-gray-400">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>

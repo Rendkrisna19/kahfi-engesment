@@ -63,8 +63,10 @@ class DashboardController extends Controller
         $totalComments = (clone $query)->sum('comments');
         $totalShares = (clone $query)->sum('shares');
         $totalSaves = (clone $query)->sum('saves');
-        $avgER = (clone $query)->where('engagement_rate', '>', 0)->avg('engagement_rate') ?? 0;
-        $avgSawScore = (clone $query)->where('saw_score', '>', 0)->avg('saw_score') ?? 0;
+        $avgER = $totalViews > 0 ? (($totalLikes + $totalComments + $totalShares) / $totalViews) * 100 : 0;
+
+        // Hitung total kenaikan views pasca update / re-scraping
+        $totalViewsIncrease = (clone $query)->whereNotNull('prev_views')->get()->sum(fn($l) => max(0, $l->views - $l->prev_views));
 
         // Top 5 Campaigns by Views (matching date filters)
         $topCampaigns = Campaign::whereIn('id', $campaignIds)
@@ -97,11 +99,19 @@ class DashboardController extends Controller
             ->pluck('total_comments', 'platform')
             ->toArray();
 
-        // Top Content Ranking (Top 5 Links by Views, Likes, Comments, SAW)
+        // Top Content Ranking (Top 20 Links by Views)
         $topContent = (clone $query)
             ->with('campaign', 'kategoriKonten')
-            ->orderBy('saw_score', 'desc')
-            ->take(5)
+            ->orderBy('views', 'desc')
+            ->take(20)
+            ->get();
+
+        // Data Tren Kenaikan Views Pasca Update
+        $viewsTrendData = (clone $query)
+            ->selectRaw("DATE_FORMAT(COALESCE(last_rescraped_at, updated_at, tanggal_upload), '%d %b') as date_label, SUM(views) as total_views, SUM(GREATEST(0, views - COALESCE(prev_views, 0))) as views_increase")
+            ->groupBy('date_label')
+            ->orderByRaw("MIN(COALESCE(last_rescraped_at, updated_at, tanggal_upload)) ASC")
+            ->take(10)
             ->get();
 
         // Links for Table
@@ -119,8 +129,8 @@ class DashboardController extends Controller
             ->pluck('year');
 
         return compact(
-            'campaigns', 'totalCampaigns', 'totalLinks', 'totalViews', 'totalLikes', 'totalComments', 'totalShares', 'totalSaves', 'avgER', 'avgSawScore',
-            'topCampaigns', 'platformViews', 'platformLikes', 'platformComments', 'topContent', 'links', 'availableYears'
+            'campaigns', 'totalCampaigns', 'totalLinks', 'totalViews', 'totalLikes', 'totalComments', 'totalShares', 'totalSaves', 'avgER', 'totalViewsIncrease',
+            'topCampaigns', 'platformViews', 'platformLikes', 'platformComments', 'topContent', 'viewsTrendData', 'links', 'availableYears'
         );
     }
 

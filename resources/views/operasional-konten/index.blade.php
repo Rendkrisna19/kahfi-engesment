@@ -18,7 +18,20 @@
 
     <x-toast />
 
-    <div class="space-y-6" x-data="{ tab: 'single', isLoaded: false }" x-init="setTimeout(() => isLoaded = true, 1500)">
+    <div class="space-y-6" x-data="{ 
+        tab: 'single', 
+        isLoaded: false,
+        selectedIds: [],
+        selectAll: false,
+        toggleAll() {
+            this.selectAll = !this.selectAll;
+            if (this.selectAll) {
+                this.selectedIds = Array.from(document.querySelectorAll('.link-checkbox')).map(cb => cb.value);
+            } else {
+                this.selectedIds = [];
+            }
+        }
+    }" x-init="setTimeout(() => isLoaded = true, 1200)">
         
         @can('operasional-konten.create')
         <!-- Tabs & Form Section -->
@@ -278,9 +291,28 @@
         <!-- Table Data & Filter Section -->
         <div class="bg-surface rounded-2xl border border-border overflow-hidden shadow-sm mt-8">
             <div class="p-6 border-b border-border flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-bold text-primary">Riwayat Link Terbaru</h3>
-                    <p class="text-xs text-secondary mt-0.5">Daftar link konten, metrik engagement (Views, Likes, Comments, Shares, Saves, ER), dan Ranking SAW per Campaign.</p>
+                <div class="flex items-center gap-3">
+                    <div>
+                        <h3 class="text-lg font-bold text-primary">Riwayat Link Terbaru</h3>
+                        <p class="text-xs text-secondary mt-0.5">Daftar link konten dan metrik engagement (Views, Likes, Comments, Shares, Saves, ER).</p>
+                    </div>
+
+                    @can('operasional-konten.delete')
+                    <div x-show="selectedIds.length > 0" style="display: none;" class="flex items-center gap-2 bg-status-danger/10 text-status-danger px-3 py-1.5 rounded-xl border border-status-danger/20">
+                        <span class="text-xs font-bold" x-text="selectedIds.length + ' dipilih'"></span>
+                        <form method="POST" action="{{ route('operasional-konten.destroy-bulk') }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semua link terpilih?');">
+                            @csrf
+                            @method('DELETE')
+                            <template x-for="id in selectedIds" :key="id">
+                                <input type="hidden" name="ids[]" :value="id">
+                            </template>
+                            <button type="submit" class="inline-flex items-center gap-1 text-xs font-bold bg-status-danger text-white px-2.5 py-1 rounded-lg hover:bg-status-danger/90 transition shadow-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Hapus Terpilih
+                            </button>
+                        </form>
+                    </div>
+                    @endcan
                 </div>
                 
                 <!-- Filter & Search Form -->
@@ -325,16 +357,21 @@
                 </form>
             </div>
 
-            <!-- Skeleton Loader (shows for 1.5s via Alpine) -->
+            <!-- Skeleton Loader (shows for 1.2s via Alpine) -->
             <div x-show="!isLoaded">
                 <x-skeleton count="4" />
             </div>
 
-            <!-- Actual Table (shows after 1.5s) -->
+            <!-- Actual Table (shows after 1.2s) -->
             <div x-show="isLoaded" style="display: none;" class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-primary">
                     <thead class="text-xs text-secondary uppercase bg-body/50 border-b border-border">
                         <tr>
+                            @can('operasional-konten.delete')
+                            <th scope="col" class="px-4 py-3.5 w-10 text-center">
+                                <input type="checkbox" @click="toggleAll()" x-model="selectAll" class="rounded border-border text-brand-blue focus:ring-brand-blue cursor-pointer" title="Pilih Semua">
+                            </th>
+                            @endcan
                             <th scope="col" class="px-4 py-3.5 font-semibold">Tanggal</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold">Platform & Akun</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold">Campaign</th>
@@ -344,14 +381,19 @@
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Shares</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Saves</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">ER (%)</th>
-                            <th scope="col" class="px-4 py-3.5 font-semibold text-center">Skor SAW</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-center">Status</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
                         @forelse($links as $link)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors" :class="{'bg-blue-50/50 dark:bg-blue-900/10': selectedIds.includes('{{ $link->id }}')}">
+                            @can('operasional-konten.delete')
+                            <td class="px-4 py-3.5 text-center">
+                                <input type="checkbox" value="{{ $link->id }}" x-model="selectedIds" class="link-checkbox rounded border-border text-brand-blue focus:ring-brand-blue cursor-pointer">
+                            </td>
+                            @endcan
+
                             <!-- Tanggal -->
                             <td class="px-4 py-3.5 whitespace-nowrap">
                                 <span class="text-xs text-primary font-semibold block">
@@ -415,13 +457,6 @@
                             <!-- ER (%) -->
                             <td class="px-4 py-3.5 text-right font-semibold text-xs whitespace-nowrap text-brand-blue">
                                 {{ number_format($link->engagement_rate ?? 0, 2) }}%
-                            </td>
-
-                            <!-- Skor SAW -->
-                            <td class="px-4 py-3.5 text-center whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                                    {{ number_format($link->saw_score ?? 0, 4) }}
-                                </span>
                             </td>
 
                             <!-- Status Scraping -->

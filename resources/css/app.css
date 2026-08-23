@@ -31,23 +31,29 @@
     --status-info: #0ea5e9;
   }
 
-  [data-theme="dark"] {
+  [data-theme="dark"], .dark {
     /* Base Brand Colors (Dark Mode) */
     --brand-blue: #3b82f6;
     --brand-blue-hover: #60a5fa;
     --brand-purple: #8b5cf6;
     --brand-purple-hover: #a78bfa;
-    --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --brand-gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
 
-    /* Neutral / Surface */
-    --bg-body: #0f172a;
-    --bg-surface: #1e293b;
-    --bg-card: #1e293b;
-    --border-color: #334155;
+    /* High-Contrast Dark Surface & Background */
+    --bg-body: #090d16;
+    --bg-surface: #111827;
+    --bg-card: #1f2937;
+    --border-color: #374151;
 
-    /* Typography */
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    /* High-Contrast Typography */
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+
+    /* Status Tokens */
+    --status-success: #10b981;
+    --status-warning: #f59e0b;
+    --status-danger: #ef4444;
+    --status-info: #0ea5e9;
   }
 }
