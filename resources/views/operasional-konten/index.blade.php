@@ -179,47 +179,89 @@
                     @csrf
                     <input type="hidden" name="type" value="csv">
                     
-                    <!-- Guide & Preview Header Table -->
-                    <div class="bg-body/60 border border-border rounded-xl p-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 rounded-lg bg-brand-blue/10 text-brand-blue">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </span>
+                    <!-- Excel/Spreadsheet Style Format Preview -->
+                    <div class="bg-surface border border-border rounded-2xl overflow-hidden shadow-xs">
+                        <!-- Excel Window Header Bar -->
+                        <div class="bg-gray-100 dark:bg-gray-800/80 px-4 py-2.5 border-b border-border flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                                    XLS
+                                </div>
                                 <div>
-                                    <h4 class="text-xs font-bold text-primary uppercase tracking-wider">Format Struktur Header CSV</h4>
-                                    <p class="text-[11px] text-secondary">Pastikan file CSV mengikuti struktur kolom di bawah ini (kolom pertama berisi URL Konten).</p>
+                                    <h4 class="text-xs font-bold text-primary flex items-center gap-2">
+                                        Format Kolom Excel / CSV
+                                        <span class="px-2 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Wajib Kolom A</span>
+                                    </h4>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">TikTok & Instagram</span>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">Max 5MB</span>
+                            <div class="text-[11px] text-secondary font-medium hidden sm:block">
+                                Baris 1: Header (<span class="font-bold text-emerald-600 dark:text-emerald-400">URL Konten</span>) &bull; Baris 2+: Link TikTok / Instagram
                             </div>
                         </div>
 
-                        <!-- Mini Table Preview Header -->
-                        <div class="overflow-x-auto rounded-lg border border-border bg-surface">
-                            <table class="w-full text-left text-xs">
-                                <thead class="bg-gray-100/70 dark:bg-gray-800/70 text-secondary uppercase text-[10px] border-b border-border">
-                                    <tr>
-                                        <th class="px-3 py-2 font-bold w-12 text-center">No</th>
-                                        <th class="px-3 py-2 font-bold">Header: URL Konten (Kolom 1)</th>
-                                        <th class="px-3 py-2 font-bold">Platform Otomatis</th>
-                                        <th class="px-3 py-2 font-bold text-center">Contoh Format URL</th>
+                        <!-- Spreadsheet Grid Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs border-collapse font-sans">
+                                <thead>
+                                    <tr class="bg-gray-200/80 dark:bg-gray-700/80 text-secondary text-[11px] border-b border-border">
+                                        <th class="w-10 px-2 py-1.5 text-center font-semibold border-r border-border bg-gray-200 dark:bg-gray-700 select-none"></th>
+                                        <th class="px-3 py-1.5 font-bold text-center border-r border-border w-2/5 min-w-[280px]">A</th>
+                                        <th class="px-3 py-1.5 font-bold text-center border-r border-border w-1/5 min-w-[100px] select-none text-muted">B</th>
+                                        <th class="px-3 py-1.5 font-bold text-center border-r border-border w-1/5 min-w-[100px] select-none text-muted">C</th>
+                                        <th class="px-3 py-1.5 font-bold text-center border-r border-border w-1/5 min-w-[100px] select-none text-muted">D</th>
+                                        <th class="px-3 py-1.5 font-bold text-center border-r border-border select-none text-muted hidden md:table-cell">E</th>
+                                        <th class="px-3 py-1.5 font-bold text-center select-none text-muted hidden md:table-cell">F</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-border text-[11px]">
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-                                        <td class="px-3 py-1.5 text-center font-bold text-secondary">1</td>
-                                        <td class="px-3 py-1.5 font-mono text-brand-blue">https://www.tiktok.com/@user/video/12345...</td>
-                                        <td class="px-3 py-1.5 font-semibold text-primary">TikTok</td>
-                                        <td class="px-3 py-1.5 text-center text-muted">Video / Reels TikTok</td>
+                                <tbody class="divide-y divide-border font-mono text-[11px]">
+                                    <!-- Row 1: Header Row -->
+                                    <tr class="bg-surface">
+                                        <td class="px-2 py-1.5 text-center font-bold text-secondary bg-gray-100 dark:bg-gray-800/80 border-r border-border select-none">1</td>
+                                        <td class="px-3 py-1.5 font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border-2 border-emerald-500 dark:border-emerald-400 border-r border-border">
+                                            <div class="flex items-center justify-between">
+                                                <span>URL Konten</span>
+                                                <span class="text-[9px] uppercase px-1.5 py-0.2 rounded bg-emerald-600 text-white font-sans font-extrabold">Header</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-1.5 border-r border-border bg-gray-50/50 dark:bg-gray-800/20"></td>
+                                        <td class="px-3 py-1.5 border-r border-border bg-gray-50/50 dark:bg-gray-800/20"></td>
+                                        <td class="px-3 py-1.5 border-r border-border bg-gray-50/50 dark:bg-gray-800/20"></td>
+                                        <td class="px-3 py-1.5 border-r border-border bg-gray-50/50 dark:bg-gray-800/20 hidden md:table-cell"></td>
+                                        <td class="px-3 py-1.5 bg-gray-50/50 dark:bg-gray-800/20 hidden md:table-cell"></td>
                                     </tr>
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
-                                        <td class="px-3 py-1.5 text-center font-bold text-secondary">2</td>
-                                        <td class="px-3 py-1.5 font-mono text-brand-blue">https://www.instagram.com/p/Cxyz123...</td>
-                                        <td class="px-3 py-1.5 font-semibold text-primary">Instagram</td>
-                                        <td class="px-3 py-1.5 text-center text-muted">Post / Reels Instagram</td>
+                                    <!-- Row 2: TikTok Example -->
+                                    <tr class="bg-surface hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <td class="px-2 py-1.5 text-center font-bold text-secondary bg-gray-100 dark:bg-gray-800/80 border-r border-border select-none">2</td>
+                                        <td class="px-3 py-1.5 text-primary border-r border-border truncate max-w-[320px]">
+                                            https://www.tiktok.com/@creator/video/1234567890
+                                        </td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border hidden md:table-cell"></td>
+                                        <td class="px-3 py-1.5 hidden md:table-cell"></td>
+                                    </tr>
+                                    <!-- Row 3: Instagram Example -->
+                                    <tr class="bg-surface hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                                        <td class="px-2 py-1.5 text-center font-bold text-secondary bg-gray-100 dark:bg-gray-800/80 border-r border-border select-none">3</td>
+                                        <td class="px-3 py-1.5 text-primary border-r border-border truncate max-w-[320px]">
+                                            https://www.instagram.com/p/Cxyz123456/
+                                        </td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border hidden md:table-cell"></td>
+                                        <td class="px-3 py-1.5 hidden md:table-cell"></td>
+                                    </tr>
+                                    <!-- Row 4: Empty Row -->
+                                    <tr class="bg-surface">
+                                        <td class="px-2 py-1.5 text-center font-bold text-secondary bg-gray-100 dark:bg-gray-800/80 border-r border-border select-none">4</td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border"></td>
+                                        <td class="px-3 py-1.5 border-r border-border hidden md:table-cell"></td>
+                                        <td class="px-3 py-1.5 hidden md:table-cell"></td>
                                     </tr>
                                 </tbody>
                             </table>
