@@ -33,7 +33,7 @@
                             @endif
                         @endif
                     </h2>
-                    <p class="text-xs text-secondary mt-0.5">Centang link konten yang ingin di-scrape ulang untuk memperbarui Views, Engagement Rate, dan Skor SAW secara langsung.</p>
+                    <p class="text-xs text-secondary mt-0.5">Centang link konten yang ingin di-scrape ulang untuk memperbarui Views dan Engagement Rate secara langsung.</p>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                         <!-- Submit Re-Scrape Button -->
                         <button type="button" onclick="confirmRescrape()" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-brand-blue hover:bg-brand-blue-hover text-white transition shadow-md shadow-brand-blue/20">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            Jalankan Re-Scraping & Update SAW
+                            Jalankan Re-Scraping Data
                         </button>
                     </div>
                 </div>
@@ -95,7 +95,6 @@
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Likes</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Comments</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">ER (%)</th>
-                                <th scope="col" class="px-4 py-3.5 font-semibold text-center">Skor SAW (Baru vs Lama)</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-center">Status / Re-Scraped</th>
                             </tr>
                         </thead>
@@ -104,12 +103,6 @@
                             @php
                                 $viewsDiff = ($link->prev_views !== null) ? ($link->views - $link->prev_views) : 0;
                                 $erDiff = ($link->prev_engagement_rate !== null) ? ($link->engagement_rate - $link->prev_engagement_rate) : 0;
-                                $sawDiff = ($link->prev_saw_score !== null) ? ($link->saw_score - $link->prev_saw_score) : 0;
-                                
-                                $sawPercent = 0;
-                                if ($link->prev_saw_score && $link->prev_saw_score > 0) {
-                                    $sawPercent = (($link->saw_score - $link->prev_saw_score) / $link->prev_saw_score) * 100;
-                                }
                             @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                 <!-- Checkbox Column -->
@@ -180,31 +173,6 @@
                                     @endif
                                 </td>
 
-                                <!-- Skor SAW (Comparison) -->
-                                <td class="px-4 py-3.5 text-center whitespace-nowrap">
-                                    <div class="flex flex-col items-center">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-extrabold bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                                            {{ number_format($link->saw_score, 4) }}
-                                        </span>
-
-                                        @if($sawDiff > 0)
-                                            <!-- Green Indicator for Increased SAW Score -->
-                                            <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-200 dark:border-emerald-800">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                                                <span>Naik +{{ number_format($sawDiff, 4) }} ({{ number_format($sawPercent, 1) }}%)</span>
-                                            </div>
-                                        @elseif($sawDiff < 0)
-                                            <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-[10px] font-medium">
-                                                <span>Turun {{ number_format($sawDiff, 4) }}</span>
-                                            </div>
-                                        @elseif($link->prev_saw_score !== null)
-                                            <span class="text-[10px] text-secondary mt-0.5">Stabil (Tidak Berubah)</span>
-                                        @else
-                                            <span class="text-[10px] text-secondary mt-0.5">Data Perdana</span>
-                                        @endif
-                                    </div>
-                                </td>
-
                                 <!-- Status & Last Rescraped -->
                                 <td class="px-4 py-3.5 text-center whitespace-nowrap">
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-success/10 text-status-success mb-0.5">
@@ -217,7 +185,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-8 text-center text-secondary">
+                                <td colspan="7" class="px-6 py-8 text-center text-secondary">
                                     Tidak ada link konten dalam Campaign ini.
                                 </td>
                             </tr>
@@ -259,7 +227,7 @@
 
         Swal.fire({
             title: 'Jalankan Re-Scraping Apify?',
-            text: `Metrik ${countText} link terpilih akan diperbarui. Data lama tersimpan untuk indikator komparasi skor SAW.`,
+            text: `Metrik ${countText} link terpilih akan diperbarui. Data lama tersimpan untuk indikator komparasi.`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#2563eb',

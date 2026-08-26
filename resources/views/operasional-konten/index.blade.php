@@ -61,6 +61,13 @@
             @endif
 
             <div class="p-6">
+                @if($campaigns->isEmpty())
+                    <div class="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-sm font-semibold flex items-center gap-3 shadow-xs">
+                        <svg class="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <span>Maaf, kamu masih belum ditugaskan campaign. Hubungi Admin Master untuk memberikan akses penugasan campaign.</span>
+                    </div>
+                @endif
+
                 <!-- Single Input Form -->
                 <form x-show="tab === 'single'" method="POST" action="{{ route('operasional-konten.store') }}" class="space-y-6">
                     @csrf
@@ -74,11 +81,15 @@
                         
                         <div>
                             <x-input-label for="campaign_id" value="Pilih Campaign" />
-                            <select id="campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Campaign --</option>
-                                @foreach($campaigns as $camp)
+                            <select id="campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
+                                @forelse($campaigns as $camp)
+                                    @if($loop->first)
+                                        <option value="">-- Pilih Campaign --</option>
+                                    @endif
                                     <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
+                                @endforelse
                             </select>
                         </div>
 
@@ -104,7 +115,7 @@
                     </div>
 
                     <div class="flex justify-end pt-4 border-t border-border mt-6">
-                        <x-primary-button>
+                        <x-primary-button :disabled="$campaigns->isEmpty()">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             Simpan & Antrean Scraping
                         </x-primary-button>
@@ -124,11 +135,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <x-input-label for="bulk_campaign_id" value="Pilih Campaign" />
-                            <select id="bulk_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Campaign --</option>
-                                @foreach($campaigns as $camp)
+                            <select id="bulk_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
+                                @forelse($campaigns as $camp)
+                                    @if($loop->first)
+                                        <option value="">-- Pilih Campaign --</option>
+                                    @endif
                                     <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
+                                @endforelse
                             </select>
                         </div>
                         <div>
@@ -152,7 +167,7 @@
                     </div>
                     
                     <div class="flex justify-end pt-4 border-t border-border mt-6">
-                        <x-primary-button>
+                        <x-primary-button :disabled="$campaigns->isEmpty()">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             Proses Bulk Link
                         </x-primary-button>
@@ -160,35 +175,110 @@
                 </form>
 
                 <!-- CSV Upload Form -->
-                <form x-show="tab === 'csv'" style="display: none;" method="POST" action="{{ route('operasional-konten.store') }}" enctype="multipart/form-data" class="space-y-6">
+                <form x-show="tab === 'csv'" style="display: none;" method="POST" action="{{ route('operasional-konten.store') }}" enctype="multipart/form-data" class="space-y-6" x-data="{ fileName: '', fileSize: '' }">
                     @csrf
                     <input type="hidden" name="type" value="csv">
                     
-                    <div class="flex items-center justify-center w-full mt-4">
-                        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-border border-dashed rounded-xl cursor-pointer bg-body hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-10 h-10 mb-3 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                <p class="mb-2 text-sm text-secondary"><span class="font-semibold text-brand-blue">Klik untuk upload</span> atau drag and drop</p>
-                                <p class="text-xs text-muted">CSV (MAX. 5MB)</p>
+                    <!-- Guide & Preview Header Table -->
+                    <div class="bg-body/60 border border-border rounded-xl p-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="p-1.5 rounded-lg bg-brand-blue/10 text-brand-blue">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-primary uppercase tracking-wider">Format Struktur Header CSV</h4>
+                                    <p class="text-[11px] text-secondary">Pastikan file CSV mengikuti struktur kolom di bawah ini (kolom pertama berisi URL Konten).</p>
+                                </div>
                             </div>
-                            <input id="dropzone-file" type="file" name="file" class="hidden" accept=".csv" required />
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">TikTok & Instagram</span>
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">Max 5MB</span>
+                            </div>
+                        </div>
+
+                        <!-- Mini Table Preview Header -->
+                        <div class="overflow-x-auto rounded-lg border border-border bg-surface">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-gray-100/70 dark:bg-gray-800/70 text-secondary uppercase text-[10px] border-b border-border">
+                                    <tr>
+                                        <th class="px-3 py-2 font-bold w-12 text-center">No</th>
+                                        <th class="px-3 py-2 font-bold">Header: URL Konten (Kolom 1)</th>
+                                        <th class="px-3 py-2 font-bold">Platform Otomatis</th>
+                                        <th class="px-3 py-2 font-bold text-center">Contoh Format URL</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border text-[11px]">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                                        <td class="px-3 py-1.5 text-center font-bold text-secondary">1</td>
+                                        <td class="px-3 py-1.5 font-mono text-brand-blue">https://www.tiktok.com/@user/video/12345...</td>
+                                        <td class="px-3 py-1.5 font-semibold text-primary">TikTok</td>
+                                        <td class="px-3 py-1.5 text-center text-muted">Video / Reels TikTok</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                                        <td class="px-3 py-1.5 text-center font-bold text-secondary">2</td>
+                                        <td class="px-3 py-1.5 font-mono text-brand-blue">https://www.instagram.com/p/Cxyz123...</td>
+                                        <td class="px-3 py-1.5 font-semibold text-primary">Instagram</td>
+                                        <td class="px-3 py-1.5 text-center text-muted">Post / Reels Instagram</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Dropzone File Upload -->
+                    <div class="flex items-center justify-center w-full">
+                        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-44 border-2 border-border border-dashed rounded-xl cursor-pointer bg-body hover:bg-gray-50/80 dark:hover:bg-gray-800/50 transition-all duration-200 group relative overflow-hidden" :class="{'border-status-success bg-status-success/5': fileName}">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                <template x-if="!fileName">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-12 h-12 mb-3 rounded-2xl bg-brand-blue/10 text-brand-blue flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                        </div>
+                                        <p class="mb-1 text-sm text-primary font-medium"><span class="font-bold text-brand-blue hover:underline">Klik untuk pilih file CSV</span> atau tarik file ke sini</p>
+                                        <p class="text-xs text-secondary">Format file yang didukung: <span class="font-semibold text-primary">.CSV</span> (Maksimal 5MB)</p>
+                                    </div>
+                                </template>
+                                
+                                <template x-if="fileName">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-12 h-12 mb-2 rounded-2xl bg-status-success/15 text-status-success flex items-center justify-center">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <p class="text-sm font-bold text-status-success truncate max-w-md" x-text="fileName"></p>
+                                        <p class="text-xs text-secondary mt-0.5">Ukuran File: <span class="font-semibold text-primary" x-text="fileSize"></span></p>
+                                        <span class="mt-2 text-[11px] text-brand-blue font-semibold hover:underline">Klik untuk mengganti file</span>
+                                    </div>
+                                </template>
+                            </div>
+                            <input id="dropzone-file" type="file" name="file" class="hidden" accept=".csv" required @change="
+                                if ($event.target.files.length > 0) {
+                                    fileName = $event.target.files[0].name;
+                                    fileSize = ($event.target.files[0].size / 1024).toFixed(1) + ' KB';
+                                }
+                            " />
                         </label>
                     </div>
 
+                    <!-- Target Configuration Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <x-input-label for="csv_campaign_id" value="Pilih Campaign" />
-                            <select id="csv_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Campaign --</option>
-                                @foreach($campaigns as $camp)
+                            <x-input-label for="csv_campaign_id" value="Pilih Target Campaign" />
+                            <select id="csv_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
+                                @forelse($campaigns as $camp)
+                                    @if($loop->first)
+                                        <option value="">-- Pilih Campaign --</option>
+                                    @endif
                                     <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
+                                @endforelse
                             </select>
                         </div>
                         <div>
                             <x-input-label for="csv_kategori_konten" value="Kategori Konten" />
                             <select id="csv_kategori_konten" name="kategori_konten_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
+                                <option value="">-- Pilih Kategori Konten --</option>
                                 @foreach($kategoriKonten as $kat)
                                     <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
                                 @endforeach
@@ -197,7 +287,7 @@
                         <div>
                             <x-input-label for="csv_kategori_creator" value="Kategori Creator" />
                             <select id="csv_kategori_creator" name="kategori_creator_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
+                                <option value="">-- Pilih Kategori Creator --</option>
                                 @foreach($kategoriCreator as $kat)
                                     <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
                                 @endforeach
@@ -205,14 +295,15 @@
                         </div>
                     </div> 
                     
-                    <div class="flex justify-between items-center pt-4 border-t border-border mt-6">
-                        <a href="{{ route('operasional-konten.template') }}" class="inline-flex items-center text-sm font-medium text-brand-blue hover:underline">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Download Template CSV
+                    <!-- Action Buttons Footer -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4 border-t border-border mt-6">
+                        <a href="{{ route('operasional-konten.template') }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-body border border-border text-brand-blue hover:bg-brand-blue/10 transition-colors shadow-2xs">
+                            <svg class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span>Download Template CSV Resmi</span>
                         </a>
-                        <x-primary-button>
+                        <x-primary-button :disabled="$campaigns->isEmpty()">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Upload File & Proses
+                            <span>Upload File & Proses Batch</span>
                         </x-primary-button>
                     </div>
                 </form>
@@ -318,13 +409,17 @@
                 <!-- Filter & Search Form -->
                 <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-3">
                     <!-- Campaign Filter -->
-                    <select name="campaign_id" onchange="this.form.submit()" class="text-xs border-border bg-body text-primary rounded-xl focus:border-brand-blue focus:ring-brand-blue py-2 px-3">
-                        <option value="">-- Semua Campaign --</option>
-                        @foreach($campaigns as $camp)
+                    <select name="campaign_id" onchange="this.form.submit()" class="text-xs border-border bg-body text-primary rounded-xl focus:border-brand-blue focus:ring-brand-blue py-2 px-3" {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
+                        @forelse($campaigns as $camp)
+                            @if($loop->first)
+                                <option value="">-- Semua Campaign --</option>
+                            @endif
                             <option value="{{ $camp->id }}" {{ request('campaign_id') == $camp->id ? 'selected' : '' }}>
                                 {{ $camp->nama_campaign }}
                             </option>
-                        @endforeach
+                        @empty
+                            <option value="" disabled selected>-- Belum Ada Campaign Ditugaskan --</option>
+                        @endforelse
                     </select>
 
                     <!-- Platform Filter -->

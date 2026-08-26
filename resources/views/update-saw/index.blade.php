@@ -1,12 +1,12 @@
 <x-app-layout>
-    <x-slot name="title">Update Campaign SAW - Kahfi Engagement</x-slot>
+    <x-slot name="title">Update Campaign - Kahfi Engagement</x-slot>
 
     <div class="space-y-6">
         <!-- Header & Description -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border shadow-xs">
             <div>
-                <h2 class="text-2xl font-bold text-primary tracking-tight">Update Campaign SAW</h2>
-                <p class="text-sm text-secondary mt-1">Pilih Campaign untuk menjalankan Re-Scraping Apify secara massal atau parsial, serta pantau kenaikan metrik & skor SAW secara real-time.</p>
+                <h2 class="text-2xl font-bold text-primary tracking-tight">Update Campaign</h2>
+                <p class="text-sm text-secondary mt-1">Pilih Campaign untuk menjalankan Re-Scraping Apify secara massal atau parsial, serta pantau kenaikan metrik secara real-time.</p>
             </div>
             
             <!-- Search & Platform Filter -->
@@ -96,9 +96,9 @@
                             </span>
                         </div>
                         <div class="bg-body/60 p-2 rounded-lg">
-                            <span class="text-[10px] text-secondary font-medium block">Rata SAW</span>
-                            <span class="text-xs font-bold text-purple-600 dark:text-purple-400 mt-0.5 block">
-                                {{ number_format($campaign->avg_saw_score, 4) }}
+                            <span class="text-[10px] text-secondary font-medium block">Avg ER (%)</span>
+                            <span class="text-xs font-bold text-brand-blue mt-0.5 block">
+                                {{ number_format($campaign->avg_er ?? 0, 2) }}%
                             </span>
                         </div>
                     </div>

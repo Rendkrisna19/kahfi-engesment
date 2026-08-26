@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\UserCampaignAccess;
 use Exception;
 
 class LinkController extends Controller
@@ -21,12 +23,31 @@ class LinkController extends Controller
      */
     public function index(Request $request)
     {
-        $campaigns = Campaign::orderBy('nama_campaign', 'asc')->get();
+        $user = Auth::user();
         $kategoriKonten = KategoriKonten::orderBy('nama', 'asc')->get();
         $kategoriCreator = KategoriCreator::orderBy('nama', 'asc')->get();
 
-        $query = Link::with(['campaign', 'kategoriKonten', 'kategoriCreator'])
-            ->orderBy('id', 'desc');
+        if ($user->hasRole('Admin Master') || $user->role === 'Admin Master') {
+            $campaigns = Campaign::orderBy('nama_campaign', 'asc')->get();
+        } elseif ($user->hasRole('Admin') || $user->role === 'Admin') {
+            $accessIds = UserCampaignAccess::where('user_id', $user->id)->pluck('campaign_id');
+            $campaigns = Campaign::whereIn('id', $accessIds)->orderBy('nama_campaign', 'asc')->get();
+        } elseif ($user->hasRole('Client') || $user->role === 'Client') {
+            $campaigns = Campaign::where('client_id', $user->id)->orderBy('nama_campaign', 'asc')->get();
+        } else {
+            $campaigns = collect();
+        }
+
+        $campaignIds = $campaigns->pluck('id');
+
+        $query = Link::with(['campaign', 'kategoriKonten', 'kategoriCreator']);
+
+        // Scope data link sesuai campaign yang bisa diakses user
+        if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
+            $query->whereIn('campaign_id', $campaignIds);
+        }
+
+        $query->orderBy('id', 'desc');
 
         // Filter Campaign jika dipilih
         if ($request->filled('campaign_id')) {
@@ -70,7 +91,12 @@ class LinkController extends Controller
         }
 
         $links = $query->paginate(15)->withQueryString();
-        $pendingCount = Link::where('status_scraping', 'Pending')->count();
+
+        $pendingCountQuery = Link::where('status_scraping', 'Pending');
+        if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
+            $pendingCountQuery->whereIn('campaign_id', $campaignIds);
+        }
+        $pendingCount = $pendingCountQuery->count();
 
         return view('operasional-konten.index', compact('campaigns', 'kategoriKonten', 'kategoriCreator', 'links', 'pendingCount'));
     }
@@ -80,6 +106,23 @@ class LinkController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Validasi akses ke campaign
+        if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
+            if ($user->hasRole('Admin') || $user->role === 'Admin') {
+                $allowedIds = UserCampaignAccess::where('user_id', $user->id)->pluck('campaign_id')->toArray();
+            } elseif ($user->hasRole('Client') || $user->role === 'Client') {
+                $allowedIds = Campaign::where('client_id', $user->id)->pluck('id')->toArray();
+            } else {
+                $allowedIds = [];
+            }
+
+            if (!in_array($request->campaign_id, $allowedIds)) {
+                return redirect()->back()->with('error', 'Maaf, kamu masih belum ditugaskan campaign ini.');
+            }
+        }
+
         $request->validate([
             'type' => 'required|in:single,bulk,csv',
             'campaign_id' => 'required|exists:campaigns,id',

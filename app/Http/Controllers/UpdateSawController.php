@@ -18,9 +18,12 @@ class UpdateSawController extends Controller
         $user = Auth::user();
         $query = Campaign::withCount('links');
 
-        // Scope filter jika Client
-        if ($user->hasRole('Client')) {
+        // Scope filter berdasarkan Role User
+        if ($user->hasRole('Client') || $user->role === 'Client') {
             $query->where('client_id', $user->id);
+        } elseif (($user->hasRole('Admin') || $user->role === 'Admin') && !($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
+            $accessIds = \App\Models\UserCampaignAccess::where('user_id', $user->id)->pluck('campaign_id');
+            $query->whereIn('id', $accessIds);
         }
 
         if ($request->filled('search')) {
@@ -45,6 +48,7 @@ class UpdateSawController extends Controller
             $links = Link::where('campaign_id', $campaign->id)->get();
             $campaign->total_views = $links->sum('views');
             $campaign->total_likes = $links->sum('likes');
+            $campaign->avg_er = $links->avg('engagement_rate') ?? 0;
             $campaign->avg_saw_score = $links->avg('saw_score') ?? 0;
             $campaign->last_rescrape = $links->max('last_rescraped_at') ?? $links->max('updated_at');
             $campaign->pending_count = $links->where('status_scraping', 'Pending')->count();
@@ -62,8 +66,15 @@ class UpdateSawController extends Controller
         $user = Auth::user();
         $campaign = Campaign::findOrFail($id);
 
-        if ($user->hasRole('Client') && $campaign->client_id !== $user->id) {
+        if (($user->hasRole('Client') || $user->role === 'Client') && $campaign->client_id !== $user->id) {
             abort(403, 'Anda tidak memiliki akses ke Campaign ini.');
+        }
+
+        if (($user->hasRole('Admin') || $user->role === 'Admin') && !($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
+            $hasAccess = \App\Models\UserCampaignAccess::where('user_id', $user->id)->where('campaign_id', $campaign->id)->exists();
+            if (!$hasAccess) {
+                abort(403, 'Anda tidak memiliki akses ke Campaign ini.');
+            }
         }
 
         $query = Link::where('campaign_id', $campaign->id);
