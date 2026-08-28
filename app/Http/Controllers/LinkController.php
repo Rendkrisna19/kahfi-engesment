@@ -178,30 +178,88 @@ class LinkController extends Controller
             }
         } elseif ($request->type === 'csv') {
             $request->validate([
-                'file' => 'required|file|mimes:csv,txt|max:5120',
+                'file' => 'required|file|max:10240',
             ]);
 
-            if (($handle = fopen($request->file('file')->getRealPath(), 'r')) !== false) {
-                fgetcsv($handle, 1000, ','); // Skip baris header
+            $targetCampaign = Campaign::find($request->campaign_id);
+            $targetPlatform = $targetCampaign ? $targetCampaign->platform : null;
 
-                while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                    if (isset($data[0]) && filter_var(trim($data[0]), FILTER_VALIDATE_URL)) {
-                        $url = strtok(trim($data[0]), '?');
-                        $platform = $this->detectPlatform($url);
+            $filePath = $request->file('file')->getRealPath();
+            $fileContents = file_get_contents($filePath);
 
-                        Link::create([
-                            'campaign_id' => $request->campaign_id,
-                            'kategori_konten_id' => $request->kategori_konten_id,
-                            'kategori_creator_id' => $request->kategori_creator_id,
-                            'url' => $url,
-                            'platform' => $platform,
-                            'tanggal_upload' => now()->toDateString(),
-                            'status_scraping' => 'Pending'
-                        ]);
-                        $insertedCount++;
+            $rawUrls = [];
+
+            // Check if file is HTML table format (.xls created from template)
+            if (str_contains($fileContents, '<tr') || str_contains($fileContents, '<td')) {
+                // Parse HTML rows line by line to extract URLs from table cells only
+                preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $fileContents, $trMatches);
+                if (!empty($trMatches[1])) {
+                    foreach ($trMatches[1] as $trContent) {
+                        // Skip instruction and banner rows
+                        if (str_contains($trContent, 'PETUNJUK PENGISIAN') || str_contains($trContent, 'th-header') || str_contains($trContent, 'title-banner')) {
+                            continue;
+                        }
+
+                        preg_match_all('/<td[^>]*>(.*?)<\/td>/is', $trContent, $tdMatches);
+                        if (!empty($tdMatches[1])) {
+                            // Extract URL from column A or any cell in this row
+                            foreach ($tdMatches[1] as $cellValue) {
+                                $cleanCell = trim(strip_tags($cellValue));
+                                if (preg_match('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $cleanCell, $urlMatch)) {
+                                    $rawUrls[] = $urlMatch[0];
+                                    break; // Only take 1 URL per table row
+                                }
+                            }
+                        }
                     }
                 }
-                fclose($handle);
+            }
+
+            // Fallback for CSV / Plain Text if HTML parsing didn't find URLs
+            if (empty($rawUrls)) {
+                preg_match_all('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $fileContents, $matches);
+                if (!empty($matches[0])) {
+                    $rawUrls = $matches[0];
+                }
+            }
+
+            $extractedUrls = [];
+            foreach ($rawUrls as $rawUrl) {
+                $cleanUrl = strtok(trim($rawUrl), '?');
+                if (filter_var($cleanUrl, FILTER_VALIDATE_URL)) {
+                    $extractedUrls[] = $cleanUrl;
+                }
+            }
+
+            $extractedUrls = array_unique($extractedUrls);
+
+            foreach ($extractedUrls as $url) {
+                $detectedPlatform = $this->detectPlatform($url);
+
+                // Platform Validation & Filtering based on Selected Target Campaign
+                if ($targetPlatform && in_array($targetPlatform, ['TikTok', 'Instagram'])) {
+                    // Skip Instagram links when TikTok campaign is selected, and vice versa
+                    if ($targetPlatform === 'TikTok' && $detectedPlatform === 'Instagram') {
+                        continue;
+                    }
+                    if ($targetPlatform === 'Instagram' && $detectedPlatform === 'TikTok') {
+                        continue;
+                    }
+                    $finalPlatform = $targetPlatform;
+                } else {
+                    $finalPlatform = $detectedPlatform;
+                }
+
+                Link::create([
+                    'campaign_id' => $request->campaign_id,
+                    'kategori_konten_id' => $request->kategori_konten_id,
+                    'kategori_creator_id' => $request->kategori_creator_id,
+                    'url' => $url,
+                    'platform' => $finalPlatform,
+                    'tanggal_upload' => now()->toDateString(),
+                    'status_scraping' => 'Pending'
+                ]);
+                $insertedCount++;
             }
         }
 
@@ -210,24 +268,103 @@ class LinkController extends Controller
     }
 
     /**
-     * Download template format CSV untuk upload bulk
+     * Download template format Excel / CSV untuk upload bulk
      */
-    public function downloadTemplate()
+    public function downloadTemplate(Request $request)
     {
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="template_upload_link.csv"',
-        ];
+        $format = $request->query('format', 'excel');
 
-        $callback = function () {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, ['URL Konten']);
-            fputcsv($file, ['https://www.tiktok.com/@creator/video/1234567890']);
-            fputcsv($file, ['https://www.instagram.com/p/Cxyz123456/']);
-            fclose($file);
-        };
+        if ($format === 'csv') {
+            $headers = [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+                'Content-Disposition' => 'attachment; filename="template_upload_link.csv"',
+            ];
 
-        return response()->stream($callback, 200, $headers);
+            $callback = function () {
+                $file = fopen('php://output', 'w');
+                // UTF-8 BOM for Excel CSV compatibility
+                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+                fputcsv($file, ['URL Konten', 'Platform', 'Keterangan']);
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        }
+
+        // Default: Excel (.xls) template with styled table borders and gridlines
+        $filename = "template_upload_link.xls";
+
+        $html = '<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--[if gte mso 9]>
+    <xml>
+        <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                    <x:Name>Template Upload Link</x:Name>
+                    <x:WorksheetOptions>
+                        <x:DisplayGridlines/>
+                    </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+    </xml>
+    <![endif]-->
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 10pt; color: #1f2937; }
+        .title-banner { font-size: 14pt; font-weight: bold; color: #ffffff; background-color: #1e3a8a; text-align: center; height: 35px; vertical-align: middle; border: 2px solid #1e3a8a; }
+        .instruction-banner { font-size: 9.5pt; color: #1e40af; background-color: #eff6ff; padding: 10px; border: 1px solid #93c5fd; text-align: left; vertical-align: middle; }
+        .th-header { font-size: 11pt; font-weight: bold; color: #ffffff; background-color: #1e40af; text-align: center; vertical-align: middle; height: 30px; border: 1px solid #111827; }
+        .td-no { text-align: center; vertical-align: middle; border: 1px solid #4b5563; background-color: #f3f4f6; font-weight: bold; color: #374151; }
+        .td-empty { text-align: left; vertical-align: middle; border: 1px solid #9ca3af; background-color: #ffffff; height: 24px; }
+    </style>
+</head>
+<body>
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <tr>
+            <td colspan="4" class="title-banner">TEMPLATE UPLOAD LINK KONTEN - KAHFI ENGAGEMENT</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="instruction-banner">
+                <b>PETUNJUK PENGISIAN:</b><br/>
+                1. Masukkan URL video TikTok atau postingan Instagram pada kolom <b>URL Konten (Kolom A)</b>.<br/>
+                2. Pastikan URL lengkap diawali dengan <b>http://</b> atau <b>https://</b>.<br/>
+                3. Kolom <b>Platform</b> dan <b>Keterangan</b> bersifat opsional (sistem akan otomatis mendeteksi platform).<br/>
+                4. <b>CONTOH FORMAT URL:</b><br/>
+                   - TikTok: <i>https://www.tiktok.com/@creator/video/1234567890</i><br/>
+                   - Instagram: <i>https://www.instagram.com/p/Cxyz123456/</i>
+            </td>
+        </tr>
+        <tr><td colspan="4" style="height: 10px; border: none; background-color: #ffffff;"></td></tr>
+        <tr>
+            <th style="width: 45px;" class="th-header">No</th>
+            <th style="width: 450px;" class="th-header">URL Konten (TikTok / Instagram) *Wajib</th>
+            <th style="width: 120px;" class="th-header">Platform</th>
+            <th style="width: 200px;" class="th-header">Keterangan</th>
+        </tr>';
+
+        for ($i = 1; $i <= 20; $i++) {
+            $html .= '
+        <tr>
+            <td class="td-no">' . $i . '</td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
+        </tr>';
+        }
+
+        $html .= '
+    </table>
+</body>
+</html>';
+
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 
     /**
@@ -240,6 +377,72 @@ class LinkController extends Controller
             dd('Masuk ke halaman show!', $link->toArray());
         }
         return view('operasional-konten.show', compact('link'));
+    }
+
+    /**
+     * Update metrik engagement link secara manual (Views, Likes, Comments, Shares, Saves)
+     */
+    public function update(Request $request, $id)
+    {
+        $link = Link::findOrFail($id);
+
+        // Security check: status Gagal cannot be edited
+        if ($link->status_scraping === 'Gagal') {
+            return redirect()->back()->with('error', 'Link dengan status Gagal tidak dapat diedit secara manual.');
+        }
+
+        // Check user access to this campaign
+        $user = auth()->user();
+        if ($user->hasRole('Admin')) {
+            $allowedIds = UserCampaignAccess::where('user_id', $user->id)->pluck('campaign_id')->toArray();
+            if (!in_array($link->campaign_id, $allowedIds)) {
+                return redirect()->back()->with('error', 'Maaf, Anda tidak memiliki akses ke campaign ini.');
+            }
+        }
+
+        $validated = $request->validate([
+            'username' => 'nullable|string|max:255',
+            'tanggal_upload' => 'nullable|date',
+            'views' => 'required|numeric|min:0',
+            'likes' => 'required|numeric|min:0',
+            'comments' => 'required|numeric|min:0',
+            'shares' => 'required|numeric|min:0',
+            'saves' => 'required|numeric|min:0',
+        ]);
+
+        $views = (int) $validated['views'];
+        $likes = (int) $validated['likes'];
+        $comments = (int) $validated['comments'];
+        $shares = (int) $validated['shares'];
+        $saves = (int) $validated['saves'];
+
+        // Calculate Engagement Rate: (Likes + Comments + Shares) / Views * 100
+        $er = 0;
+        if ($views > 0) {
+            $er = (($likes + $comments + $shares) / $views) * 100;
+        }
+
+        // If status was Pending, update status to Completed because metrics are now entered manually
+        $statusScraping = in_array($link->status_scraping, ['Pending']) ? 'Completed' : $link->status_scraping;
+
+        $link->update([
+            'username' => $validated['username'] ?? $link->username,
+            'tanggal_upload' => $validated['tanggal_upload'] ?? $link->tanggal_upload,
+            'views' => $views,
+            'likes' => $likes,
+            'comments' => $comments,
+            'shares' => $shares,
+            'saves' => $saves,
+            'engagement_rate' => min(100, round($er, 2)),
+            'status_scraping' => $statusScraping,
+            'updated_at' => now(),
+        ]);
+
+        // Recalculate SAW score for the campaign
+        $this->calculateSawScoresForCampaign($link->campaign_id);
+
+        return redirect()->route('operasional-konten.index')
+            ->with('success', "Berhasil memperbarui metrik engagement untuk link secara manual!");
     }
 
     /**
@@ -553,6 +756,69 @@ class LinkController extends Controller
 
             $link->update([
                 'saw_score' => round($sawScore, 4)
+            ]);
+        }
+    }
+
+    /**
+     * Cek Saldo & Limit Kuota Apify Account
+     */
+    public function getApifyStatus()
+    {
+        $token = env('APIFY_TOKEN', env('APIFY_API_TOKEN'));
+        if (empty($token)) {
+            return response()->json([
+                'configured' => false,
+                'message' => 'Token Apify belum dikonfigurasi di .env'
+            ]);
+        }
+
+        try {
+            $response = Http::timeout(8)
+                ->withToken($token)
+                ->get('https://api.apify.com/v2/users/me');
+
+            if ($response->successful()) {
+                $userData = $response->json('data', []);
+
+                $username = $userData['username'] ?? ($userData['email'] ?? 'User Apify');
+                $planName = $userData['plan']['name'] ?? ($userData['plan']['id'] ?? 'Free');
+
+                $maxUsageUsd = (float)($userData['plan']['maxMonthlyUsageUsd'] 
+                    ?? ($userData['limits']['monthlyUsageUsd'] ?? 5.00));
+                    
+                $currentUsageUsd = (float)($userData['monthlyUsage']['totalUsageUsd'] 
+                    ?? ($userData['stats']['usageUsd'] ?? 0.00));
+
+                if (!isset($userData['monthlyUsage']['totalUsageUsd'])) {
+                    $usageRes = Http::timeout(5)->withToken($token)->get('https://api.apify.com/v2/users/me/usage/monthly');
+                    if ($usageRes->successful()) {
+                        $currentUsageUsd = (float)$usageRes->json('data.totalUsageUsd', $currentUsageUsd);
+                    }
+                }
+
+                $remainingUsd = max(0, $maxUsageUsd - $currentUsageUsd);
+                $percentageUsed = $maxUsageUsd > 0 ? min(100, round(($currentUsageUsd / $maxUsageUsd) * 100, 1)) : 0;
+
+                return response()->json([
+                    'configured' => true,
+                    'username' => $username,
+                    'plan_name' => $planName,
+                    'usage_usd' => number_format($currentUsageUsd, 2),
+                    'limit_usd' => number_format($maxUsageUsd, 2),
+                    'remaining_usd' => number_format($remainingUsd, 2),
+                    'percentage_used' => $percentageUsed
+                ]);
+            }
+
+            return response()->json([
+                'configured' => false,
+                'message' => 'Gagal mengontak Apify API (Status: ' . $response->status() . ')'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'configured' => false,
+                'message' => 'Koneksi Apify error: ' . $e->getMessage()
             ]);
         }
     }

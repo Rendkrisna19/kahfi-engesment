@@ -176,6 +176,7 @@ Route::middleware(['auth', 'can:operasional-konten.view'])
     ->prefix('operasional-konten')
     ->group(function () {
         Route::get('/template', [\App\Http\Controllers\LinkController::class, 'downloadTemplate'])->name('operasional-konten.template');
+        Route::get('/apify-status', [\App\Http\Controllers\LinkController::class, 'getApifyStatus'])->name('apify.status');
         Route::get('/test-apify', [\App\Http\Controllers\LinkController::class, 'testApifyConnection'])->name('operasional-konten.test-apify');
         Route::get('/', [\App\Http\Controllers\LinkController::class, 'index'])->name('operasional-konten.index');
         Route::get('/{operasional_konten}', [\App\Http\Controllers\LinkController::class, 'show'])->name('operasional-konten.show');
@@ -183,6 +184,7 @@ Route::middleware(['auth', 'can:operasional-konten.view'])
         Route::middleware('can:operasional-konten.create')->group(function () {
             Route::post('/store', [\App\Http\Controllers\LinkController::class, 'store'])->name('operasional-konten.store');
             Route::post('/refresh', [\App\Http\Controllers\LinkController::class, 'refreshData'])->name('operasional-konten.refresh');
+            Route::put('/{operasional_konten}', [\App\Http\Controllers\LinkController::class, 'update'])->name('operasional-konten.update');
         });
 
         Route::middleware('can:operasional-konten.delete')->group(function () {

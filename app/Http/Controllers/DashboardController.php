@@ -106,12 +106,12 @@ class DashboardController extends Controller
             ->take(20)
             ->get();
 
-        // Data Tren Kenaikan Views Pasca Update
+        // Data Tren Kenaikan Views Pasca Update (Grouped by Date)
         $viewsTrendData = (clone $query)
-            ->selectRaw("DATE_FORMAT(COALESCE(last_rescraped_at, updated_at, tanggal_upload), '%d %b') as date_label, SUM(views) as total_views, SUM(GREATEST(0, views - COALESCE(prev_views, 0))) as views_increase")
-            ->groupBy('date_label')
-            ->orderByRaw("MIN(COALESCE(last_rescraped_at, updated_at, tanggal_upload)) ASC")
-            ->take(10)
+            ->selectRaw("DATE(COALESCE(last_rescraped_at, updated_at, tanggal_upload)) as full_date, DATE_FORMAT(COALESCE(last_rescraped_at, updated_at, tanggal_upload), '%d %b %Y') as date_label, SUM(views) as total_views, SUM(GREATEST(0, views - COALESCE(prev_views, 0))) as views_increase")
+            ->groupBy('full_date', 'date_label')
+            ->orderBy('full_date', 'asc')
+            ->take(15)
             ->get();
 
         // Links for Table

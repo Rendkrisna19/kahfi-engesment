@@ -23,6 +23,73 @@
         isLoaded: false,
         selectedIds: [],
         selectAll: false,
+        editModalOpen: false,
+        deleteConfirmOpen: false,
+        deleteTargetForm: null,
+        deleteConfirmTitle: '',
+        deleteConfirmMessage: '',
+        editForm: {
+            id: null,
+            url: '',
+            username: '',
+            platform: '',
+            campaign_name: '',
+            tanggal_upload: '',
+            views: 0,
+            likes: 0,
+            comments: 0,
+            shares: 0,
+            saves: 0,
+            status: ''
+        },
+        updateUrl: '',
+        openEditModal(link) {
+            if (link.status_scraping === 'Gagal') {
+                alert('Link dengan status Gagal tidak dapat diedit secara manual!');
+                return;
+            }
+            this.editForm = {
+                id: link.id,
+                url: link.url,
+                username: link.username || '',
+                platform: link.platform || '',
+                campaign_name: link.campaign_name || '-',
+                tanggal_upload: link.tanggal_upload || '',
+                views: link.views || 0,
+                likes: link.likes || 0,
+                comments: link.comments || 0,
+                shares: link.shares || 0,
+                saves: link.saves || 0,
+                status: link.status_scraping
+            };
+            this.updateUrl = '{{ url('operasional-konten') }}/' + link.id;
+            this.editModalOpen = true;
+        },
+        triggerDeleteConfirm(formElement, isBulk = false) {
+            this.deleteTargetForm = formElement;
+            if (isBulk) {
+                this.deleteConfirmTitle = 'Hapus Link Terpilih (' + this.selectedIds.length + ' Item)';
+                this.deleteConfirmMessage = 'Apakah Anda yakin ingin menghapus ' + this.selectedIds.length + ' link terpilih? Data metrik dan skor SAW akan diperbarui.';
+            } else {
+                this.deleteConfirmTitle = 'Hapus Link Konten';
+                this.deleteConfirmMessage = 'Apakah Anda yakin ingin menghapus link ini? Data metrik dan skor SAW akan diperbarui.';
+            }
+            this.deleteConfirmOpen = true;
+        },
+        submitDelete() {
+            if (this.deleteTargetForm) {
+                this.deleteTargetForm.submit();
+            }
+        },
+        get calculatedER() {
+            const v = parseFloat(this.editForm.views) || 0;
+            const l = parseFloat(this.editForm.likes) || 0;
+            const c = parseFloat(this.editForm.comments) || 0;
+            const s = parseFloat(this.editForm.shares) || 0;
+            if (v <= 0) return '0.00';
+            const er = ((l + c + s) / v) * 100;
+            return er.toFixed(2);
+        },
         toggleAll() {
             this.selectAll = !this.selectAll;
             if (this.selectAll) {
@@ -80,37 +147,18 @@
                         </div>
                         
                         <div>
-                            <x-input-label for="campaign_id" value="Pilih Campaign" />
-                            <select id="campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
-                                @forelse($campaigns as $camp)
-                                    @if($loop->first)
-                                        <option value="">-- Pilih Campaign --</option>
-                                    @endif
-                                    <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @empty
-                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
-                                @endforelse
-                            </select>
+                            <x-input-label for="single_campaign_id" value="Pilih Campaign" />
+                            <x-custom-select name="campaign_id" id="single_campaign_id" :options="$campaigns" placeholder="-- Pilih Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Maaf kamu masih blm ditugaskan campign --" required class="mt-1" />
                         </div>
 
                         <div>
-                            <x-input-label for="kategori_konten" value="Kategori Konten" />
-                            <select id="kategori_konten" name="kategori_konten_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach($kategoriKonten as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-input-label for="single_kategori_konten" value="Kategori Konten" />
+                            <x-custom-select name="kategori_konten_id" id="single_kategori_konten" :options="$kategoriKonten" placeholder="-- Pilih Kategori --" required class="mt-1" />
                         </div>
 
                         <div>
-                            <x-input-label for="kategori_creator" value="Kategori Creator" />
-                            <select id="kategori_creator" name="kategori_creator_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue focus:ring-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach($kategoriCreator as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-input-label for="single_kategori_creator" value="Kategori Creator" />
+                            <x-custom-select name="kategori_creator_id" id="single_kategori_creator" :options="$kategoriCreator" placeholder="-- Pilih Kategori --" required class="mt-1" />
                         </div>
                     </div>
 
@@ -135,34 +183,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <x-input-label for="bulk_campaign_id" value="Pilih Campaign" />
-                            <select id="bulk_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
-                                @forelse($campaigns as $camp)
-                                    @if($loop->first)
-                                        <option value="">-- Pilih Campaign --</option>
-                                    @endif
-                                    <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @empty
-                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
-                                @endforelse
-                            </select>
+                            <x-custom-select name="campaign_id" id="bulk_campaign_id" :options="$campaigns" placeholder="-- Pilih Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Maaf kamu masih blm ditugaskan campign --" required class="mt-1" />
                         </div>
                         <div>
                             <x-input-label for="bulk_kategori_konten" value="Kategori Konten" />
-                            <select id="bulk_kategori_konten" name="kategori_konten_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach($kategoriKonten as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-custom-select name="kategori_konten_id" id="bulk_kategori_konten" :options="$kategoriKonten" placeholder="-- Pilih Kategori --" required class="mt-1" />
                         </div>
                         <div>
                             <x-input-label for="bulk_kategori_creator" value="Kategori Creator" />
-                            <select id="bulk_kategori_creator" name="kategori_creator_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach($kategoriCreator as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-custom-select name="kategori_creator_id" id="bulk_kategori_creator" :options="$kategoriCreator" placeholder="-- Pilih Kategori --" required class="mt-1" />
                         </div>
                     </div>
                     
@@ -277,8 +306,8 @@
                                         <div class="w-12 h-12 mb-3 rounded-2xl bg-brand-blue/10 text-brand-blue flex items-center justify-center group-hover:scale-110 transition-transform">
                                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                                         </div>
-                                        <p class="mb-1 text-sm text-primary font-medium"><span class="font-bold text-brand-blue hover:underline">Klik untuk pilih file CSV</span> atau tarik file ke sini</p>
-                                        <p class="text-xs text-secondary">Format file yang didukung: <span class="font-semibold text-primary">.CSV</span> (Maksimal 5MB)</p>
+                                        <p class="mb-1 text-sm text-primary font-medium"><span class="font-bold text-brand-blue hover:underline">Klik untuk pilih file Excel / CSV</span> atau tarik file ke sini</p>
+                                        <p class="text-xs text-secondary">Format file yang didukung: <span class="font-semibold text-primary">.XLS, .XLSX, .CSV</span> (Maksimal 10MB)</p>
                                     </div>
                                 </template>
                                 
@@ -293,7 +322,7 @@
                                     </div>
                                 </template>
                             </div>
-                            <input id="dropzone-file" type="file" name="file" class="hidden" accept=".csv" required @change="
+                            <input id="dropzone-file" type="file" name="file" class="hidden" accept=".csv,.xls,.xlsx,.txt" required @change="
                                 if ($event.target.files.length > 0) {
                                     fileName = $event.target.files[0].name;
                                     fileSize = ($event.target.files[0].size / 1024).toFixed(1) + ' KB';
@@ -306,43 +335,32 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <x-input-label for="csv_campaign_id" value="Pilih Target Campaign" />
-                            <select id="csv_campaign_id" name="campaign_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
-                                @forelse($campaigns as $camp)
-                                    @if($loop->first)
-                                        <option value="">-- Pilih Campaign --</option>
-                                    @endif
-                                    <option value="{{ $camp->id }}">{{ $camp->nama_campaign }}</option>
-                                @empty
-                                    <option value="" disabled selected>-- Maaf kamu masih blm ditugaskan campign --</option>
-                                @endforelse
-                            </select>
+                            <x-custom-select name="campaign_id" id="csv_campaign_id" :options="$campaigns" placeholder="-- Pilih Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Maaf kamu masih blm ditugaskan campign --" required class="mt-1" />
                         </div>
                         <div>
                             <x-input-label for="csv_kategori_konten" value="Kategori Konten" />
-                            <select id="csv_kategori_konten" name="kategori_konten_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori Konten --</option>
-                                @foreach($kategoriKonten as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-custom-select name="kategori_konten_id" id="csv_kategori_konten" :options="$kategoriKonten" placeholder="-- Pilih Kategori Konten --" required class="mt-1" />
                         </div>
                         <div>
                             <x-input-label for="csv_kategori_creator" value="Kategori Creator" />
-                            <select id="csv_kategori_creator" name="kategori_creator_id" class="mt-1 block w-full border-border bg-body text-primary rounded-lg focus:border-brand-blue shadow-sm" required>
-                                <option value="">-- Pilih Kategori Creator --</option>
-                                @foreach($kategoriCreator as $kat)
-                                    <option value="{{ $kat->id }}">{{ $kat->nama }}</option>
-                                @endforeach
-                            </select>
+                            <x-custom-select name="kategori_creator_id" id="csv_kategori_creator" :options="$kategoriCreator" placeholder="-- Pilih Kategori Creator --" required class="mt-1" />
                         </div>
                     </div> 
                     
                     <!-- Action Buttons Footer -->
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4 border-t border-border mt-6">
-                        <a href="{{ route('operasional-konten.template') }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-body border border-border text-brand-blue hover:bg-brand-blue/10 transition-colors shadow-2xs">
-                            <svg class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Download Template CSV Resmi</span>
-                        </a>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Download Excel Template with Table & Borders -->
+                            <a href="{{ route('operasional-konten.template', ['format' => 'excel']) }}" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-2xs">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span>Download Template Excel (.XLS)</span>
+                                <span class="bg-white/20 text-[10px] px-1.5 py-0.5 rounded font-medium">Tabel & Border</span>
+                            </a>
+                            <!-- Download CSV Template -->
+                            <a href="{{ route('operasional-konten.template', ['format' => 'csv']) }}" class="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-body border border-border text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <span>CSV</span>
+                            </a>
+                        </div>
                         <x-primary-button :disabled="$campaigns->isEmpty()">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             <span>Upload File & Proses Batch</span>
@@ -433,7 +451,7 @@
                     @can('operasional-konten.delete')
                     <div x-show="selectedIds.length > 0" style="display: none;" class="flex items-center gap-2 bg-status-danger/10 text-status-danger px-3 py-1.5 rounded-xl border border-status-danger/20">
                         <span class="text-xs font-bold" x-text="selectedIds.length + ' dipilih'"></span>
-                        <form method="POST" action="{{ route('operasional-konten.destroy-bulk') }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semua link terpilih?');">
+                        <form method="POST" action="{{ route('operasional-konten.destroy-bulk') }}" @submit.prevent="triggerDeleteConfirm($el, true)">
                             @csrf
                             @method('DELETE')
                             <template x-for="id in selectedIds" :key="id">
@@ -451,25 +469,10 @@
                 <!-- Filter & Search Form -->
                 <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-3">
                     <!-- Campaign Filter -->
-                    <select name="campaign_id" onchange="this.form.submit()" class="text-xs border-border bg-body text-primary rounded-xl focus:border-brand-blue focus:ring-brand-blue py-2 px-3" {{ $campaigns->isEmpty() ? 'disabled' : '' }}>
-                        @forelse($campaigns as $camp)
-                            @if($loop->first)
-                                <option value="">-- Semua Campaign --</option>
-                            @endif
-                            <option value="{{ $camp->id }}" {{ request('campaign_id') == $camp->id ? 'selected' : '' }}>
-                                {{ $camp->nama_campaign }}
-                            </option>
-                        @empty
-                            <option value="" disabled selected>-- Belum Ada Campaign Ditugaskan --</option>
-                        @endforelse
-                    </select>
+                    <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign Ditugaskan --" onChange="this.form.submit()" class="min-w-[170px]" />
 
                     <!-- Platform Filter -->
-                    <select name="platform" onchange="this.form.submit()" class="text-xs border-border bg-body text-primary rounded-xl focus:border-brand-blue focus:ring-brand-blue py-2 px-3">
-                        <option value="">-- Semua Platform --</option>
-                        <option value="TikTok" {{ request('platform') == 'TikTok' ? 'selected' : '' }}>TikTok</option>
-                        <option value="Instagram" {{ request('platform') == 'Instagram' ? 'selected' : '' }}>Instagram</option>
-                    </select>
+                    <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" class="min-w-[150px]" />
 
                     <!-- Date Range Filter -->
                     <div class="flex items-center gap-1 bg-body border border-border rounded-xl px-2 py-1">
@@ -622,8 +625,34 @@
                                     <a href="{{ route('operasional-konten.show', $link->id) }}" class="text-secondary hover:text-brand-blue p-1.5 rounded-lg hover:bg-brand-blue/10 transition-colors" title="Lihat Detail">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                     </a>
+
+                                    @can('operasional-konten.create')
+                                        @if($link->status_scraping === 'Gagal')
+                                            <button type="button" class="text-gray-300 dark:text-gray-600 p-1.5 rounded-lg cursor-not-allowed" title="Data Gagal Scraping tidak dapat diedit" disabled>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </button>
+                                        @else
+                                            <button type="button" @click="openEditModal({{ json_encode([
+                                                'id' => $link->id,
+                                                'url' => $link->url,
+                                                'username' => $link->username ?? '',
+                                                'platform' => $link->platform ?? '',
+                                                'campaign_name' => $link->campaign->nama_campaign ?? '-',
+                                                'tanggal_upload' => $link->tanggal_upload ? \Carbon\Carbon::parse($link->tanggal_upload)->format('Y-m-d') : '',
+                                                'views' => $link->views ?? 0,
+                                                'likes' => $link->likes ?? 0,
+                                                'comments' => $link->comments ?? 0,
+                                                'shares' => $link->shares ?? 0,
+                                                'saves' => $link->saves ?? 0,
+                                                'status_scraping' => $link->status_scraping
+                                            ]) }})" class="text-secondary hover:text-brand-blue p-1.5 rounded-lg hover:bg-brand-blue/10 transition-colors" title="Edit Metrik Manual">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            </button>
+                                        @endif
+                                    @endcan
+
                                     @can('operasional-konten.delete')
-                                    <form action="{{ route('operasional-konten.destroy', $link->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus link ini?');">
+                                    <form action="{{ route('operasional-konten.destroy', $link->id) }}" method="POST" class="inline" @submit.prevent="triggerDeleteConfirm($el, false)">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-secondary hover:text-status-danger p-1.5 rounded-lg hover:bg-status-danger/10 transition-colors" title="Hapus">
@@ -648,6 +677,138 @@
             <!-- Pagination Links -->
             <div class="px-6 py-4 border-t border-border bg-body/30">
                 {{ $links->links() }}
+            </div>
+        </div>
+
+        <!-- Modal Edit Metrik Engagement Manual -->
+        <div x-show="editModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Backdrop -->
+                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-xs" @click="editModalOpen = false"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <!-- Modal Dialog Box -->
+                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block w-full max-w-xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-surface border border-border rounded-2xl shadow-xl">
+                    <div class="flex items-center justify-between pb-4 border-b border-border">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-brand-blue/10 text-brand-blue flex items-center justify-center font-bold">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-primary">Edit Metrik Engagement Manual</h3>
+                                <p class="text-xs text-secondary">Ubah data Views, Likes, Comments, Shares, & Saves secara manual.</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="editModalOpen = false" class="text-secondary hover:text-primary p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <form :action="updateUrl" method="POST" class="mt-4 space-y-4">
+                        @csrf
+                        @method('PUT')
+
+                        <!-- Link & Campaign Info Banner -->
+                        <div class="p-3 bg-body rounded-xl border border-border space-y-1 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-primary" x-text="editForm.platform"></span>
+                                <span class="text-brand-blue font-semibold" x-text="editForm.campaign_name"></span>
+                            </div>
+                            <p class="text-secondary truncate font-mono" x-text="editForm.url"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Creator Username -->
+                            <div>
+                                <x-input-label value="Nama Akun / Creator" />
+                                <x-text-input type="text" name="username" x-model="editForm.username" class="w-full text-xs mt-1" placeholder="@username" />
+                            </div>
+
+                            <!-- Tanggal Upload -->
+                            <div>
+                                <x-input-label value="Tanggal Upload" />
+                                <x-text-input type="date" name="tanggal_upload" x-model="editForm.tanggal_upload" class="w-full text-xs mt-1" />
+                            </div>
+                        </div>
+
+                        <!-- Live ER Calculation Box -->
+                        <div class="p-3 bg-brand-blue/5 rounded-xl border border-brand-blue/20 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-secondary">Estimasi Engagement Rate (ER):</span>
+                                <p class="text-xs text-secondary">Dihitung otomatis: (Likes + Comments + Shares) / Views * 100</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-lg font-black text-brand-blue" x-text="calculatedER + '%'"></span>
+                            </div>
+                        </div>
+
+                        <!-- Input Metrik Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                            <div>
+                                <x-input-label value="Views" />
+                                <x-text-input type="number" name="views" x-model.number="editForm.views" min="0" required class="w-full text-xs mt-1 font-bold text-primary" />
+                            </div>
+                            <div>
+                                <x-input-label value="Likes" />
+                                <x-text-input type="number" name="likes" x-model.number="editForm.likes" min="0" required class="w-full text-xs mt-1 font-bold text-primary" />
+                            </div>
+                            <div>
+                                <x-input-label value="Comments" />
+                                <x-text-input type="number" name="comments" x-model.number="editForm.comments" min="0" required class="w-full text-xs mt-1 font-bold text-primary" />
+                            </div>
+                            <div>
+                                <x-input-label value="Shares" />
+                                <x-text-input type="number" name="shares" x-model.number="editForm.shares" min="0" required class="w-full text-xs mt-1 font-bold text-primary" />
+                            </div>
+                            <div>
+                                <x-input-label value="Saves" />
+                                <x-text-input type="number" name="saves" x-model.number="editForm.saves" min="0" required class="w-full text-xs mt-1 font-bold text-primary" />
+                            </div>
+                        </div>
+
+                        <!-- Modal Actions -->
+                        <div class="flex justify-end gap-3 pt-4 border-t border-border mt-6">
+                            <button type="button" @click="editModalOpen = false" class="px-4 py-2 text-xs font-semibold text-secondary hover:text-primary rounded-xl bg-body border border-border transition">
+                                Batal
+                            </button>
+                            <x-primary-button type="submit">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Simpan Perubahan
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Modal Konfirmasi Hapus Data -->
+        <div x-show="deleteConfirmOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Backdrop -->
+                <div x-show="deleteConfirmOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity bg-gray-900/60 backdrop-blur-xs" @click="deleteConfirmOpen = false"></div>
+
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                <!-- Dialog Box -->
+                <div x-show="deleteConfirmOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-center align-middle transition-all transform bg-surface border border-border rounded-2xl shadow-xl">
+                    
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-status-danger/10 text-status-danger flex items-center justify-center shadow-xs">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-primary" x-text="deleteConfirmTitle">Konfirmasi Hapus</h3>
+                    <p class="text-xs text-secondary mt-2 leading-relaxed" x-text="deleteConfirmMessage">Apakah Anda yakin ingin menghapus data ini?</p>
+
+                    <div class="flex items-center justify-center gap-3 mt-6">
+                        <button type="button" @click="deleteConfirmOpen = false" class="px-4 py-2.5 text-xs font-semibold text-secondary hover:text-primary rounded-xl bg-body border border-border transition">
+                            Batal
+                        </button>
+                        <button type="button" @click="submitDelete()" class="px-5 py-2.5 text-xs font-bold text-white bg-status-danger hover:bg-status-danger/90 rounded-xl transition shadow-xs">
+                            Ya, Hapus Data
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

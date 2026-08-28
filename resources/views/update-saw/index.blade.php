@@ -111,10 +111,15 @@
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between text-secondary">
-                            <span>Re-Scrape:</span>
-                            <span class="font-medium text-primary truncate max-w-[100px]">
-                                {{ $campaign->last_rescrape ? \Carbon\Carbon::parse($campaign->last_rescrape)->diffForHumans() : 'Belum' }}
+                        <div class="flex items-start justify-between text-secondary">
+                            <span class="pt-0.5">Re-Scrape:</span>
+                            <span class="text-right">
+                                @if($campaign->last_rescrape)
+                                    <strong class="block text-primary text-[10px]">{{ \Carbon\Carbon::parse($campaign->last_rescrape)->format('d/m/Y H:i') }}</strong>
+                                    <span class="block text-[9px] text-brand-blue font-medium">({{ \Carbon\Carbon::parse($campaign->last_rescrape)->diffForHumans() }})</span>
+                                @else
+                                    <span class="text-muted font-normal">Belum Pernah</span>
+                                @endif
                             </span>
                         </div>
                     </div>

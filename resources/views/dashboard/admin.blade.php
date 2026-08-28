@@ -1,7 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-primary leading-tight">
-            Halo {{ explode(' ', Auth::user()->name)[0] }}, Selamat Datang Kembali! 👏
+        <h2 class="font-semibold text-2xl text-primary leading-tight flex items-center gap-2">
+            <span>Halo {{ explode(' ', Auth::user()->name)[0] }}, Selamat Datang Kembali!</span>
+            <svg class="w-6 h-6 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5a1.5 1.5 0 113 0m-3 0V11m3-5.5a1.5 1.5 0 113 0m-3 0V11"></path></svg>
         </h2>
     </x-slot>
 
@@ -97,7 +98,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($totalViews) }}</h3>
-                    <span class="text-[10px] text-status-success font-semibold">👁️ Tayangan</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-status-success font-semibold">
+                        <svg class="w-3 h-3 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <span>Tayangan</span>
+                    </span>
                 </div>
             </div>
 
@@ -111,7 +115,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($totalLikes) }}</h3>
-                    <span class="text-[10px] text-rose-500 font-semibold">❤️ Suka</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-rose-500 font-semibold">
+                        <svg class="w-3 h-3 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <span>Suka</span>
+                    </span>
                 </div>
             </div>
 
@@ -125,7 +132,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($totalComments) }}</h3>
-                    <span class="text-[10px] text-emerald-500 font-semibold">💬 Komentar</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-semibold">
+                        <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span>Komentar</span>
+                    </span>
                 </div>
             </div>
 
@@ -139,7 +149,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($totalShares) }}</h3>
-                    <span class="text-[10px] text-indigo-500 font-semibold">🔄 Bagikan</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-indigo-500 font-semibold">
+                        <svg class="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        <span>Bagikan</span>
+                    </span>
                 </div>
             </div>
 
@@ -153,7 +166,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($totalSaves) }}</h3>
-                    <span class="text-[10px] text-amber-500 font-semibold">🔖 Simpan/Bookmark</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-amber-500 font-semibold">
+                        <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
+                        <span>Simpan/Bookmark</span>
+                    </span>
                 </div>
             </div>
 
@@ -167,7 +183,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-primary">{{ number_format($avgER, 2) }}%</h3>
-                    <span class="text-[10px] text-cyan-500 font-semibold">📈 Engagement Rate</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-cyan-500 font-semibold">
+                        <svg class="w-3 h-3 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        <span>Engagement Rate</span>
+                    </span>
                 </div>
             </div>
 
@@ -181,7 +200,10 @@
                 </div>
                 <div class="mt-2">
                     <h3 class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">+{{ number_format($totalViewsIncrease) }}</h3>
-                    <span class="text-[10px] text-emerald-500 font-semibold">🚀 Pasca Update</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-semibold">
+                        <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>Pasca Update</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -190,7 +212,10 @@
         <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-primary">Grafik Update Kenaikan Views 📈</h3>
+                    <h3 class="text-lg font-bold text-primary flex items-center gap-2">
+                        <span>Grafik Update Kenaikan Views</span>
+                        <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    </h3>
                     <p class="text-xs text-secondary">Tren pertumbuhan akumulasi tayangan dan kenaikan views pasca update data</p>
                 </div>
                 <span class="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-xl border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
@@ -242,7 +267,10 @@
         <div class="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden" x-data="{ showAllTop: false }">
             <div class="p-6 border-b border-border flex justify-between items-center bg-body/25">
                 <div>
-                    <h3 class="text-lg font-bold text-primary">Top Content Ranking 🏆</h3>
+                    <h3 class="text-lg font-bold text-primary flex items-center gap-2">
+                        <span>Top Content Ranking</span>
+                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    </h3>
                     <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan total tayangan (Views)</p>
                 </div>
                 <span class="text-xs font-semibold px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-lg">

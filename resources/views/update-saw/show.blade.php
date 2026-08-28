@@ -173,13 +173,17 @@
                                     @endif
                                 </td>
 
-                                <!-- Status & Last Rescraped -->
                                 <td class="px-4 py-3.5 text-center whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-success/10 text-status-success mb-0.5">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-status-success/10 text-status-success mb-0.5">
                                         Completed
                                     </span>
-                                    <span class="text-[10px] text-secondary block">
-                                        {{ $link->last_rescraped_at ? \Carbon\Carbon::parse($link->last_rescraped_at)->diffForHumans() : 'Awal' }}
+                                    <span class="text-[10px] font-semibold text-primary block">
+                                        @if($link->last_rescraped_at)
+                                            {{ \Carbon\Carbon::parse($link->last_rescraped_at)->format('d/m/Y H:i') }}
+                                            <span class="text-[9px] text-brand-blue block font-medium">({{ \Carbon\Carbon::parse($link->last_rescraped_at)->diffForHumans() }})</span>
+                                        @else
+                                            {{ \Carbon\Carbon::parse($link->updated_at)->format('d/m/Y H:i') }}
+                                        @endif
                                     </span>
                                 </td>
                             </tr>
