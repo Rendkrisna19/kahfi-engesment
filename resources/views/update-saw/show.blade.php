@@ -128,7 +128,23 @@
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Likes</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Comments</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">ER (%)</th>
-                                <th scope="col" class="px-4 py-3.5 font-semibold text-center">Status / Re-Scraped</th>
+                                <th scope="col" class="px-4 py-3.5 font-semibold text-center whitespace-nowrap">
+                                    @php
+                                        $currentSortDir = request('sort_dir', 'asc');
+                                        $nextSortDir = ($currentSortDir === 'asc') ? 'desc' : 'asc';
+                                        $sortUrl = request()->fullUrlWithQuery(['sort_dir' => $nextSortDir]);
+                                    @endphp
+                                    <a href="{{ $sortUrl }}" class="inline-flex items-center gap-1.5 justify-center hover:text-brand-blue transition-colors group" title="Klik untuk mengubah urutan tanggal">
+                                        <span>Status / Tanggal</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-blue/10 text-brand-blue">
+                                            @if(request('sort_dir') === 'desc')
+                                                ▼ Terbaru
+                                            @else
+                                                ▲ Terlama
+                                            @endif
+                                        </span>
+                                    </a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-border" x-data="{ checkAll: false }" @toggle-all.window="checkAll = $event.detail">

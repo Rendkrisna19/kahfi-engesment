@@ -47,7 +47,14 @@ class LinkController extends Controller
             $query->whereIn('campaign_id', $campaignIds);
         }
 
-        $query->orderBy('id', 'desc');
+        $sortDir = strtolower($request->query('sort_dir', 'asc'));
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'asc';
+        }
+
+        // Urutkan otomatis berdasarkan Tanggal Upload (default: dari terlama ke terbaru)
+        $query->orderByRaw("COALESCE(tanggal_upload, DATE(updated_at)) {$sortDir}")
+              ->orderBy('id', $sortDir);
 
         // Filter Campaign jika dipilih
         if ($request->filled('campaign_id')) {

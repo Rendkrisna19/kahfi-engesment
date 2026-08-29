@@ -92,7 +92,15 @@ class UpdateSawController extends Controller
             });
         }
 
-        $links = $query->orderBy('saw_score', 'desc')->paginate(20)->withQueryString();
+        $sortDir = strtolower($request->query('sort_dir', 'asc'));
+        if (!in_array($sortDir, ['asc', 'desc'])) {
+            $sortDir = 'asc';
+        }
+
+        $links = $query->orderByRaw("COALESCE(tanggal_upload, DATE(updated_at)) {$sortDir}")
+                       ->orderBy('id', $sortDir)
+                       ->paginate(20)
+                       ->withQueryString();
 
         return view('update-saw.show', compact('campaign', 'links'));
     }
