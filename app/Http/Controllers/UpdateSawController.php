@@ -102,6 +102,10 @@ class UpdateSawController extends Controller
      */
     public function process(Request $request, $id)
     {
+        @set_time_limit(0);
+        @ini_set('max_execution_time', '0');
+        @ini_set('memory_limit', '512M');
+
         $campaign = Campaign::findOrFail($id);
 
         $request->validate([
@@ -145,6 +149,7 @@ class UpdateSawController extends Controller
         $igActorId = str_replace('/', '~', $rawIgActor);
 
         $processedCount = 0;
+        $failedCount = 0;
 
         if (!empty($token)) {
             foreach ($linksToProcess as $link) {
@@ -168,7 +173,7 @@ class UpdateSawController extends Controller
                         ];
                     }
 
-                    $response = Http::timeout(120)->post($endpoint, $input);
+                    $response = Http::timeout(35)->post($endpoint, $input);
 
                     if ($response->successful()) {
                         $data = $response->json();
@@ -239,10 +244,31 @@ class UpdateSawController extends Controller
                             ]);
 
                             $processedCount++;
+                        } else {
+                            // Empty data response fallback
+                            if (($link->views ?? 0) > 0 || ($link->likes ?? 0) > 0) {
+                                $link->update(['status_scraping' => 'Completed']);
+                            } else {
+                                $link->update(['status_scraping' => 'Gagal']);
+                                $failedCount++;
+                            }
+                        }
+                    } else {
+                        if (($link->views ?? 0) > 0 || ($link->likes ?? 0) > 0) {
+                            $link->update(['status_scraping' => 'Completed']);
+                        } else {
+                            $link->update(['status_scraping' => 'Gagal']);
+                            $failedCount++;
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::error("Error re-scraping link {$link->id}: " . $e->getMessage());
+                    if (($link->views ?? 0) > 0 || ($link->likes ?? 0) > 0) {
+                        $link->update(['status_scraping' => 'Completed']);
+                    } else {
+                        $link->update(['status_scraping' => 'Gagal']);
+                        $failedCount++;
+                    }
                 }
             }
         }

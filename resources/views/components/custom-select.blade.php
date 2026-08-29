@@ -76,7 +76,7 @@
             @endif
         });
     }
-}" @click.outside="open = false" class="relative w-full {{ $class }}">
+}" @click.outside="open = false" class="relative {{ preg_match('/\b(w-|max-w-)/', $class) ? '' : 'w-full' }} {{ $class }}">
 
     <!-- Hidden Native Input for standard Form Submission -->
     <input type="hidden" name="{{ $name }}" id="{{ $id }}" x-ref="hiddenInput" :value="selectedValue" {{ $required ? 'required' : '' }}>

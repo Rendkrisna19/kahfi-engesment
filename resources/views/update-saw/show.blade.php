@@ -72,6 +72,39 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
+                        <!-- Search & Platform Filter Controls -->
+                        <div class="flex items-center gap-2">
+                            <!-- Search Input -->
+                            <div class="relative">
+                                <input type="text" 
+                                    id="searchFilter"
+                                    value="{{ request('search') }}" 
+                                    placeholder="Cari akun / URL..." 
+                                    onkeydown="if(event.key === 'Enter'){ event.preventDefault(); applyFilter(); }"
+                                    class="w-36 sm:w-44 px-3 py-2 text-xs rounded-xl bg-body border border-border text-primary placeholder:text-secondary focus:outline-none focus:border-brand-blue transition shadow-2xs">
+                            </div>
+
+                            <!-- Platform Dropdown Custom Select -->
+                            <div class="w-36">
+                                <x-custom-select 
+                                    name="platform_filter" 
+                                    :options="[
+                                        'TikTok' => 'TikTok',
+                                        'Instagram' => 'Instagram'
+                                    ]" 
+                                    :selected="request('platform')" 
+                                    placeholder="Semua Platform" 
+                                    onChange="applyFilter()"
+                                />
+                            </div>
+
+                            @if(request('search') || request('platform'))
+                                <button type="button" onclick="resetFilter()" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors" title="Reset Filter">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            @endif
+                        </div>
+
                         <!-- Submit Re-Scrape Button -->
                         <button type="button" onclick="confirmRescrape()" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-brand-blue hover:bg-brand-blue-hover text-white transition shadow-md shadow-brand-blue/20">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -206,8 +239,38 @@
         </form>
     </div>
 
-    <!-- Confirm Re-Scrape Script using SweetAlert2 -->
+    <!-- Confirm Re-Scrape Script using SweetAlert2 & Filter Handlers -->
     <script>
+    function applyFilter() {
+        const url = new URL(window.location.href);
+        const searchVal = document.getElementById('searchFilter')?.value?.trim();
+        const platformInput = document.querySelector('input[name="platform_filter"]');
+        const platformVal = platformInput ? platformInput.value : '';
+
+        if (searchVal) {
+            url.searchParams.set('search', searchVal);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        if (platformVal) {
+            url.searchParams.set('platform', platformVal);
+        } else {
+            url.searchParams.delete('platform');
+        }
+
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    function resetFilter() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('search');
+        url.searchParams.delete('platform');
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
     function confirmRescrape() {
         const checkedCount = document.querySelectorAll('input[name="link_ids[]"]:checked').length;
         const selectAllCheckbox = document.querySelector('input[x-model="selectAll"]');

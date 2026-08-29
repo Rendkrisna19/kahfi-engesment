@@ -467,31 +467,36 @@
                 </div>
                 
                 <!-- Filter & Search Form -->
-                <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-3">
+                <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-2">
                     <!-- Campaign Filter -->
-                    <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign Ditugaskan --" onChange="this.form.submit()" class="min-w-[170px]" />
+                    <div class="w-full sm:w-48">
+                        <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign --" onChange="this.form.submit()" class="w-full" />
+                    </div>
 
                     <!-- Platform Filter -->
-                    <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" class="min-w-[150px]" />
+                    <div class="w-full sm:w-36">
+                        <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" class="w-full" />
+                    </div>
 
                     <!-- Date Range Filter -->
-                    <div class="flex items-center gap-1 bg-body border border-border rounded-xl px-2 py-1">
-                        <span class="text-[11px] text-secondary font-medium pl-1">Tgl:</span>
-                        <input type="date" name="start_date" value="{{ request('start_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-1" title="Tanggal Mulai">
-                        <span class="text-xs text-secondary">-</span>
-                        <input type="date" name="end_date" value="{{ request('end_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-1" title="Tanggal Selesai">
+                    <div class="flex items-center gap-1 bg-body border border-border rounded-xl px-2.5 py-1.5 shadow-2xs w-full sm:w-auto">
+                        <svg class="w-3.5 h-3.5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="text-[11px] text-secondary font-medium hidden sm:inline">Tgl:</span>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Mulai">
+                        <span class="text-xs text-secondary font-bold">-</span>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Selesai">
                     </div>
 
                     <!-- Search Input -->
-                    <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari URL / User..." class="text-xs border-border bg-body text-primary rounded-xl pl-8 pr-3 py-2 focus:border-brand-blue focus:ring-brand-blue min-w-[150px]">
+                    <div class="relative w-full sm:w-40">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari URL / User..." class="w-full text-xs border-border bg-body text-primary rounded-xl pl-8 pr-3 py-2 focus:border-brand-blue focus:ring-brand-blue shadow-2xs">
                         <svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
 
                     @if(request()->hasAny(['campaign_id', 'platform', 'search', 'start_date', 'end_date']))
-                        <a href="{{ route('operasional-konten.index') }}" class="text-xs text-status-danger hover:underline font-semibold flex items-center gap-1">
+                        <a href="{{ route('operasional-konten.index') }}" class="px-2.5 py-1.5 text-xs text-status-danger hover:bg-status-danger/10 rounded-xl font-semibold flex items-center gap-1 transition" title="Reset Filter">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            Reset
+                            <span>Reset</span>
                         </a>
                     @endif
                 </form>

@@ -134,11 +134,16 @@ class LinkController extends Controller
 
         if ($request->type === 'single') {
             $request->validate([
-                'url' => 'required|url',
+                'url' => 'required|string',
             ]);
 
-            $url = strtok(trim($request->url), '?');
-            $platform = $this->detectPlatform($url);
+            $url = $this->sanitizeUrl($request->url);
+            if (!$url) {
+                return redirect()->back()->with('error', 'URL Konten tidak valid atau bukan format TikTok/Instagram.');
+            }
+
+            $campaignObj = \App\Models\Campaign::find($request->campaign_id);
+            $platform = $this->detectPlatform($url, $campaignObj->platform ?? null);
 
             Link::create([
                 'campaign_id' => $request->campaign_id,
@@ -156,13 +161,13 @@ class LinkController extends Controller
                 'urls' => 'required|string',
             ]);
 
+            $campaignObj = \App\Models\Campaign::find($request->campaign_id);
             $urls = explode("\n", str_replace("\r", "", $request->urls));
 
             foreach ($urls as $rawUrl) {
-                $trimmed = trim($rawUrl);
-                if (filter_var($trimmed, FILTER_VALIDATE_URL)) {
-                    $url = strtok($trimmed, '?');
-                    $platform = $this->detectPlatform($url);
+                $url = $this->sanitizeUrl($rawUrl);
+                if ($url) {
+                    $platform = $this->detectPlatform($url, $campaignObj->platform ?? null);
 
                     Link::create([
                         'campaign_id' => $request->campaign_id,
@@ -181,90 +186,184 @@ class LinkController extends Controller
                 'file' => 'required|file|max:10240',
             ]);
 
-            $targetCampaign = Campaign::find($request->campaign_id);
-            $targetPlatform = $targetCampaign ? $targetCampaign->platform : null;
+            $campaignObj = \App\Models\Campaign::find($request->campaign_id);
+            $campaignPlatform = $campaignObj->platform ?? null;
 
             $filePath = $request->file('file')->getRealPath();
             $fileContents = file_get_contents($filePath);
 
-            $rawUrls = [];
+            // Clean XML/HTML metadata tags (<head>, <xml>, <style>, <annotation>) to prevent w3.org namespace URLs from being read
+            $cleanContents = preg_replace('/<head[^>]*>.*?<\/head>/is', '', $fileContents);
+            $cleanContents = preg_replace('/<xml[^>]*>.*?<\/xml>/is', '', $cleanContents);
+            $cleanContents = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $cleanContents);
 
-            // Check if file is HTML table format (.xls created from template)
-            if (str_contains($fileContents, '<tr') || str_contains($fileContents, '<td')) {
-                // Parse HTML rows line by line to extract URLs from table cells only
-                preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $fileContents, $trMatches);
+            $rowsData = [];
+
+            // 1. Parse HTML Table (.xls format exported from Excel / Google Sheets)
+            if (str_contains($cleanContents, '<tr') || str_contains($cleanContents, '<td')) {
+                preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $cleanContents, $trMatches);
                 if (!empty($trMatches[1])) {
+                    $headerMap = [];
                     foreach ($trMatches[1] as $trContent) {
-                        // Skip instruction and banner rows
-                        if (str_contains($trContent, 'PETUNJUK PENGISIAN') || str_contains($trContent, 'th-header') || str_contains($trContent, 'title-banner')) {
+                        preg_match_all('/<(?:td|th)[^>]*>(.*?)<\/(?:td|th)>/is', $trContent, $cellMatches);
+                        if (empty($cellMatches[1])) continue;
+
+                        $rowCells = array_map(function($c) {
+                            return trim(strip_tags($c));
+                        }, $cellMatches[1]);
+
+                        $rowText = strtolower(implode(' ', $rowCells));
+                        if (empty($headerMap) && (str_contains($rowText, 'link') || str_contains($rowText, 'url') || str_contains($rowText, 'views') || str_contains($rowText, 'tgl upload') || str_contains($rowText, 'account'))) {
+                            foreach ($rowCells as $idx => $cellText) {
+                                $lowerHeader = strtolower($cellText);
+                                if (str_contains($lowerHeader, 'link') || str_contains($lowerHeader, 'url') || str_contains($lowerHeader, 'post') || str_contains($lowerHeader, 'content')) {
+                                    if (!isset($headerMap['url'])) $headerMap['url'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'account') || str_contains($lowerHeader, 'akun') || str_contains($lowerHeader, 'username') || str_contains($lowerHeader, 'creator')) {
+                                    $headerMap['username'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'tgl') || str_contains($lowerHeader, 'tanggal') || str_contains($lowerHeader, 'date')) {
+                                    $headerMap['tanggal_upload'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'view')) {
+                                    $headerMap['views'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'like')) {
+                                    $headerMap['likes'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'comment') || str_contains($lowerHeader, 'komentar')) {
+                                    $headerMap['comments'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'save') || str_contains($lowerHeader, 'simpan')) {
+                                    $headerMap['saves'] = $idx;
+                                } elseif (str_contains($lowerHeader, 'share') || str_contains($lowerHeader, 'bagikan')) {
+                                    $headerMap['shares'] = $idx;
+                                }
+                            }
                             continue;
                         }
 
-                        preg_match_all('/<td[^>]*>(.*?)<\/td>/is', $trContent, $tdMatches);
-                        if (!empty($tdMatches[1])) {
-                            // Extract URL from column A or any cell in this row
-                            foreach ($tdMatches[1] as $cellValue) {
-                                $cleanCell = trim(strip_tags($cellValue));
-                                if (preg_match('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $cleanCell, $urlMatch)) {
-                                    $rawUrls[] = $urlMatch[0];
-                                    break; // Only take 1 URL per table row
-                                }
-                            }
+                        $extractedRow = $this->extractRowDataFromCells($rowCells, $headerMap);
+                        if ($extractedRow && !empty($extractedRow['url'])) {
+                            $rowsData[] = $extractedRow;
                         }
                     }
                 }
             }
 
-            // Fallback for CSV / Plain Text if HTML parsing didn't find URLs
-            if (empty($rawUrls)) {
-                preg_match_all('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $fileContents, $matches);
+            // 2. Parse Delimited CSV / TSV
+            if (empty($rowsData)) {
+                $lines = explode("\n", str_replace("\r", "", $cleanContents));
+                $headerMap = [];
+
+                foreach ($lines as $line) {
+                    if (empty(trim($line))) continue;
+
+                    $delimiter = str_contains($line, ';') ? ';' : (str_contains($line, "\t") ? "\t" : ',');
+                    $rowCells = array_map('trim', str_getcsv($line, $delimiter));
+
+                    $rowText = strtolower(implode(' ', $rowCells));
+                    if (empty($headerMap) && (str_contains($rowText, 'link') || str_contains($rowText, 'url') || str_contains($rowText, 'views') || str_contains($rowText, 'tgl upload') || str_contains($rowText, 'account'))) {
+                        foreach ($rowCells as $idx => $cellText) {
+                            $lowerHeader = strtolower($cellText);
+                            if (str_contains($lowerHeader, 'link') || str_contains($lowerHeader, 'url') || str_contains($lowerHeader, 'post') || str_contains($lowerHeader, 'content')) {
+                                if (!isset($headerMap['url'])) $headerMap['url'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'account') || str_contains($lowerHeader, 'akun') || str_contains($lowerHeader, 'username') || str_contains($lowerHeader, 'creator')) {
+                                $headerMap['username'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'tgl') || str_contains($lowerHeader, 'tanggal') || str_contains($lowerHeader, 'date')) {
+                                $headerMap['tanggal_upload'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'view')) {
+                                $headerMap['views'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'like')) {
+                                $headerMap['likes'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'comment') || str_contains($lowerHeader, 'komentar')) {
+                                $headerMap['comments'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'save') || str_contains($lowerHeader, 'simpan')) {
+                                $headerMap['saves'] = $idx;
+                            } elseif (str_contains($lowerHeader, 'share') || str_contains($lowerHeader, 'bagikan')) {
+                                $headerMap['shares'] = $idx;
+                            }
+                        }
+                        continue;
+                    }
+
+                    $extractedRow = $this->extractRowDataFromCells($rowCells, $headerMap);
+                    if ($extractedRow && !empty($extractedRow['url'])) {
+                        $rowsData[] = $extractedRow;
+                    }
+                }
+            }
+
+            // 3. Fallback scan text regex for any URLs
+            if (empty($rowsData)) {
+                preg_match_all('/(?:https?:\/\/|[a-z0-9\.\-]+\.(?:com|am)\/)[^\s"<>\'\,\;\r\n]+/i', $cleanContents, $matches);
                 if (!empty($matches[0])) {
-                    $rawUrls = $matches[0];
+                    foreach ($matches[0] as $rawUrl) {
+                        $cleanUrl = $this->sanitizeUrl($rawUrl);
+                        if ($cleanUrl) {
+                            $rowsData[] = [
+                                'url' => $cleanUrl,
+                                'username' => null,
+                                'tanggal_upload' => now()->toDateString(),
+                                'views' => 0,
+                                'likes' => 0,
+                                'comments' => 0,
+                                'saves' => 0,
+                                'shares' => 0,
+                            ];
+                        }
+                    }
                 }
             }
 
-            $extractedUrls = [];
-            foreach ($rawUrls as $rawUrl) {
-                $cleanUrl = strtok(trim($rawUrl), '?');
-                if (filter_var($cleanUrl, FILTER_VALIDATE_URL)) {
-                    $extractedUrls[] = $cleanUrl;
+            $seenUrls = [];
+            $hasAnyMetrics = false;
+
+            foreach ($rowsData as $r) {
+                $url = $r['url'];
+                if (in_array($url, $seenUrls)) continue;
+                $seenUrls[] = $url;
+
+                $detectedPlatform = $this->detectPlatform($url, $campaignPlatform);
+
+                $views = (int)($r['views'] ?? 0);
+                $likes = (int)($r['likes'] ?? 0);
+                $comments = (int)($r['comments'] ?? 0);
+                $saves = (int)($r['saves'] ?? 0);
+                $shares = (int)($r['shares'] ?? 0);
+
+                $hasMetrics = ($views > 0 || $likes > 0 || $comments > 0 || $saves > 0 || $shares > 0);
+                if ($hasMetrics) {
+                    $hasAnyMetrics = true;
                 }
-            }
+                $statusScraping = $hasMetrics ? 'Completed' : 'Pending';
+                $er = ($views > 0) ? (($likes + $comments + $shares) / $views) * 100 : 0;
 
-            $extractedUrls = array_unique($extractedUrls);
+                Link::updateOrCreate(
+                    [
+                        'campaign_id' => $request->campaign_id,
+                        'url' => $url,
+                    ],
+                    [
+                        'kategori_konten_id' => $request->kategori_konten_id,
+                        'kategori_creator_id' => $request->kategori_creator_id,
+                        'username' => !empty($r['username']) ? $r['username'] : null,
+                        'platform' => $detectedPlatform,
+                        'tanggal_upload' => !empty($r['tanggal_upload']) ? $r['tanggal_upload'] : now()->toDateString(),
+                        'views' => $views,
+                        'likes' => $likes,
+                        'comments' => $comments,
+                        'saves' => $saves,
+                        'shares' => $shares,
+                        'engagement_rate' => min(100, round($er, 2)),
+                        'status_scraping' => $statusScraping
+                    ]
+                );
 
-            foreach ($extractedUrls as $url) {
-                $detectedPlatform = $this->detectPlatform($url);
-
-                // Platform Validation & Filtering based on Selected Target Campaign
-                if ($targetPlatform && in_array($targetPlatform, ['TikTok', 'Instagram'])) {
-                    // Skip Instagram links when TikTok campaign is selected, and vice versa
-                    if ($targetPlatform === 'TikTok' && $detectedPlatform === 'Instagram') {
-                        continue;
-                    }
-                    if ($targetPlatform === 'Instagram' && $detectedPlatform === 'TikTok') {
-                        continue;
-                    }
-                    $finalPlatform = $targetPlatform;
-                } else {
-                    $finalPlatform = $detectedPlatform;
-                }
-
-                Link::create([
-                    'campaign_id' => $request->campaign_id,
-                    'kategori_konten_id' => $request->kategori_konten_id,
-                    'kategori_creator_id' => $request->kategori_creator_id,
-                    'url' => $url,
-                    'platform' => $finalPlatform,
-                    'tanggal_upload' => now()->toDateString(),
-                    'status_scraping' => 'Pending'
-                ]);
                 $insertedCount++;
+            }
+
+            if ($hasAnyMetrics) {
+                $this->calculateSawScoresForCampaign($request->campaign_id);
             }
         }
 
         return redirect()->route('operasional-konten.index')
-            ->with('success', "Berhasil menyimpan {$insertedCount} link konten ke dalam status Pending.");
+            ->with('success', "Berhasil memproses & menyimpan {$insertedCount} data link konten dari file.");
     }
 
     /**
@@ -284,7 +383,10 @@ class LinkController extends Controller
                 $file = fopen('php://output', 'w');
                 // UTF-8 BOM for Excel CSV compatibility
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['URL Konten', 'Platform', 'Keterangan']);
+                fputcsv($file, ['Tgl Upload', 'Account', 'Link Content', 'Views', 'Likes', 'Comment', 'Save', 'Share']);
+                fputcsv($file, ['Sabtu, 08 Agustus 2026', 'Ruang Bercerita', 'https://vt.tiktok.com/ZS4sj89A1/', '398900', '5329', '69', '284', '463']);
+                fputcsv($file, ['Minggu, 09 Agustus 2026', 'Area Cerita', 'https://www.tiktok.com/@areacerita/video/7381920192831', '7381', '120', '15', '8', '12']);
+                fputcsv($file, ['Rabu, 12 Agustus 2026', 'Inspirasi Harian', 'https://www.instagram.com/p/Cxyz123456/', '45200', '1850', '42', '110', '95']);
                 fclose($file);
             };
 
@@ -314,41 +416,88 @@ class LinkController extends Controller
     <![endif]-->
     <style>
         body { font-family: Arial, sans-serif; font-size: 10pt; color: #1f2937; }
-        .title-banner { font-size: 14pt; font-weight: bold; color: #ffffff; background-color: #1e3a8a; text-align: center; height: 35px; vertical-align: middle; border: 2px solid #1e3a8a; }
-        .instruction-banner { font-size: 9.5pt; color: #1e40af; background-color: #eff6ff; padding: 10px; border: 1px solid #93c5fd; text-align: left; vertical-align: middle; }
-        .th-header { font-size: 11pt; font-weight: bold; color: #ffffff; background-color: #1e40af; text-align: center; vertical-align: middle; height: 30px; border: 1px solid #111827; }
+        .th-header { font-size: 10pt; font-weight: bold; color: #ffffff; background-color: #1e40af; text-align: center; vertical-align: middle; height: 30px; border: 1px solid #111827; }
         .td-no { text-align: center; vertical-align: middle; border: 1px solid #4b5563; background-color: #f3f4f6; font-weight: bold; color: #374151; }
+        .td-data { text-align: left; vertical-align: middle; border: 1px solid #9ca3af; background-color: #fffbeb; height: 24px; font-size: 9.5pt; }
+        .td-num { text-align: right; vertical-align: middle; border: 1px solid #9ca3af; background-color: #fffbeb; height: 24px; font-size: 9.5pt; }
         .td-empty { text-align: left; vertical-align: middle; border: 1px solid #9ca3af; background-color: #ffffff; height: 24px; }
     </style>
 </head>
 <body>
     <table border="1" style="border-collapse: collapse; width: 100%;">
         <tr>
-            <td colspan="4" class="title-banner">TEMPLATE UPLOAD LINK KONTEN - KAHFI ENGAGEMENT</td>
-        </tr>
-        <tr>
-            <td colspan="4" class="instruction-banner">
-                <b>PETUNJUK PENGISIAN:</b><br/>
-                1. Masukkan URL video TikTok atau postingan Instagram pada kolom <b>URL Konten (Kolom A)</b>.<br/>
-                2. Pastikan URL lengkap diawali dengan <b>http://</b> atau <b>https://</b>.<br/>
-                3. Kolom <b>Platform</b> dan <b>Keterangan</b> bersifat opsional (sistem akan otomatis mendeteksi platform).<br/>
-                4. <b>CONTOH FORMAT URL:</b><br/>
-                   - TikTok: <i>https://www.tiktok.com/@creator/video/1234567890</i><br/>
-                   - Instagram: <i>https://www.instagram.com/p/Cxyz123456/</i>
-            </td>
-        </tr>
-        <tr><td colspan="4" style="height: 10px; border: none; background-color: #ffffff;"></td></tr>
-        <tr>
-            <th style="width: 45px;" class="th-header">No</th>
-            <th style="width: 450px;" class="th-header">URL Konten (TikTok / Instagram) *Wajib</th>
-            <th style="width: 120px;" class="th-header">Platform</th>
-            <th style="width: 200px;" class="th-header">Keterangan</th>
+            <th style="width: 40px;" class="th-header">No</th>
+            <th style="width: 150px;" class="th-header">Tgl Upload</th>
+            <th style="width: 140px;" class="th-header">Account</th>
+            <th style="width: 330px;" class="th-header">Link Content (TikTok / Instagram) *Wajib</th>
+            <th style="width: 90px;" class="th-header">Views</th>
+            <th style="width: 80px;" class="th-header">Likes</th>
+            <th style="width: 80px;" class="th-header">Comment</th>
+            <th style="width: 80px;" class="th-header">Save</th>
+            <th style="width: 80px;" class="th-header">Share</th>
         </tr>';
 
-        for ($i = 1; $i <= 20; $i++) {
+        // 3 Data Contoh Testing
+        $sampleData = [
+            [
+                'no' => 1,
+                'tgl' => 'Sabtu, 08 Agustus 2026',
+                'account' => 'Ruang Bercerita',
+                'url' => 'https://vt.tiktok.com/ZS4sj89A1/',
+                'views' => '398.900',
+                'likes' => '5.329',
+                'comments' => '69',
+                'saves' => '284',
+                'shares' => '463',
+            ],
+            [
+                'no' => 2,
+                'tgl' => 'Minggu, 09 Agustus 2026',
+                'account' => 'Area Cerita',
+                'url' => 'https://www.tiktok.com/@areacerita/video/7381920192831',
+                'views' => '7.381',
+                'likes' => '120',
+                'comments' => '15',
+                'saves' => '8',
+                'shares' => '12',
+            ],
+            [
+                'no' => 3,
+                'tgl' => 'Rabu, 12 Agustus 2026',
+                'account' => 'Inspirasi Harian',
+                'url' => 'https://www.instagram.com/p/Cxyz123456/',
+                'views' => '45.200',
+                'likes' => '1.850',
+                'comments' => '42',
+                'saves' => '110',
+                'shares' => '95',
+            ]
+        ];
+
+        foreach ($sampleData as $item) {
+            $html .= '
+        <tr>
+            <td class="td-no">' . $item['no'] . '</td>
+            <td class="td-data">' . $item['tgl'] . '</td>
+            <td class="td-data">' . $item['account'] . '</td>
+            <td class="td-data">' . $item['url'] . '</td>
+            <td class="td-num">' . $item['views'] . '</td>
+            <td class="td-num">' . $item['likes'] . '</td>
+            <td class="td-num">' . $item['comments'] . '</td>
+            <td class="td-num">' . $item['saves'] . '</td>
+            <td class="td-num">' . $item['shares'] . '</td>
+        </tr>';
+        }
+
+        for ($i = 4; $i <= 20; $i++) {
             $html .= '
         <tr>
             <td class="td-no">' . $i . '</td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
+            <td class="td-empty"></td>
             <td class="td-empty"></td>
             <td class="td-empty"></td>
             <td class="td-empty"></td>
@@ -492,6 +641,10 @@ class LinkController extends Controller
      */
     public function refreshData(Request $request)
     {
+        @set_time_limit(0);
+        @ini_set('max_execution_time', '0');
+        @ini_set('memory_limit', '512M');
+
         $query = Link::where('status_scraping', 'Pending');
 
         // Jika refresh dipicu untuk campaign tertentu
@@ -705,17 +858,177 @@ class LinkController extends Controller
     }
 
     /**
+     * Helper pembersihan & pemastian format URL (mendukung vt.tiktok.com, vm.tiktok.com, dll)
+     */
+    private function sanitizeUrl(?string $rawUrl): ?string
+    {
+        if (empty($rawUrl)) return null;
+
+        $trimmed = trim(strip_tags($rawUrl));
+        if (empty($trimmed)) return null;
+
+        $trimmed = trim($trimmed, '"\'`()[]{}<> ');
+        if (empty($trimmed)) return null;
+
+        $lowerTrimmed = strtolower($trimmed);
+
+        // Filter out W3C/Microsoft XML schema metadata URLs
+        if (str_contains($lowerTrimmed, 'w3.org') || str_contains($lowerTrimmed, 'schemas.microsoft.com') || str_contains($lowerTrimmed, 'schemas-microsoft-com')) {
+            return null;
+        }
+
+        // Jika URL belum diawali http:// atau https://
+        if (!preg_match('/^https?:\/\//i', $trimmed)) {
+            if (preg_match('/^(vt\.tiktok\.com|vm\.tiktok\.com|www\.tiktok\.com|tiktok\.com|www\.instagram\.com|instagram\.com|instagr\.am)\//i', $trimmed)) {
+                $trimmed = 'https://' . $trimmed;
+            }
+        }
+
+        // Cari pola URL TikTok / Instagram
+        if (preg_match('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $trimmed, $match)) {
+            $cleanUrl = strtok($match[0], '?');
+            $cleanUrl = rtrim($cleanUrl, '.,;');
+            $lowerClean = strtolower($cleanUrl);
+            
+            // Pastikan URL milik TikTok atau Instagram
+            if (str_contains($lowerClean, 'tiktok') || str_contains($lowerClean, 'instagram') || str_contains($lowerClean, 'instagr.am')) {
+                return $cleanUrl;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Helper deteksi platform berdasarkan string URL
      */
-    private function detectPlatform(string $url): string
+    private function detectPlatform(string $url, ?string $fallbackPlatform = null): string
     {
         $lower = strtolower($url);
-        if (str_contains($lower, 'tiktok.com')) {
+        if (str_contains($lower, 'tiktok') || str_contains($lower, 'vt.tiktok') || str_contains($lower, 'vm.tiktok')) {
             return 'TikTok';
-        } elseif (str_contains($lower, 'instagram.com')) {
+        } elseif (str_contains($lower, 'instagram') || str_contains($lower, 'instagr.am') || str_contains($lower, '/p/') || str_contains($lower, '/reel/')) {
             return 'Instagram';
         }
+
+        if (!empty($fallbackPlatform) && in_array(ucfirst(strtolower($fallbackPlatform)), ['TikTok', 'Instagram'])) {
+            return ucfirst(strtolower($fallbackPlatform));
+        }
+
         return 'Unknown';
+    }
+
+    /**
+     * Helper parse angka dari format string (misal: "7.381" -> 7381, "398.900" -> 398900)
+     */
+    private function parseFormattedNumber($raw): int
+    {
+        if (empty($raw)) return 0;
+        $str = trim((string)$raw);
+        // Hapus semua karakter bukan angka (misal titik ribuan, koma, spasi)
+        $cleaned = preg_replace('/[^\d]/', '', $str);
+        return (int)$cleaned;
+    }
+
+    /**
+     * Helper parse tanggal upload dari string (misal: "Sabtu, 08 Agustus 2026")
+     */
+    private function parseUploadedDate($dateStr): string
+    {
+        if (empty($dateStr)) {
+            return now()->toDateString();
+        }
+
+        $clean = trim((string)$dateStr);
+
+        $indoMonths = [
+            'Januari' => 'January', 'Februari' => 'February', 'Maret' => 'March',
+            'April' => 'April', 'Mei' => 'May', 'Juni' => 'June',
+            'Juli' => 'July', 'Agustus' => 'August', 'September' => 'September',
+            'Oktober' => 'October', 'November' => 'November', 'Desember' => 'December',
+            'Agus' => 'August', 'Okto' => 'October', 'Nop' => 'November', 'Des' => 'December'
+        ];
+
+        foreach ($indoMonths as $indo => $eng) {
+            $clean = str_ireplace($indo, $eng, $clean);
+        }
+
+        $clean = preg_replace('/^(senin|selasa|rabu|kamis|jumat|sabtu|minggu)\,?\s*/i', '', $clean);
+
+        $timestamp = strtotime($clean);
+        if ($timestamp && $timestamp > 0) {
+            return date('Y-m-d', $timestamp);
+        }
+
+        return now()->toDateString();
+    }
+
+    /**
+     * Helper mengekstrak data 1 baris sel tabel Excel / CSV
+     */
+    private function extractRowDataFromCells(array $rowCells, array $headerMap): ?array
+    {
+        $url = null;
+
+        // Cek sel URL berdasarkan kolom terpetakan dari header
+        if (isset($headerMap['url']) && isset($rowCells[$headerMap['url']])) {
+            $url = $this->sanitizeUrl($rowCells[$headerMap['url']]);
+        }
+
+        // Jika tidak ditemukan di kolom terpetakan, cari di semua sel baris ini
+        if (!$url) {
+            foreach ($rowCells as $cell) {
+                $foundUrl = $this->sanitizeUrl($cell);
+                if ($foundUrl) {
+                    $url = $foundUrl;
+                    break;
+                }
+            }
+        }
+
+        if (!$url) {
+            return null; // Lewati jika tidak ada URL TikTok / Instagram
+        }
+
+        $username = isset($headerMap['username']) && isset($rowCells[$headerMap['username']]) 
+            ? trim(strip_tags($rowCells[$headerMap['username']])) 
+            : null;
+
+        $tglRaw = isset($headerMap['tanggal_upload']) && isset($rowCells[$headerMap['tanggal_upload']]) 
+            ? $rowCells[$headerMap['tanggal_upload']] 
+            : null;
+        $tanggalUpload = $this->parseUploadedDate($tglRaw);
+
+        $views = isset($headerMap['views']) && isset($rowCells[$headerMap['views']]) 
+            ? $this->parseFormattedNumber($rowCells[$headerMap['views']]) 
+            : 0;
+
+        $likes = isset($headerMap['likes']) && isset($rowCells[$headerMap['likes']]) 
+            ? $this->parseFormattedNumber($rowCells[$headerMap['likes']]) 
+            : 0;
+
+        $comments = isset($headerMap['comments']) && isset($rowCells[$headerMap['comments']]) 
+            ? $this->parseFormattedNumber($rowCells[$headerMap['comments']]) 
+            : 0;
+
+        $saves = isset($headerMap['saves']) && isset($rowCells[$headerMap['saves']]) 
+            ? $this->parseFormattedNumber($rowCells[$headerMap['saves']]) 
+            : 0;
+
+        $shares = isset($headerMap['shares']) && isset($rowCells[$headerMap['shares']]) 
+            ? $this->parseFormattedNumber($rowCells[$headerMap['shares']]) 
+            : 0;
+
+        return [
+            'url' => $url,
+            'username' => $username,
+            'tanggal_upload' => $tanggalUpload,
+            'views' => $views,
+            'likes' => $likes,
+            'comments' => $comments,
+            'saves' => $saves,
+            'shares' => $shares,
+        ];
     }
 
     /**
