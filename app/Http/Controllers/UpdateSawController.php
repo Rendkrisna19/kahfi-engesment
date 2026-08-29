@@ -97,9 +97,14 @@ class UpdateSawController extends Controller
             $sortDir = 'asc';
         }
 
+        $perPage = (int) $request->query('per_page', 20);
+        if (!in_array($perPage, [10, 15, 20, 25, 50, 100])) {
+            $perPage = 20;
+        }
+
         $links = $query->orderByRaw("COALESCE(tanggal_upload, DATE(updated_at)) {$sortDir}")
                        ->orderBy('id', $sortDir)
-                       ->paginate(20)
+                       ->paginate($perPage)
                        ->withQueryString();
 
         return view('update-saw.show', compact('campaign', 'links'));

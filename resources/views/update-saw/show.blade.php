@@ -74,6 +74,22 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Search & Platform Filter Controls -->
                         <div class="flex items-center gap-2">
+                            <!-- Per Page Custom Select -->
+                            <div class="w-28">
+                                <x-custom-select 
+                                    name="per_page_filter" 
+                                    :options="[
+                                        '10' => '10 Data',
+                                        '20' => '20 Data',
+                                        '50' => '50 Data',
+                                        '100' => '100 Data'
+                                    ]" 
+                                    :selected="request('per_page', 20)" 
+                                    placeholder="20 Data" 
+                                    onChange="applyFilter()"
+                                />
+                            </div>
+
                             <!-- Search Input -->
                             <div class="relative">
                                 <input type="text" 
@@ -98,7 +114,7 @@
                                 />
                             </div>
 
-                            @if(request('search') || request('platform'))
+                            @if(request('search') || request('platform') || request('per_page'))
                                 <button type="button" onclick="resetFilter()" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors" title="Reset Filter">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
@@ -247,9 +263,14 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <div class="px-6 py-4 border-t border-border bg-body/30">
-                    {{ $links->links() }}
+                <!-- Pagination Links & Info Summary -->
+                <div class="px-6 py-4 border-t border-border bg-body/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-xs text-secondary font-medium">
+                        Menampilkan <span class="font-bold text-primary">{{ $links->firstItem() ?? 0 }}</span> - <span class="font-bold text-primary">{{ $links->lastItem() ?? 0 }}</span> dari <span class="font-bold text-primary">{{ number_format($links->total()) }}</span> total link
+                    </div>
+                    <div>
+                        {{ $links->links() }}
+                    </div>
                 </div>
             </div>
         </form>
@@ -262,6 +283,8 @@
         const searchVal = document.getElementById('searchFilter')?.value?.trim();
         const platformInput = document.querySelector('input[name="platform_filter"]');
         const platformVal = platformInput ? platformInput.value : '';
+        const perPageInput = document.querySelector('input[name="per_page_filter"]');
+        const perPageVal = perPageInput ? perPageInput.value : '';
 
         if (searchVal) {
             url.searchParams.set('search', searchVal);
@@ -275,6 +298,12 @@
             url.searchParams.delete('platform');
         }
 
+        if (perPageVal) {
+            url.searchParams.set('per_page', perPageVal);
+        } else {
+            url.searchParams.delete('per_page');
+        }
+
         url.searchParams.set('page', '1');
         window.location.href = url.toString();
     }
@@ -283,6 +312,7 @@
         const url = new URL(window.location.href);
         url.searchParams.delete('search');
         url.searchParams.delete('platform');
+        url.searchParams.delete('per_page');
         url.searchParams.set('page', '1');
         window.location.href = url.toString();
     }

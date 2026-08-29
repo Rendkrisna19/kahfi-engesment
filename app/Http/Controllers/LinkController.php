@@ -97,7 +97,12 @@ class LinkController extends Controller
             });
         }
 
-        $links = $query->paginate(15)->withQueryString();
+        $perPage = (int) $request->query('per_page', 15);
+        if (!in_array($perPage, [10, 15, 25, 50, 100])) {
+            $perPage = 15;
+        }
+
+        $links = $query->paginate($perPage)->withQueryString();
 
         $pendingCountQuery = Link::where('status_scraping', 'Pending');
         if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {

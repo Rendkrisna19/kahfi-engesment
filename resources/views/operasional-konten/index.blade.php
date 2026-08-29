@@ -467,36 +467,55 @@
                 </div>
                 
                 <!-- Filter & Search Form -->
-                <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-2">
+                <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-2.5">
+                    @if(request('sort_dir'))
+                        <input type="hidden" name="sort_dir" value="{{ request('sort_dir') }}">
+                    @endif
+
+                    <!-- Per Page Filter Dropdown -->
+                    <div class="w-28 shrink-0">
+                        <x-custom-select 
+                            name="per_page" 
+                            :options="[
+                                '10' => '10 Data',
+                                '15' => '15 Data',
+                                '25' => '25 Data',
+                                '50' => '50 Data',
+                                '100' => '100 Data'
+                            ]" 
+                            :selected="request('per_page', 15)" 
+                            placeholder="15 Data" 
+                            onChange="this.form.submit()" 
+                        />
+                    </div>
+
                     <!-- Campaign Filter -->
-                    <div class="w-full sm:w-48">
-                        <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign --" onChange="this.form.submit()" class="w-full" />
+                    <div class="w-40 sm:w-48 shrink-0">
+                        <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign --" onChange="this.form.submit()" />
                     </div>
 
                     <!-- Platform Filter -->
-                    <div class="w-full sm:w-36">
-                        <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" class="w-full" />
+                    <div class="w-36 shrink-0">
+                        <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" />
                     </div>
 
                     <!-- Date Range Filter -->
-                    <div class="flex items-center gap-1 bg-body border border-border rounded-xl px-2.5 py-1.5 shadow-2xs w-full sm:w-auto">
+                    <div class="flex items-center gap-1.5 bg-body border border-border rounded-xl px-3 py-2 shadow-2xs shrink-0">
                         <svg class="w-3.5 h-3.5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span class="text-[11px] text-secondary font-medium hidden sm:inline">Tgl:</span>
                         <input type="date" name="start_date" value="{{ request('start_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Mulai">
                         <span class="text-xs text-secondary font-bold">-</span>
                         <input type="date" name="end_date" value="{{ request('end_date') }}" onchange="this.form.submit()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Selesai">
                     </div>
 
                     <!-- Search Input -->
-                    <div class="relative w-full sm:w-40">
+                    <div class="relative w-40 sm:w-44 shrink-0">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari URL / User..." class="w-full text-xs border-border bg-body text-primary rounded-xl pl-8 pr-3 py-2 focus:border-brand-blue focus:ring-brand-blue shadow-2xs">
                         <svg class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
 
-                    @if(request()->hasAny(['campaign_id', 'platform', 'search', 'start_date', 'end_date']))
-                        <a href="{{ route('operasional-konten.index') }}" class="px-2.5 py-1.5 text-xs text-status-danger hover:bg-status-danger/10 rounded-xl font-semibold flex items-center gap-1 transition" title="Reset Filter">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            <span>Reset</span>
+                    @if(request()->hasAny(['campaign_id', 'platform', 'search', 'start_date', 'end_date', 'per_page']))
+                        <a href="{{ route('operasional-konten.index') }}" class="p-2 text-xs text-status-danger hover:bg-status-danger/10 rounded-xl font-semibold flex items-center gap-1 transition shrink-0" title="Reset Filter">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </a>
                     @endif
                 </form>
@@ -695,9 +714,14 @@
                 </table>
             </div>
 
-            <!-- Pagination Links -->
-            <div class="px-6 py-4 border-t border-border bg-body/30">
-                {{ $links->links() }}
+            <!-- Pagination Links & Info Summary -->
+            <div class="px-6 py-4 border-t border-border bg-body/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-secondary font-medium">
+                    Menampilkan <span class="font-bold text-primary">{{ $links->firstItem() ?? 0 }}</span> - <span class="font-bold text-primary">{{ $links->lastItem() ?? 0 }}</span> dari <span class="font-bold text-primary">{{ number_format($links->total()) }}</span> total link
+                </div>
+                <div>
+                    {{ $links->links() }}
+                </div>
             </div>
         </div>
 
