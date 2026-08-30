@@ -47,12 +47,12 @@ class LinkController extends Controller
             $query->whereIn('campaign_id', $campaignIds);
         }
 
-        $sortDir = strtolower($request->query('sort_dir', 'asc'));
+        $sortDir = strtolower($request->query('sort_dir', 'desc'));
         if (!in_array($sortDir, ['asc', 'desc'])) {
-            $sortDir = 'asc';
+            $sortDir = 'desc';
         }
 
-        // Urutkan otomatis berdasarkan Tanggal Upload (default: dari terlama ke terbaru)
+        // Urutkan otomatis berdasarkan Tanggal Upload (default: dari terbaru ke terlama)
         $query->orderByRaw("COALESCE(tanggal_upload, DATE(updated_at)) {$sortDir}")
               ->orderBy('id', $sortDir);
 
