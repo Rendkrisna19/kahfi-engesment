@@ -199,20 +199,146 @@ class LinkController extends Controller
             ]);
 
             $campaignObj = \App\Models\Campaign::find($request->campaign_id);
-            $campaignPlatform = $campaignObj->platform ?? null;
+            $campaignPlatform = trim($campaignObj->platform ?? '');
 
             $filePath = $request->file('file')->getRealPath();
             $fileContents = file_get_contents($filePath);
+
+            $rowsData = [];
+            $unzippedTextPool = '';
+
+            // 1. Parse Native .xlsx Zip Archive if available
+            if (str_starts_with($fileContents, "PK\x03\x04") && class_exists('ZipArchive')) {
+                $zip = new \ZipArchive();
+                if ($zip->open($filePath) === true) {
+                    $sharedStrings = [];
+                    $ssXml = null;
+                    $sheetXmls = [];
+
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+                        $entryName = $zip->getNameIndex($i);
+                        $entryContent = $zip->getFromIndex($i);
+                        if (!empty($entryContent)) {
+                            $unzippedTextPool .= " " . $entryContent;
+                        }
+
+                        if (preg_match('/xl\/sharedStrings\.xml$/i', $entryName)) {
+                            $ssXml = $entryContent;
+                        } elseif (preg_match('/xl\/worksheets\/sheet\d*\.xml$/i', $entryName)) {
+                            $sheetXmls[] = $entryContent;
+                        }
+                    }
+
+                    if ($ssXml) {
+                        $ssObj = @simplexml_load_string($ssXml);
+                        if ($ssObj && isset($ssObj->si)) {
+                            foreach ($ssObj->si as $si) {
+                                if (isset($si->t)) {
+                                    $sharedStrings[] = html_entity_decode((string)$si->t, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                } elseif (isset($si->r)) {
+                                    $text = '';
+                                    foreach ($si->r as $rItem) {
+                                        $text .= (string)($rItem->t ?? '');
+                                    }
+                                    $sharedStrings[] = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                } else {
+                                    $sharedStrings[] = '';
+                                }
+                            }
+                        } else {
+                            preg_match_all('/<t[^>]*>(.*?)<\/t>/s', $ssXml, $ssMatches);
+                            if (!empty($ssMatches[1])) {
+                                foreach ($ssMatches[1] as $val) {
+                                    $sharedStrings[] = html_entity_decode(strip_tags($val), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                                }
+                            }
+                        }
+                    }
+
+                    foreach ($sheetXmls as $sheetXml) {
+                        $sheetObj = @simplexml_load_string($sheetXml);
+                        if ($sheetObj && isset($sheetObj->sheetData->row)) {
+                            $headerMap = [];
+                            foreach ($sheetObj->sheetData->row as $rowNode) {
+                                $rowCells = [];
+                                foreach ($rowNode->c as $cNode) {
+                                    $rAttr = (string)($cNode['r'] ?? '');
+                                    $colIdx = null;
+
+                                    if (!empty($rAttr) && preg_match('/^([A-Z]+)(\d+)$/i', $rAttr, $rMatches)) {
+                                        $colStr = strtoupper($rMatches[1]);
+                                        $cVal = 0;
+                                        for ($charIdx = 0; $charIdx < strlen($colStr); $charIdx++) {
+                                            $cVal = $cVal * 26 + (ord($colStr[$charIdx]) - ord('A') + 1);
+                                        }
+                                        $colIdx = $cVal - 1;
+                                    }
+
+                                    $t = (string)($cNode['t'] ?? '');
+                                    $v = (string)($cNode->v ?? '');
+
+                                    $cellVal = '';
+                                    if ($t === 's' && is_numeric($v) && isset($sharedStrings[(int)$v])) {
+                                        $cellVal = $sharedStrings[(int)$v];
+                                    } elseif ($t === 'inlineStr' && isset($cNode->is->t)) {
+                                        $cellVal = (string)$cNode->is->t;
+                                    } else {
+                                        $cellVal = trim($v);
+                                    }
+
+                                    if ($colIdx !== null) {
+                                        $rowCells[$colIdx] = $cellVal;
+                                    } else {
+                                        $rowCells[] = $cellVal;
+                                    }
+                                }
+
+                                if (empty($rowCells)) continue;
+
+                                $rowText = strtolower(implode(' ', $rowCells));
+                                if (empty($headerMap) && (str_contains($rowText, 'link') || str_contains($rowText, 'url') || str_contains($rowText, 'views') || str_contains($rowText, 'tgl upload') || str_contains($rowText, 'account'))) {
+                                    foreach ($rowCells as $idx => $cellText) {
+                                        $lowerHeader = strtolower((string)$cellText);
+                                        if (str_contains($lowerHeader, 'link') || str_contains($lowerHeader, 'url') || str_contains($lowerHeader, 'post') || str_contains($lowerHeader, 'content')) {
+                                            if (!isset($headerMap['url'])) $headerMap['url'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'account') || str_contains($lowerHeader, 'akun') || str_contains($lowerHeader, 'username') || str_contains($lowerHeader, 'creator')) {
+                                            $headerMap['username'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'tgl') || str_contains($lowerHeader, 'tanggal') || str_contains($lowerHeader, 'date')) {
+                                            $headerMap['tanggal_upload'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'view')) {
+                                            $headerMap['views'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'like')) {
+                                            $headerMap['likes'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'comment') || str_contains($lowerHeader, 'komentar')) {
+                                            $headerMap['comments'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'save') || str_contains($lowerHeader, 'simpan')) {
+                                            $headerMap['saves'] = $idx;
+                                        } elseif (str_contains($lowerHeader, 'share') || str_contains($lowerHeader, 'bagikan')) {
+                                            $headerMap['shares'] = $idx;
+                                        }
+                                    }
+                                    continue;
+                                }
+
+                                $extractedRow = $this->extractRowDataFromCells($rowCells, $headerMap);
+                                if ($extractedRow && !empty($extractedRow['url'])) {
+                                    $rowsData[] = $extractedRow;
+                                }
+                            }
+                        }
+                    }
+
+                    $zip->close();
+                }
+            }
 
             // Clean XML/HTML metadata tags (<head>, <xml>, <style>, <annotation>) to prevent w3.org namespace URLs from being read
             $cleanContents = preg_replace('/<head[^>]*>.*?<\/head>/is', '', $fileContents);
             $cleanContents = preg_replace('/<xml[^>]*>.*?<\/xml>/is', '', $cleanContents);
             $cleanContents = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $cleanContents);
 
-            $rowsData = [];
-
-            // 1. Parse HTML Table (.xls format exported from Excel / Google Sheets)
-            if (str_contains($cleanContents, '<tr') || str_contains($cleanContents, '<td')) {
+            // 2. Parse HTML Table (.xls format exported from Excel / Google Sheets)
+            if (empty($rowsData) && (str_contains($cleanContents, '<tr') || str_contains($cleanContents, '<td'))) {
                 preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $cleanContents, $trMatches);
                 if (!empty($trMatches[1])) {
                     $headerMap = [];
@@ -221,7 +347,8 @@ class LinkController extends Controller
                         if (empty($cellMatches[1])) continue;
 
                         $rowCells = array_map(function($c) {
-                            return trim(strip_tags($c));
+                            $decoded = html_entity_decode($c, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                            return trim(preg_replace('/\s+/', ' ', strip_tags($decoded)));
                         }, $cellMatches[1]);
 
                         $rowText = strtolower(implode(' ', $rowCells));
@@ -257,16 +384,21 @@ class LinkController extends Controller
                 }
             }
 
-            // 2. Parse Delimited CSV / TSV
+            // 3. Parse Delimited CSV / TSV
             if (empty($rowsData)) {
-                $lines = explode("\n", str_replace("\r", "", $cleanContents));
+                $lines = explode("\n", str_replace("\r", "", $fileContents));
                 $headerMap = [];
 
                 foreach ($lines as $line) {
                     if (empty(trim($line))) continue;
+                    if (str_starts_with(trim($line), 'sep=') || str_starts_with(trim($line), '<?xml')) continue;
 
                     $delimiter = str_contains($line, ';') ? ';' : (str_contains($line, "\t") ? "\t" : ',');
-                    $rowCells = array_map('trim', str_getcsv($line, $delimiter));
+                    $rawCells = str_getcsv($line, $delimiter);
+                    $rowCells = array_map(function($c) {
+                        $decoded = html_entity_decode($c, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        return trim(preg_replace('/\s+/', ' ', strip_tags($decoded)));
+                    }, $rawCells);
 
                     $rowText = strtolower(implode(' ', $rowCells));
                     if (empty($headerMap) && (str_contains($rowText, 'link') || str_contains($rowText, 'url') || str_contains($rowText, 'views') || str_contains($rowText, 'tgl upload') || str_contains($rowText, 'account'))) {
@@ -300,9 +432,10 @@ class LinkController extends Controller
                 }
             }
 
-            // 3. Fallback scan text regex for any URLs
+            // 4. Ultimate Fallback: scan all text contents (raw, unzipped, clean) for ANY TikTok / Instagram URL
             if (empty($rowsData)) {
-                preg_match_all('/(?:https?:\/\/|[a-z0-9\.\-]+\.(?:com|am)\/)[^\s"<>\'\,\;\r\n]+/i', $cleanContents, $matches);
+                $searchPool = $fileContents . " " . $cleanContents . " " . $unzippedTextPool;
+                preg_match_all('/(?:https?:\/\/|www\.|vt\.|vm\.|[a-z0-9\.\-]+\.(?:tiktok|instagram)\.com\/)[^\s"<>\'\,\;\r\n]+/i', $searchPool, $matches);
                 if (!empty($matches[0])) {
                     foreach ($matches[0] as $rawUrl) {
                         $cleanUrl = $this->sanitizeUrl($rawUrl);
@@ -323,7 +456,8 @@ class LinkController extends Controller
             }
 
             $seenUrls = [];
-            $hasAnyMetrics = false;
+            $insertedCount = 0;
+            $skippedPlatformCount = 0;
 
             foreach ($rowsData as $r) {
                 $url = $r['url'];
@@ -332,18 +466,31 @@ class LinkController extends Controller
 
                 $detectedPlatform = $this->detectPlatform($url, $campaignPlatform);
 
+                // Check platform compatibility with selected campaign
+                if (!empty($campaignPlatform)) {
+                    $lowerCampPlat = strtolower($campaignPlatform);
+                    $isCampTiktok = str_contains($lowerCampPlat, 'tiktok') && !str_contains($lowerCampPlat, 'instagram');
+                    $isCampIg = str_contains($lowerCampPlat, 'instagram') && !str_contains($lowerCampPlat, 'tiktok');
+
+                    if ($isCampTiktok && strtolower($detectedPlatform) !== 'tiktok') {
+                        $skippedPlatformCount++;
+                        continue;
+                    }
+
+                    if ($isCampIg && strtolower($detectedPlatform) !== 'instagram') {
+                        $skippedPlatformCount++;
+                        continue;
+                    }
+                }
+
                 $views = (int)($r['views'] ?? 0);
                 $likes = (int)($r['likes'] ?? 0);
                 $comments = (int)($r['comments'] ?? 0);
                 $saves = (int)($r['saves'] ?? 0);
                 $shares = (int)($r['shares'] ?? 0);
 
-                $hasMetrics = ($views > 0 || $likes > 0 || $comments > 0 || $saves > 0 || $shares > 0);
-                if ($hasMetrics) {
-                    $hasAnyMetrics = true;
-                }
-                $statusScraping = $hasMetrics ? 'Completed' : 'Pending';
                 $er = ($views > 0) ? (($likes + $comments + $shares) / $views) * 100 : 0;
+                $statusScraping = 'Completed';
 
                 Link::updateOrCreate(
                     [
@@ -362,15 +509,25 @@ class LinkController extends Controller
                         'saves' => $saves,
                         'shares' => $shares,
                         'engagement_rate' => min(100, round($er, 2)),
-                        'status_scraping' => $statusScraping
+                        'status_scraping' => $statusScraping,
+                        'updated_at' => now(),
                     ]
                 );
 
                 $insertedCount++;
             }
 
-            if ($hasAnyMetrics) {
+            if ($insertedCount > 0) {
                 $this->calculateSawScoresForCampaign($request->campaign_id);
+                $msg = "Berhasil memproses & menyimpan {$insertedCount} data link konten dari file Excel.";
+                if ($skippedPlatformCount > 0) {
+                    $msg .= " ({$skippedPlatformCount} link dilewati karena jenis platform tidak sesuai dengan Campaign '{$campaignObj->nama_campaign}' - Platform: {$campaignObj->platform}).";
+                }
+                return redirect()->route('operasional-konten.index')->with('success', $msg);
+            } elseif ($skippedPlatformCount > 0) {
+                return redirect()->route('operasional-konten.index')->with('warning', "Tidak ada link yang diimpor. Total {$skippedPlatformCount} link dalam file dilewati karena tidak sesuai dengan platform Campaign '{$campaignObj->nama_campaign}' (Platform: {$campaignObj->platform}).");
+            } else {
+                return redirect()->route('operasional-konten.index')->with('error', 'Tidak ditemukan link video yang valid dalam file Excel/CSV yang diupload.');
             }
         }
 
@@ -383,149 +540,36 @@ class LinkController extends Controller
      */
     public function downloadTemplate(Request $request)
     {
-        $format = $request->query('format', 'excel');
+        $format = strtolower($request->query('format', 'excel'));
 
-        if ($format === 'csv') {
-            $headers = [
-                'Content-Type' => 'text/csv; charset=UTF-8',
-                'Content-Disposition' => 'attachment; filename="template_upload_link.csv"',
-            ];
-
-            $callback = function () {
-                $file = fopen('php://output', 'w');
-                // UTF-8 BOM for Excel CSV compatibility
-                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-                fputcsv($file, ['Tgl Upload', 'Account', 'Link Content', 'Views', 'Likes', 'Comment', 'Save', 'Share']);
-                fputcsv($file, ['Sabtu, 08 Agustus 2026', 'Ruang Bercerita', 'https://vt.tiktok.com/ZS4sj89A1/', '398900', '5329', '69', '284', '463']);
-                fputcsv($file, ['Minggu, 09 Agustus 2026', 'Area Cerita', 'https://www.tiktok.com/@areacerita/video/7381920192831', '7381', '120', '15', '8', '12']);
-                fputcsv($file, ['Rabu, 12 Agustus 2026', 'Inspirasi Harian', 'https://www.instagram.com/p/Cxyz123456/', '45200', '1850', '42', '110', '95']);
-                fclose($file);
-            };
-
-            return response()->stream($callback, 200, $headers);
-        }
-
-        // Default: Excel (.xls) template with styled table borders and gridlines
-        $filename = "template_upload_link.xls";
-
-        $html = '<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <!--[if gte mso 9]>
-    <xml>
-        <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-                <x:ExcelWorksheet>
-                    <x:Name>Template Upload Link</x:Name>
-                    <x:WorksheetOptions>
-                        <x:DisplayGridlines/>
-                    </x:WorksheetOptions>
-                </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-        </x:ExcelWorkbook>
-    </xml>
-    <![endif]-->
-    <style>
-        body { font-family: Arial, sans-serif; font-size: 10pt; color: #1f2937; }
-        .th-header { font-size: 10pt; font-weight: bold; color: #ffffff; background-color: #1e40af; text-align: center; vertical-align: middle; height: 30px; border: 1px solid #111827; }
-        .td-no { text-align: center; vertical-align: middle; border: 1px solid #4b5563; background-color: #f3f4f6; font-weight: bold; color: #374151; }
-        .td-data { text-align: left; vertical-align: middle; border: 1px solid #9ca3af; background-color: #fffbeb; height: 24px; font-size: 9.5pt; }
-        .td-num { text-align: right; vertical-align: middle; border: 1px solid #9ca3af; background-color: #fffbeb; height: 24px; font-size: 9.5pt; }
-        .td-empty { text-align: left; vertical-align: middle; border: 1px solid #9ca3af; background-color: #ffffff; height: 24px; }
-    </style>
-</head>
-<body>
-    <table border="1" style="border-collapse: collapse; width: 100%;">
-        <tr>
-            <th style="width: 40px;" class="th-header">No</th>
-            <th style="width: 150px;" class="th-header">Tgl Upload</th>
-            <th style="width: 140px;" class="th-header">Account</th>
-            <th style="width: 330px;" class="th-header">Link Content (TikTok / Instagram) *Wajib</th>
-            <th style="width: 90px;" class="th-header">Views</th>
-            <th style="width: 80px;" class="th-header">Likes</th>
-            <th style="width: 80px;" class="th-header">Comment</th>
-            <th style="width: 80px;" class="th-header">Save</th>
-            <th style="width: 80px;" class="th-header">Share</th>
-        </tr>';
-
-        // 3 Data Contoh Testing
-        $sampleData = [
-            [
-                'no' => 1,
-                'tgl' => 'Sabtu, 08 Agustus 2026',
-                'account' => 'Ruang Bercerita',
-                'url' => 'https://vt.tiktok.com/ZS4sj89A1/',
-                'views' => '398.900',
-                'likes' => '5.329',
-                'comments' => '69',
-                'saves' => '284',
-                'shares' => '463',
-            ],
-            [
-                'no' => 2,
-                'tgl' => 'Minggu, 09 Agustus 2026',
-                'account' => 'Area Cerita',
-                'url' => 'https://www.tiktok.com/@areacerita/video/7381920192831',
-                'views' => '7.381',
-                'likes' => '120',
-                'comments' => '15',
-                'saves' => '8',
-                'shares' => '12',
-            ],
-            [
-                'no' => 3,
-                'tgl' => 'Rabu, 12 Agustus 2026',
-                'account' => 'Inspirasi Harian',
-                'url' => 'https://www.instagram.com/p/Cxyz123456/',
-                'views' => '45.200',
-                'likes' => '1.850',
-                'comments' => '42',
-                'saves' => '110',
-                'shares' => '95',
-            ]
+        $filename = ($format === 'excel') ? 'template_upload_link.csv' : 'template_upload_link.csv';
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
         ];
 
-        foreach ($sampleData as $item) {
-            $html .= '
-        <tr>
-            <td class="td-no">' . $item['no'] . '</td>
-            <td class="td-data">' . $item['tgl'] . '</td>
-            <td class="td-data">' . $item['account'] . '</td>
-            <td class="td-data">' . $item['url'] . '</td>
-            <td class="td-num">' . $item['views'] . '</td>
-            <td class="td-num">' . $item['likes'] . '</td>
-            <td class="td-num">' . $item['comments'] . '</td>
-            <td class="td-num">' . $item['saves'] . '</td>
-            <td class="td-num">' . $item['shares'] . '</td>
-        </tr>';
-        }
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            // UTF-8 BOM & sep directive for seamless Microsoft Excel opening
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fwrite($file, "sep=,\n");
 
-        for ($i = 4; $i <= 20; $i++) {
-            $html .= '
-        <tr>
-            <td class="td-no">' . $i . '</td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-            <td class="td-empty"></td>
-        </tr>';
-        }
+            fputcsv($file, ['No', 'Tgl Upload', 'Account', 'Link Content (TikTok / Instagram) *Wajib', 'Views', 'Likes', 'Comment', 'Save', 'Share']);
+            fputcsv($file, ['1', 'Sabtu, 08 Agustus 2026', 'Ruang Bercerita', 'https://vt.tiktok.com/ZS4sj89A1/', '398900', '5329', '69', '284', '463']);
+            fputcsv($file, ['2', 'Minggu, 09 Agustus 2026', 'Area Cerita', 'https://www.tiktok.com/@haloiniakimm/video/7677116573420621076', '7381', '120', '15', '8', '12']);
+            fputcsv($file, ['3', 'Rabu, 12 Agustus 2026', 'Inspirasi Harian', 'https://www.instagram.com/p/Cxyz123456/', '45200', '1850', '42', '110', '95']);
+            
+            for ($i = 4; $i <= 10; $i++) {
+                fputcsv($file, [(string)$i, '', '', '', '', '', '', '', '']);
+            }
 
-        $html .= '
-    </table>
-</body>
-</html>';
+            fclose($file);
+        };
 
-        return response($html, 200, [
-            'Content-Type' => 'application/vnd.ms-excel',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            'Cache-Control' => 'max-age=0',
-        ]);
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
@@ -876,10 +920,17 @@ class LinkController extends Controller
     {
         if (empty($rawUrl)) return null;
 
-        $trimmed = trim(strip_tags($rawUrl));
-        if (empty($trimmed)) return null;
+        // 1. Decode HTML entities (&nbsp;, &amp;, dll)
+        $str = html_entity_decode((string)$rawUrl, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        $trimmed = trim($trimmed, '"\'`()[]{}<> ');
+        // 2. Strip tags
+        $str = strip_tags($str);
+
+        // 3. Ganti non-breaking spaces (\xC2\xA0 / &nbsp;), BOM (\xEF\xBB\xBF), dan karakter kontrol dengan spasi biasa
+        $str = preg_replace('/[\x00-\x1F\x7F\xC2\xA0\xEF\xBB\xBF]/u', ' ', $str);
+
+        // 4. Trim spasi dan tanda petik/kurung
+        $trimmed = trim($str, " \t\n\r\0\x0B\"'`()[]{}<>");
         if (empty($trimmed)) return null;
 
         $lowerTrimmed = strtolower($trimmed);
@@ -889,21 +940,20 @@ class LinkController extends Controller
             return null;
         }
 
-        // Jika URL belum diawali http:// atau https://
-        if (!preg_match('/^https?:\/\//i', $trimmed)) {
-            if (preg_match('/^(vt\.tiktok\.com|vm\.tiktok\.com|www\.tiktok\.com|tiktok\.com|www\.instagram\.com|instagram\.com|instagr\.am)\//i', $trimmed)) {
-                $trimmed = 'https://' . $trimmed;
-            }
-        }
+        // 5. Cari pola URL TikTok / Instagram
+        if (preg_match('/(?:https?:\/\/|[a-z0-9\.\-]*tiktok\.com|[a-z0-9\.\-]*instagram\.com|instagr\.am|ig\.me)[^\s"<>\'\,\;\r\n]+/i', $trimmed, $match)) {
+            $extracted = $match[0];
 
-        // Cari pola URL TikTok / Instagram
-        if (preg_match('/https?:\/\/[^\s"<>\'\,\;\r\n]+/i', $trimmed, $match)) {
-            $cleanUrl = strtok($match[0], '?');
+            // Tambahkan https:// jika belum ada
+            if (!preg_match('/^https?:\/\//i', $extracted)) {
+                $extracted = 'https://' . ltrim($extracted, '/');
+            }
+
+            $cleanUrl = strtok($extracted, '?');
             $cleanUrl = rtrim($cleanUrl, '.,;');
             $lowerClean = strtolower($cleanUrl);
-            
-            // Pastikan URL milik TikTok atau Instagram
-            if (str_contains($lowerClean, 'tiktok') || str_contains($lowerClean, 'instagram') || str_contains($lowerClean, 'instagr.am')) {
+
+            if (str_contains($lowerClean, 'tiktok') || str_contains($lowerClean, 'instagram') || str_contains($lowerClean, 'instagr.am') || str_contains($lowerClean, 'ig.me')) {
                 return $cleanUrl;
             }
         }

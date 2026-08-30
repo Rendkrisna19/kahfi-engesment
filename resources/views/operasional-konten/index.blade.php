@@ -224,7 +224,7 @@
                                 </div>
                             </div>
                             <div class="text-[11px] text-secondary font-medium hidden sm:block">
-                                Baris 1: Header (<span class="font-bold text-emerald-600 dark:text-emerald-400">URL Konten</span>) &bull; Baris 2+: Link TikTok / Instagram
+                                Baris 1: Header (<span class="font-bold text-emerald-600 dark:text-emerald-400">URL Konten, Metrik Engagement</span>) &bull; Filter otomatis platform Campaign (Tanpa Apify)
                             </div>
                         </div>
 
