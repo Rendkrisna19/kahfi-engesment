@@ -21,8 +21,34 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         
-        <!-- Vite Styles & Alpine JS -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Montserrat', 'sans-serif'],
+                        },
+                        colors: {
+                            brand: {
+                                blue: '#2563eb',
+                                purple: '#7c3aed',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <!-- Alpine JS CDN -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <!-- Vite Assets (Optional if built) -->
+        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @endif
 
         @php
             $brandLogoUrl = \App\Models\LandingSetting::brandLogoUrl();
@@ -55,6 +81,12 @@
                 background: rgba(255, 255, 255, 0.82);
                 backdrop-filter: blur(16px);
                 -webkit-backdrop-filter: blur(16px);
+            }
+            .text-gradient-brand {
+                background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
         </style>
     </head>
@@ -132,7 +164,7 @@
                     $secondPart = implode(' ', array_slice($words, max(1, (int)($total * 0.5))));
                 @endphp
                 {{ $firstPart }}
-                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
+                <span class="text-gradient-brand bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
                     {{ $secondPart }}
                 </span>
             </h1>

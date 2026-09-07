@@ -80,14 +80,25 @@ class LandingCmsController extends Controller
                 'brand_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
             ]);
             $oldLogo = LandingSetting::get('brand_logo');
-            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+            if ($oldLogo && file_exists(public_path($oldLogo))) {
+                @unlink(public_path($oldLogo));
+            } elseif ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
                 Storage::disk('public')->delete($oldLogo);
             }
-            $path = $request->file('brand_logo')->store('landing', 'public');
+            $file = $request->file('brand_logo');
+            $fileName = 'logo_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dest = public_path('uploads/landing');
+            if (!file_exists($dest)) {
+                @mkdir($dest, 0755, true);
+            }
+            $file->move($dest, $fileName);
+            $path = 'uploads/landing/' . $fileName;
             LandingSetting::set('brand_logo', $path, 'general');
         } elseif ($request->boolean('remove_brand_logo')) {
             $oldLogo = LandingSetting::get('brand_logo');
-            if ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
+            if ($oldLogo && file_exists(public_path($oldLogo))) {
+                @unlink(public_path($oldLogo));
+            } elseif ($oldLogo && Storage::disk('public')->exists($oldLogo)) {
                 Storage::disk('public')->delete($oldLogo);
             }
             LandingSetting::set('brand_logo', null, 'general');
@@ -98,7 +109,20 @@ class LandingCmsController extends Controller
             $request->validate([
                 'hero_image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
             ]);
-            $path = $request->file('hero_image')->store('landing', 'public');
+            $oldHero = LandingSetting::get('hero_image');
+            if ($oldHero && file_exists(public_path($oldHero))) {
+                @unlink(public_path($oldHero));
+            } elseif ($oldHero && Storage::disk('public')->exists($oldHero)) {
+                Storage::disk('public')->delete($oldHero);
+            }
+            $file = $request->file('hero_image');
+            $fileName = 'hero_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dest = public_path('uploads/landing');
+            if (!file_exists($dest)) {
+                @mkdir($dest, 0755, true);
+            }
+            $file->move($dest, $fileName);
+            $path = 'uploads/landing/' . $fileName;
             LandingSetting::set('hero_image', $path, 'hero');
         }
 
@@ -141,7 +165,14 @@ class LandingCmsController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('landing', 'public');
+            $file = $request->file('image');
+            $fileName = $request->type . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dest = public_path('uploads/landing');
+            if (!file_exists($dest)) {
+                @mkdir($dest, 0755, true);
+            }
+            $file->move($dest, $fileName);
+            $imagePath = 'uploads/landing/' . $fileName;
         }
 
         $extraMeta = null;
@@ -196,13 +227,23 @@ class LandingCmsController extends Controller
 
         $imagePath = $item->image;
         if ($request->hasFile('image')) {
-            // Delete old file if local
-            if ($item->image && Storage::disk('public')->exists($item->image)) {
+            if ($item->image && file_exists(public_path($item->image))) {
+                @unlink(public_path($item->image));
+            } elseif ($item->image && Storage::disk('public')->exists($item->image)) {
                 Storage::disk('public')->delete($item->image);
             }
-            $imagePath = $request->file('image')->store('landing', 'public');
+            $file = $request->file('image');
+            $fileName = $item->type . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $dest = public_path('uploads/landing');
+            if (!file_exists($dest)) {
+                @mkdir($dest, 0755, true);
+            }
+            $file->move($dest, $fileName);
+            $imagePath = 'uploads/landing/' . $fileName;
         } elseif ($request->boolean('remove_image')) {
-            if ($item->image && Storage::disk('public')->exists($item->image)) {
+            if ($item->image && file_exists(public_path($item->image))) {
+                @unlink(public_path($item->image));
+            } elseif ($item->image && Storage::disk('public')->exists($item->image)) {
                 Storage::disk('public')->delete($item->image);
             }
             $imagePath = null;
@@ -248,7 +289,9 @@ class LandingCmsController extends Controller
     public function destroyItem(LandingItem $item)
     {
         $type = $item->type;
-        if ($item->image && Storage::disk('public')->exists($item->image)) {
+        if ($item->image && file_exists(public_path($item->image))) {
+            @unlink(public_path($item->image));
+        } elseif ($item->image && Storage::disk('public')->exists($item->image)) {
             Storage::disk('public')->delete($item->image);
         }
         $item->delete();

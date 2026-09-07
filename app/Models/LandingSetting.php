@@ -57,8 +57,26 @@ class LandingSetting extends Model
             return $logo;
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists($logo)
-            ? \Illuminate\Support\Facades\Storage::disk('public')->url($logo)
-            : asset($logo);
+        // 1. Direct file in public path (e.g. uploads/landing/...)
+        if (file_exists(public_path($logo))) {
+            return asset($logo);
+        }
+
+        // 2. File in public/storage/...
+        if (file_exists(public_path('storage/' . $logo))) {
+            return asset('storage/' . $logo);
+        }
+
+        // 3. File in storage/app/public/...
+        if (file_exists(storage_path('app/public/' . $logo))) {
+            return url('storage/' . $logo);
+        }
+
+        // 4. Storage disk check
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($logo)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($logo);
+        }
+
+        return asset($logo);
     }
 }

@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\LandingCmsController::class, 'welcome'])->name('welcome');
 
+// Fallback direct file route for storage on shared hosting / cPanel
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (file_exists($filePath)) {
+        return response()->file($filePath);
+    }
+    abort(404);
+})->where('path', '.*');
+
 
 /*
 |--------------------------------------------------------------------------

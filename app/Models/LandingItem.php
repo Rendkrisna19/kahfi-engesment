@@ -53,8 +53,26 @@ class LandingItem extends Model
             return $this->image;
         }
 
-        return Storage::disk('public')->exists($this->image)
-            ? Storage::disk('public')->url($this->image)
-            : asset($this->image);
+        // 1. Direct file in public path (e.g. uploads/landing/...)
+        if (file_exists(public_path($this->image))) {
+            return asset($this->image);
+        }
+
+        // 2. File in public/storage/...
+        if (file_exists(public_path('storage/' . $this->image))) {
+            return asset('storage/' . $this->image);
+        }
+
+        // 3. File in storage/app/public/...
+        if (file_exists(storage_path('app/public/' . $this->image))) {
+            return url('storage/' . $this->image);
+        }
+
+        // 4. Storage disk check
+        if (Storage::disk('public')->exists($this->image)) {
+            return Storage::disk('public')->url($this->image);
+        }
+
+        return asset($this->image);
     }
 }
