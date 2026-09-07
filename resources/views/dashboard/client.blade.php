@@ -190,19 +190,19 @@
                 </div>
             </div>
 
-            <!-- Avg SAW Score -->
+            <!-- Total Views Increase -->
             <div class="bg-surface rounded-2xl p-4 border border-border shadow-xs flex flex-col justify-between hover:border-brand-blue/30 transition">
                 <div class="flex items-center justify-between text-secondary">
-                    <span class="text-xs font-semibold">Rata Skor SAW</span>
-                    <span class="p-1.5 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                    <span class="text-xs font-semibold">Kenaikan Views</span>
+                    <span class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                     </span>
                 </div>
                 <div class="mt-2">
-                    <h3 class="text-xl font-extrabold text-purple-600 dark:text-purple-400">{{ number_format($avgSawScore, 4) }}</h3>
-                    <span class="inline-flex items-center gap-1 text-[10px] text-purple-500 font-semibold">
-                        <svg class="w-3 h-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-                        <span>Bobot SAW</span>
+                    <h3 class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">+{{ number_format($totalViewsIncrease) }}</h3>
+                    <span class="inline-flex items-center gap-1 text-[10px] text-emerald-500 font-semibold">
+                        <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <span>Pasca Update</span>
                     </span>
                 </div>
             </div>
@@ -252,7 +252,7 @@
                         <span>Top 5 Content Ranking</span>
                         <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </h3>
-                    <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan preferensi skor SAW</p>
+                    <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan performa tayangan</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -266,7 +266,6 @@
                             <th class="px-6 py-4 font-semibold text-right">Likes</th>
                             <th class="px-6 py-4 font-semibold text-right">Comments</th>
                             <th class="px-6 py-4 font-semibold text-right">ER (%)</th>
-                            <th class="px-6 py-4 font-semibold text-right">SAW Score</th>
                             <th class="px-6 py-4 font-semibold text-center">Detail</th>
                         </tr>
                     </thead>
@@ -279,12 +278,11 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-primary">{{ $content->campaign->nama_campaign ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-secondary font-bold">@​{{ $content->username ?? '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-secondary font-bold">@{{ $content->username ?? '-' }}</td>
                             <td class="px-6 py-4 text-sm text-right font-medium text-primary">{{ number_format($content->views) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->likes) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->comments) }}</td>
                             <td class="px-6 py-4 text-sm text-right font-bold text-status-success">{{ number_format($content->engagement_rate, 2) }}%</td>
-                            <td class="px-6 py-4 text-sm text-right font-black text-brand-blue">{{ number_format($content->saw_score, 4) }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('laporan.show', $content->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20 rounded-xl text-xs font-bold transition-colors">
                                     Detail
@@ -293,7 +291,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
+                            <td colspan="8" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
                         </tr>
                         @endforelse
                     </tbody>
