@@ -201,7 +201,7 @@
                 <div class="animate-marquee gap-8 items-center py-3">
                     @php
                         // Duplicate array to ensure smooth infinite loop
-                        $allClients = $clients->concat($clients);
+                        $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients) : ($clients ?? collect());
                     @endphp
                     @foreach($allClients as $client)
                         <div class="px-6 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center gap-3.5 shrink-0 hover:border-blue-400 hover:shadow-md transition">
