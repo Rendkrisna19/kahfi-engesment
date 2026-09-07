@@ -278,7 +278,15 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-primary">{{ $content->campaign->nama_campaign ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-secondary font-bold">{{ $content->username ? '@' . $content->username : '-' }}</td>
+                            @php
+                                $uName = trim($content->username ?? '');
+                                if (empty($uName) || str_contains($uName, '{') || str_contains($uName, '$')) {
+                                    $displayAccount = '-';
+                                } else {
+                                    $displayAccount = str_starts_with($uName, '@') ? $uName : '@' . $uName;
+                                }
+                            @endphp
+                            <td class="px-6 py-4 text-sm text-secondary font-bold">{{ $displayAccount }}</td>
                             <td class="px-6 py-4 text-sm text-right font-medium text-primary">{{ number_format($content->views) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->likes) }}</td>
                             <td class="px-6 py-4 text-sm text-right text-secondary">{{ number_format($content->comments) }}</td>
