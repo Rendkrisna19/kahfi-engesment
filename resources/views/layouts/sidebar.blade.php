@@ -1,10 +1,18 @@
 <aside :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0 bg-surface border-r border-border flex flex-col" aria-label="Sidebar" id="logo-sidebar">
     <div class="px-6 py-8">
         <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 group">
-            <div class="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            </div>
-            <span class="text-xl font-extrabold text-primary tracking-tight">Kahfi<span class="text-brand-blue">Eng.</span></span>
+            @php
+                $sidebarLogo = \App\Models\LandingSetting::brandLogoUrl();
+                $sidebarBrand = \App\Models\LandingSetting::get('brand_name', 'Kahfi Engagement');
+            @endphp
+            @if($sidebarLogo)
+                <img src="{{ $sidebarLogo }}" alt="{{ $sidebarBrand }}" class="w-8 h-8 rounded-lg object-contain shadow-md shadow-brand-blue/20 group-hover:scale-105 transition-transform">
+            @else
+                <div class="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+            @endif
+            <span class="text-lg font-extrabold text-primary tracking-tight truncate">{{ $sidebarBrand }}</span>
         </a>
     </div>
 
@@ -61,10 +69,19 @@
                 @can('master-data.view')
                 <a href="{{ route('kategori-konten.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('kategori-konten.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kategori Konten</a>
                 <a href="{{ route('kategori-creator.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('kategori-creator.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kategori Creator</a>
+                <a href="{{ route('admin.cms.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.cms.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kelola Landing Page</a>
                 @endcan
             </div>
         </div>
         @endcanany
+
+        @can('master-data.view')
+        <!-- CMS Landing Page Direct Link -->
+        <a href="{{ route('admin.cms.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors {{ request()->routeIs('admin.cms.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-semibold' : 'text-secondary hover:bg-gray-100/80 hover:text-primary dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <span class="text-sm">Kelola Landing Page</span>
+        </a>
+        @endcan
 
         @can('laporan.view')
         <!-- 6. Laporan & Export -->

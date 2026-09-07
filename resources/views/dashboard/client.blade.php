@@ -249,16 +249,20 @@
             <div class="p-6 border-b border-border flex justify-between items-center bg-body/25">
                 <div>
                     <h3 class="text-lg font-bold text-primary flex items-center gap-2">
-                        <span>Top 5 Content Ranking</span>
+                        <span>Top 20 Content Ranking</span>
                         <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </h3>
                     <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan performa tayangan</p>
                 </div>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-lg">
+                    Menampilkan {{ $topContent->count() }} Konten Teratas
+                </span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-body/50 text-xs uppercase text-secondary">
                         <tr>
+                            <th class="px-6 py-4 font-semibold">Rank</th>
                             <th class="px-6 py-4 font-semibold">Platform</th>
                             <th class="px-6 py-4 font-semibold">Campaign</th>
                             <th class="px-6 py-4 font-semibold">Akun</th>
@@ -270,8 +274,13 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
-                        @forelse($topContent as $content)
+                        @forelse($topContent as $index => $content)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="w-6 h-6 rounded-full inline-flex items-center justify-center text-xs font-extrabold {{ $index == 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-300' : ($index == 1 ? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-300' : ($index == 2 ? 'bg-amber-800/10 text-amber-900 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-800/30' : 'bg-body text-secondary')) }}">
+                                    {{ $index + 1 }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-1 bg-body border border-border rounded-lg text-xs font-semibold">
                                     {{ ucfirst($content->platform) }}
@@ -299,7 +308,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
+                            <td colspan="9" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
                         </tr>
                         @endforelse
                     </tbody>

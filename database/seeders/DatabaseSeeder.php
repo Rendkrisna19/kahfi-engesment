@@ -48,5 +48,8 @@ class DatabaseSeeder extends Seeder
             'status' => 'Aktif',
         ]);
         $userClient->assignRole($roleClient);
+
+        // Seed Landing Page CMS data
+        $this->call(LandingCmsSeeder::class);
     }
 }
