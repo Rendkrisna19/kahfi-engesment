@@ -41,7 +41,7 @@ class LinkController extends Controller
         $campaignIds = $campaigns->pluck('id');
 
         $query = Link::with(['campaign', 'kategoriKonten', 'kategoriCreator']);
-
+ 
         // Scope data link sesuai campaign yang bisa diakses user
         if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
             $query->whereIn('campaign_id', $campaignIds);
