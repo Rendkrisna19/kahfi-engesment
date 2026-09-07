@@ -5,7 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Kahfi Engagement') }}</title>
+        @php
+            $brandTitle = \App\Models\LandingSetting::get('brand_name') ?: (config('app.name') && config('app.name') !== 'Laravel' ? config('app.name') : 'Kahfi Engagement');
+            $brandFavicon = \App\Models\LandingSetting::brandLogoUrl();
+        @endphp
+        <title>{{ $brandTitle }}</title>
+        @if($brandFavicon)
+            <link rel="icon" type="image/png" href="{{ $brandFavicon }}">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
