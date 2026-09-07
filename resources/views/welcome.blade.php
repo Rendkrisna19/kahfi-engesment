@@ -1,3 +1,14 @@
+@php
+    $settings = $settings ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_settings') ? \App\Models\LandingSetting::allKeyValues() : []);
+    $clients = $clients ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('client_logo')->active()->ordered()->get() : collect());
+    $whyJoins = $whyJoins ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('why_join')->active()->ordered()->get() : collect());
+    $notFors = $notFors ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('not_for')->active()->ordered()->get() : collect());
+    $howSteps = $howSteps ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('how_step')->active()->ordered()->get() : collect());
+    $efficiencyCards = $efficiencyCards ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('efficiency_card')->active()->ordered()->get() : collect());
+    $ctaChips = $ctaChips ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('cta_chip')->active()->ordered()->get() : collect());
+    $portfolios = $portfolios ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('portfolio')->active()->ordered()->get() : collect());
+    $paymentProofs = $paymentProofs ?? (\Illuminate\Support\Facades\Schema::hasTable('landing_items') ? \App\Models\LandingItem::ofType('payment_proof')->active()->ordered()->get() : collect());
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
     <head>
