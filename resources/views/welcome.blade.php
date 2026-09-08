@@ -322,7 +322,6 @@
             </div>
         </section>
 
-        <!-- ================= SECTION 2: CLIENT / BRAND PARTNERS ================= -->
         <section id="klien" class="relative z-10 py-12 lg:py-16 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Sleek Card Container (Matching Image 2 Style with Purple-Blue-White Palette) -->
