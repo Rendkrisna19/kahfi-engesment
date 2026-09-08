@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+<<<<<<< Updated upstream
 Route::get('/', [\App\Http\Controllers\LandingCmsController::class, 'welcome'])->name('welcome');
 
 // Fallback direct file route for storage on shared hosting / cPanel
@@ -24,6 +25,16 @@ Route::get('/storage/{path}', function ($path) {
     }
     abort(404);
 })->where('path', '.*');
+=======
+Route::get('/setup-storage', function () {
+    Artisan::call('storage:link');
+    return 'Storage berhasil dilink!';
+});
+
+Route::get('/', function () {
+    return view('welcome');
+});
+>>>>>>> Stashed changes
 
 
 /*
