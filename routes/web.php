@@ -292,7 +292,8 @@ Route::middleware(['auth', 'can:master-data.view'])->prefix('admin/cms')->name('
     Route::get('/', [\App\Http\Controllers\LandingCmsController::class, 'index'])->name('index');
     Route::post('/settings', [\App\Http\Controllers\LandingCmsController::class, 'updateSettings'])->name('settings.update');
     Route::post('/items', [\App\Http\Controllers\LandingCmsController::class, 'storeItem'])->name('items.store');
-    Route::put('/items/{item}', [\App\Http\Controllers\LandingCmsController::class, 'updateItem'])->name('items.update');
+    Route::post('/items/update-direct', [\App\Http\Controllers\LandingCmsController::class, 'updateItemDirect'])->name('items.update_direct');
+    Route::match(['put', 'post'], '/items/{item}', [\App\Http\Controllers\LandingCmsController::class, 'updateItem'])->name('items.update');
     Route::delete('/items/{item}', [\App\Http\Controllers\LandingCmsController::class, 'destroyItem'])->name('items.destroy');
 });
 

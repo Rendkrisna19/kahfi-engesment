@@ -264,7 +264,7 @@
                                 <p class="text-xs text-secondary mt-2 line-clamp-2">{{ $item->description }}</p>
                             </div>
                             <div class="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-border/50">
-                                <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
+                                <button type="button" data-item="{{ base64_encode(json_encode($item)) }}" @click="openEditModal(JSON.parse(atob($el.dataset.item)))" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
                                 <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus poin ini?')">
                                     @csrf
                                     @method('DELETE')
@@ -334,7 +334,7 @@
                                 <p class="text-xs text-secondary mt-2">{{ $item->description }}</p>
                             </div>
                             <div class="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-rose-200/50 dark:border-rose-800/50">
-                                <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
+                                <button type="button" data-item="{{ base64_encode(json_encode($item)) }}" @click="openEditModal(JSON.parse(atob($el.dataset.item)))" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
                                 <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus kriteria ini?')">
                                     @csrf
                                     @method('DELETE')
@@ -394,45 +394,38 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @forelse($portfolios as $item)
                         <div class="rounded-2xl border border-border bg-body overflow-hidden flex flex-col group hover:shadow-lg transition">
-                            <div class="h-44 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                            <div class="aspect-[2/3] bg-slate-900 relative overflow-hidden flex items-center justify-center">
                                 @if($item->image_url)
                                     <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                 @else
                                     <div class="flex flex-col items-center justify-center text-slate-500 p-4 text-center">
-                                        <svg class="w-10 h-10 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span class="text-xs">Belum ada gambar preview</span>
+                                        <svg class="w-8 h-8 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="text-[11px]">Belum ada poster</span>
                                     </div>
                                 @endif
-                                <div class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white font-extrabold text-xs">
-                                    {{ $item->extra_meta['views'] ?? 'Viral' }}
-                                </div>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <p class="text-[11px] font-semibold text-brand-blue uppercase tracking-wider">{{ $item->subtitle }}</p>
-                                    <h5 class="font-bold text-primary text-sm mt-0.5">{{ $item->title }}</h5>
-                                    <p class="text-xs text-secondary mt-1.5 line-clamp-2">{{ $item->description }}</p>
-                                </div>
-                                <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                                    <span class="text-xs font-medium text-secondary">
-                                        {{ $item->extra_meta['creators'] ?? '' }}
-                                    </span>
-                                    <div class="flex items-center gap-3">
-                                        <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-bold text-brand-blue hover:underline">Edit</button>
-                                        <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus portofolio ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-xs font-bold text-rose-500 hover:underline">Hapus</button>
-                                        </form>
+                                @if(!empty($item->extra_meta['views']) || !empty($item->subtitle))
+                                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-md bg-white text-slate-900 font-extrabold text-[11px] shadow whitespace-nowrap">
+                                        {{ $item->extra_meta['views'] ?? $item->subtitle }}
                                     </div>
+                                @endif
+                            </div>
+                            <div class="p-3 flex items-center justify-between border-t border-border bg-surface">
+                                <span class="text-xs font-bold text-primary truncate max-w-[100px]">{{ $item->title }}</span>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button type="button" data-item="{{ base64_encode(json_encode($item)) }}" @click="openEditModal(JSON.parse(atob($el.dataset.item)))" class="text-xs font-bold text-brand-blue hover:underline">Edit</button>
+                                    <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus portofolio ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs font-bold text-rose-500 hover:underline">Hapus</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="sm:col-span-2 lg:col-span-3 text-center py-8 text-secondary text-sm">Belum ada item portofolio.</div>
+                        <div class="col-span-full text-center py-8 text-secondary text-sm">Belum ada item portofolio.</div>
                     @endforelse
                 </div>
             </div>
@@ -475,24 +468,19 @@
                     </button>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     @forelse($clients as $item)
                         <div class="p-4 rounded-xl border border-border bg-body flex flex-col items-center text-center justify-between group hover:border-brand-blue/40 transition">
-                            <div class="w-20 h-14 flex items-center justify-center mb-2">
+                            <div class="w-full h-16 flex items-center justify-center mb-2 bg-surface rounded-lg p-2 border border-border">
                                 @if($item->image_url)
-                                    <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="max-h-12 max-w-full object-contain filter grayscale group-hover:grayscale-0 transition">
+                                    <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="max-h-12 max-w-full object-contain">
                                 @else
-                                    <div class="w-12 h-12 rounded-xl bg-brand-blue/10 text-brand-blue font-black flex items-center justify-center text-sm">
-                                        {{ strtoupper(substr($item->title, 0, 2)) }}
-                                    </div>
+                                    <span class="font-bold text-xs text-primary">{{ $item->title }}</span>
                                 @endif
                             </div>
-                            <div class="w-full">
-                                <h6 class="font-bold text-primary text-xs truncate">{{ $item->title }}</h6>
-                                <p class="text-[10px] text-secondary truncate">{{ $item->subtitle }}</p>
-                            </div>
-                            <div class="flex items-center justify-center gap-3 mt-3 pt-2 border-t border-border w-full">
-                                <button @click="openEditModal({{ json_encode($item) }})" class="text-[11px] font-semibold text-brand-blue hover:underline">Edit</button>
+                            <span class="text-[11px] font-bold text-primary truncate max-w-full mb-1">{{ $item->title }}</span>
+                            <div class="flex items-center justify-center gap-3 pt-2 border-t border-border w-full">
+                                <button type="button" data-item="{{ base64_encode(json_encode($item)) }}" @click="openEditModal(JSON.parse(atob($el.dataset.item)))" class="text-[11px] font-semibold text-brand-blue hover:underline">Edit</button>
                                 <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus klien ini?')">
                                     @csrf
                                     @method('DELETE')
@@ -555,7 +543,7 @@
                                 <p class="text-xs text-secondary mt-2 leading-relaxed">{{ $item->description }}</p>
                             </div>
                             <div class="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-border">
-                                <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
+                                <button type="button" data-item="{{ base64_encode(json_encode($item)) }}" @click="openEditModal(JSON.parse(atob($el.dataset.item)))" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
                                 <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus langkah ini?')">
                                     @csrf
                                     @method('DELETE')
@@ -648,12 +636,19 @@
                     @csrf
                     <input type="hidden" name="type" :value="modalType">
 
-                    <div>
-                        <label class="block text-xs font-bold text-secondary mb-1">Judul / Nama</label>
-                        <input type="text" name="title" required class="w-full rounded-xl border-border bg-body text-primary text-sm">
+                    <!-- File Upload Image (Ditaruh di atas untuk Client Logo & Portfolio) -->
+                    <div x-show="modalType === 'client_logo' || modalType === 'portfolio'" class="p-3 bg-body rounded-xl border border-border">
+                        <label class="block text-xs font-bold text-primary mb-1" x-text="modalType === 'client_logo' ? 'Pilih File Gambar Logo Klien' : 'Pilih File Gambar Poster Portofolio'"></label>
+                        <input type="file" name="image" accept="image/*" class="w-full text-xs text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:opacity-90">
+                        <p class="text-[11px] text-secondary mt-1">Format: JPG, PNG, WEBP, SVG (Maks. 20MB).</p>
                     </div>
 
-                    <div x-show="modalType !== 'cta_chip'">
+                    <div>
+                        <label class="block text-xs font-bold text-secondary mb-1" x-text="modalType === 'client_logo' ? 'Nama Klien / Brand (Opsional)' : 'Judul / Nama'"></label>
+                        <input type="text" name="title" class="w-full rounded-xl border-border bg-body text-primary text-sm">
+                    </div>
+
+                    <div x-show="modalType !== 'cta_chip' && modalType !== 'client_logo'">
                         <label class="block text-xs font-bold text-secondary mb-1">Subjudul / Kategori / Badge</label>
                         <input type="text" name="subtitle" class="w-full rounded-xl border-border bg-body text-primary text-sm">
                     </div>
@@ -663,22 +658,11 @@
                         <textarea name="description" rows="3" class="w-full rounded-xl border-border bg-body text-primary text-sm"></textarea>
                     </div>
 
-                    <!-- File Upload Image (Support Client, Portfolio) -->
-                    <div x-show="modalType === 'client_logo' || modalType === 'portfolio'">
-                        <label class="block text-xs font-bold text-secondary mb-1">Upload Gambar / Logo / Thumbnail</label>
-                        <input type="file" name="image" accept="image/*" class="w-full text-xs text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:opacity-90">
-                        <p class="text-[11px] text-secondary mt-1">Format: JPG, PNG, WEBP, SVG (Maks. 4MB).</p>
-                    </div>
-
                     <!-- Extra Meta for Portfolio -->
                     <div x-show="modalType === 'portfolio'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
                         <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Views Count Highlight (cth: 3.5M Views)</label>
-                            <input type="text" name="extra_meta[views]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Jumlah Kreator (cth: 30 Kreator)</label>
-                            <input type="text" name="extra_meta[creators]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
+                            <label class="block text-[11px] font-bold text-secondary mb-1">Views Count Pill (cth: 120.569.023 atau 5.2M Views)</label>
+                            <input type="text" name="extra_meta[views]" class="w-full rounded-lg border-border bg-surface text-primary text-xs" placeholder="cth: 120.569.023">
                         </div>
                     </div>
 
@@ -709,16 +693,33 @@
                     <button @click="editModalOpen = false" class="text-secondary hover:text-primary text-lg font-bold">✕</button>
                 </div>
 
-                <form :action="'{{ url('/admin/cms/items') }}/' + currentItem.id" method="POST" enctype="multipart/form-data" class="space-y-4">
+                <form action="{{ route('admin.cms.items.update_direct') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
-                    @method('PUT')
+                    <input type="hidden" name="id" :value="currentItem.id" x-model="currentItem.id">
+                    <input type="hidden" name="type" :value="currentItem.type" x-model="currentItem.type">
+
+                    <!-- File Upload Image -->
+                    <div x-show="currentItem.type === 'client_logo' || currentItem.type === 'portfolio'" class="p-3 bg-body rounded-xl border border-border">
+                        <label class="block text-xs font-bold text-primary mb-1" x-text="currentItem.type === 'client_logo' ? 'Ganti File Gambar Logo' : 'Ganti File Gambar Poster'"></label>
+                        <template x-if="currentItem.image">
+                            <div class="mb-2 p-2 border border-border rounded-xl flex items-center justify-between bg-surface">
+                                <span class="text-xs text-secondary truncate max-w-[280px]" x-text="currentItem.image"></span>
+                                <label class="text-xs text-rose-500 font-bold flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" name="remove_image" value="1" class="rounded border-border text-rose-600">
+                                    Hapus
+                                </label>
+                            </div>
+                        </template>
+                        <input type="file" name="image" accept="image/*" class="w-full text-xs text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:opacity-90">
+                        <p class="text-[11px] text-secondary mt-1">Pilih file baru jika ingin mengganti gambar.</p>
+                    </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-secondary mb-1">Judul / Nama</label>
+                        <label class="block text-xs font-bold text-secondary mb-1" x-text="currentItem.type === 'client_logo' ? 'Nama Klien / Brand (Opsional)' : 'Judul / Nama'"></label>
                         <input type="text" name="title" x-model="currentItem.title" class="w-full rounded-xl border-border bg-body text-primary text-sm">
                     </div>
 
-                    <div x-show="currentItem.type !== 'cta_chip'">
+                    <div x-show="currentItem.type !== 'cta_chip' && currentItem.type !== 'client_logo'">
                         <label class="block text-xs font-bold text-secondary mb-1">Subjudul / Kategori / Badge</label>
                         <input type="text" name="subtitle" x-model="currentItem.subtitle" class="w-full rounded-xl border-border bg-body text-primary text-sm">
                     </div>
@@ -728,30 +729,11 @@
                         <textarea name="description" rows="3" x-model="currentItem.description" class="w-full rounded-xl border-border bg-body text-primary text-sm"></textarea>
                     </div>
 
-                    <!-- File Upload Image -->
-                    <div x-show="currentItem.type === 'client_logo' || currentItem.type === 'portfolio'">
-                        <label class="block text-xs font-bold text-secondary mb-1">Ganti Gambar / Logo</label>
-                        <template x-if="currentItem.image">
-                            <div class="mb-2 p-2 border border-border rounded-xl flex items-center justify-between bg-body">
-                                <span class="text-xs text-secondary truncate" x-text="currentItem.image"></span>
-                                <label class="text-xs text-rose-500 font-bold flex items-center gap-1 cursor-pointer">
-                                    <input type="checkbox" name="remove_image" value="1" class="rounded border-border text-rose-600">
-                                    Hapus
-                                </label>
-                            </div>
-                        </template>
-                        <input type="file" name="image" accept="image/*" class="w-full text-xs text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:opacity-90">
-                    </div>
-
                     <!-- Extra Meta for Portfolio -->
                     <div x-show="currentItem.type === 'portfolio'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
                         <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Views Count Highlight</label>
-                            <input type="text" name="extra_meta[views]" :value="currentItem.extra_meta?.views ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Jumlah Kreator</label>
-                            <input type="text" name="extra_meta[creators]" :value="currentItem.extra_meta?.creators ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
+                            <label class="block text-[11px] font-bold text-secondary mb-1">Views Count Pill (cth: 120.569.023 atau 5.2M Views)</label>
+                            <input type="text" name="extra_meta[views]" :value="currentItem.extra_meta?.views ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs" placeholder="cth: 120.569.023">
                         </div>
                     </div>
 

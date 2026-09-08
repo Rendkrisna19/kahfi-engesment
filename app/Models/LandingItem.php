@@ -53,26 +53,28 @@ class LandingItem extends Model
             return $this->image;
         }
 
+        $cleanPath = ltrim($this->image, '/\\');
+
         // 1. Direct file in public path (e.g. uploads/landing/...)
-        if (file_exists(public_path($this->image))) {
-            return asset($this->image);
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
         }
 
         // 2. File in public/storage/...
-        if (file_exists(public_path('storage/' . $this->image))) {
-            return asset('storage/' . $this->image);
+        if (file_exists(public_path('storage/' . $cleanPath))) {
+            return asset('storage/' . $cleanPath);
         }
 
         // 3. File in storage/app/public/...
-        if (file_exists(storage_path('app/public/' . $this->image))) {
-            return url('storage/' . $this->image);
+        if (file_exists(storage_path('app/public/' . $cleanPath))) {
+            return url('storage/' . $cleanPath);
         }
 
         // 4. Storage disk check
-        if (Storage::disk('public')->exists($this->image)) {
-            return Storage::disk('public')->url($this->image);
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return Storage::disk('public')->url($cleanPath);
         }
 
-        return asset($this->image);
+        return asset($cleanPath);
     }
 }

@@ -166,17 +166,17 @@ class LandingCmsController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'link' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg,gif,bmp,avif|max:20480',
             'sort_order' => 'nullable|integer',
         ]);
 
         $imagePath = null;
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $file = $request->file('image');
-            $fileName = $request->type . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $fileName = $request->type . '_' . time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
             $dest = public_path('uploads/landing');
             if (!file_exists($dest)) {
-                @mkdir($dest, 0755, true);
+                @mkdir($dest, 0777, true);
             }
             $file->move($dest, $fileName);
             $imagePath = 'uploads/landing/' . $fileName;
@@ -185,7 +185,6 @@ class LandingCmsController extends Controller
         $extraMeta = null;
         if ($request->has('extra_meta') && is_array($request->input('extra_meta'))) {
             $meta = $request->input('extra_meta');
-            // Format pros & cons if provided as multiline text
             if (isset($meta['pros_text'])) {
                 $meta['pros'] = array_values(array_filter(array_map('trim', explode("\n", $meta['pros_text']))));
                 unset($meta['pros_text']);
@@ -200,11 +199,23 @@ class LandingCmsController extends Controller
             $extraMeta = $meta;
         }
 
+        // Default title if left blank
+        $title = $request->title;
+        if (empty($title)) {
+            if ($request->type === 'client_logo') {
+                $title = 'Klien #' . (LandingItem::where('type', 'client_logo')->count() + 1);
+            } else {
+                $title = 'Item ' . ucfirst(str_replace('_', ' ', $request->type));
+            }
+        }
+
+        $isClient = ($request->type === 'client_logo');
+
         LandingItem::create([
             'type' => $request->type,
-            'title' => $request->title,
-            'subtitle' => $request->subtitle,
-            'description' => $request->description,
+            'title' => $title,
+            'subtitle' => $isClient ? null : $request->subtitle,
+            'description' => $isClient ? null : $request->description,
             'link' => $request->link,
             'image' => $imagePath,
             'extra_meta' => $extraMeta,
@@ -219,6 +230,25 @@ class LandingCmsController extends Controller
     }
 
     /**
+     * Direct POST update for items (supports multipart file upload reliably).
+     */
+    public function updateItemDirect(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:landing_items,id',
+            'title' => 'nullable|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'link' => 'nullable|string|max:500',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg,gif,bmp,avif|max:20480',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $item = LandingItem::findOrFail($request->id);
+        return $this->processItemUpdate($request, $item);
+    }
+
+    /**
      * Update an item.
      */
     public function updateItem(Request $request, LandingItem $item)
@@ -228,30 +258,40 @@ class LandingCmsController extends Controller
             'subtitle' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'link' => 'nullable|string|max:500',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:4096',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg,gif,bmp,avif|max:20480',
             'sort_order' => 'nullable|integer',
         ]);
 
+        return $this->processItemUpdate($request, $item);
+    }
+
+    /**
+     * Shared logic to process item update.
+     */
+    private function processItemUpdate(Request $request, LandingItem $item)
+    {
         $imagePath = $item->image;
-        if ($request->hasFile('image')) {
-            if ($item->image && file_exists(public_path($item->image))) {
-                @unlink(public_path($item->image));
-            } elseif ($item->image && Storage::disk('public')->exists($item->image)) {
-                Storage::disk('public')->delete($item->image);
-            }
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $file = $request->file('image');
-            $fileName = $item->type . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            if ($item->image) {
+                $oldPath = public_path(ltrim($item->image, '/\\'));
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+            $fileName = $item->type . '_' . time() . '_' . uniqid() . '.' . strtolower($file->getClientOriginalExtension());
             $dest = public_path('uploads/landing');
             if (!file_exists($dest)) {
-                @mkdir($dest, 0755, true);
+                @mkdir($dest, 0777, true);
             }
             $file->move($dest, $fileName);
             $imagePath = 'uploads/landing/' . $fileName;
         } elseif ($request->boolean('remove_image')) {
-            if ($item->image && file_exists(public_path($item->image))) {
-                @unlink(public_path($item->image));
-            } elseif ($item->image && Storage::disk('public')->exists($item->image)) {
-                Storage::disk('public')->delete($item->image);
+            if ($item->image) {
+                $oldPath = public_path(ltrim($item->image, '/\\'));
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
             }
             $imagePath = null;
         }
@@ -273,10 +313,16 @@ class LandingCmsController extends Controller
             $extraMeta = array_merge($extraMeta, $meta);
         }
 
+        $isClient = ($item->type === 'client_logo');
+        $title = $request->input('title', $item->title);
+        if (empty($title)) {
+            $title = $item->title ?: ($isClient ? 'Logo Mitra' : 'Item');
+        }
+
         $item->update([
-            'title' => $request->input('title', $item->title),
-            'subtitle' => $request->input('subtitle', $item->subtitle),
-            'description' => $request->input('description', $item->description),
+            'title' => $title,
+            'subtitle' => $isClient ? null : $request->input('subtitle', $item->subtitle),
+            'description' => $isClient ? null : $request->input('description', $item->description),
             'link' => $request->input('link', $item->link),
             'image' => $imagePath,
             'extra_meta' => $extraMeta,
@@ -287,7 +333,7 @@ class LandingCmsController extends Controller
         $tab = $this->getTabForType($item->type);
 
         return redirect()->route('admin.cms.index', ['tab' => $tab])
-            ->with('success', 'Item berhasil diperbarui.');
+            ->with('success', 'Item ' . ($item->title ?? '') . ' berhasil diperbarui.');
     }
 
     /**
