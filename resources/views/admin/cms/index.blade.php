@@ -212,14 +212,14 @@
         </div>
 
         <!-- TAB 2: KENAPA GABUNG -->
-        <div x-show="tab === 'why_join'" class="space-y-6">
+        <div x-show="tab === 'why_join'" class="space-y-4 sm:space-y-6">
             <!-- Header Settings Form -->
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="why_join">
-                <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <h3 class="text-base font-bold text-primary">Judul & Subjudul Section "Kenapa Gabung"</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
+                    <button type="submit" class="self-start sm:self-auto shrink-0 px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -238,13 +238,13 @@
             </form>
 
             <!-- Repeatable Items List -->
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Daftar Poin Keunggulan (Kenapa Gabung)</h4>
                         <p class="text-xs text-secondary">Poin-poin checklist yang meyakinkan brand untuk berpartner.</p>
                     </div>
-                    <button @click="openAddModal('why_join')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('why_join')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Poin Baru
                     </button>
@@ -280,13 +280,13 @@
         </div>
 
         <!-- TAB 3: BUKAN UNTUK SEMUA ORANG -->
-        <div x-show="tab === 'not_for'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+        <div x-show="tab === 'not_for'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="not_for">
-                <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <h3 class="text-base font-bold text-primary">Header Section "Bukan Untuk Semua Orang"</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
+                    <button type="submit" class="self-start sm:self-auto shrink-0 px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -308,13 +308,13 @@
                 </div>
             </form>
 
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Kriteria Diskualifikasi ("Jangan Daftar Kalau Kamu:")</h4>
                         <p class="text-xs text-secondary">KlipConnect style reverse-psychology filter points.</p>
                     </div>
-                    <button @click="openAddModal('not_for')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('not_for')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Kriteria
                     </button>
@@ -350,13 +350,13 @@
         </div>
 
         <!-- TAB 4: PORTOFOLIO -->
-        <div x-show="tab === 'portfolios'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+        <div x-show="tab === 'portfolios'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="portfolios">
-                <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <h3 class="text-base font-bold text-primary">Header Portofolio & Counter Total Views</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
+                    <button type="submit" class="self-start sm:self-auto shrink-0 px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -382,13 +382,13 @@
                 </div>
             </form>
 
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Item Portofolio (Dengan Upload Image)</h4>
                         <p class="text-xs text-secondary">Upload tangkapan layar video TikTok / Reels dengan jutaan views.</p>
                     </div>
-                    <button @click="openAddModal('portfolio')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('portfolio')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Portofolio
                     </button>
@@ -432,13 +432,13 @@
         </div>
 
         <!-- TAB 5: CLIENT / MITRA BRAND -->
-        <div x-show="tab === 'clients'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+        <div x-show="tab === 'clients'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="clients">
-                <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <h3 class="text-base font-bold text-primary">Header Section Client / Mitra</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
+                    <button type="submit" class="self-start sm:self-auto shrink-0 px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -456,13 +456,13 @@
                 </div>
             </form>
 
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Logo Client / Brand (Mendukung Upload Logo)</h4>
                         <p class="text-xs text-secondary">Logo brand yang ditampilkan pada slider/marquee banner klien kami.</p>
                     </div>
-                    <button @click="openAddModal('client_logo')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('client_logo')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Client Logo
                     </button>
@@ -496,13 +496,13 @@
         </div>
 
         <!-- TAB 6: CARA KERJA (HOW IT WORKS) -->
-        <div x-show="tab === 'how_it_works'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+        <div x-show="tab === 'how_it_works'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="how_it_works">
-                <div class="flex items-center justify-between border-b border-border pb-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
                     <h3 class="text-base font-bold text-primary">Header Section "Bagaimana Kami Bekerja"</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
+                    <button type="submit" class="self-start sm:self-auto shrink-0 px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -520,13 +520,13 @@
                 </div>
             </form>
 
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Langkah Kerja (Step-by-Step)</h4>
                         <p class="text-xs text-secondary">Alur 4 tahap proses eksekusi campaign dari awal sampai monitoring.</p>
                     </div>
-                    <button @click="openAddModal('how_step')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('how_step')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Langkah
                     </button>
@@ -534,7 +534,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @forelse($howSteps as $item)
-                        <div class="p-5 rounded-2xl border border-border bg-body flex flex-col justify-between group hover:border-brand-blue/40 transition relative">
+                        <div class="p-4 sm:p-5 rounded-2xl border border-border bg-body flex flex-col justify-between group hover:border-brand-blue/40 transition relative">
                             <div>
                                 <span class="inline-block px-2.5 py-1 rounded-lg bg-brand-blue/10 text-brand-blue font-mono font-bold text-xs mb-3">
                                     {{ $item->subtitle ?: 'LANGKAH' }}
@@ -559,8 +559,8 @@
         </div>
 
         <!-- TAB 7: CTA SECTION -->
-        <div x-show="tab === 'cta'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+        <div x-show="tab === 'cta'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
                 @csrf
                 <input type="hidden" name="active_tab" value="cta">
                 <div class="border-b border-border pb-3">
@@ -590,24 +590,24 @@
                     </div>
                 </div>
                 <div class="flex justify-end pt-3 border-t border-border">
-                    <button type="submit" class="px-5 py-2 bg-brand-blue text-white font-bold rounded-xl text-sm shadow hover:opacity-90">Simpan Banner CTA</button>
+                    <button type="submit" class="w-full sm:w-auto px-5 py-2 bg-brand-blue text-white font-bold rounded-xl text-sm shadow hover:opacity-90">Simpan Banner CTA</button>
                 </div>
             </form>
 
             <!-- Feature Chips -->
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h4 class="font-bold text-primary">Chips Fitur / Nilai Tambah di CTA</h4>
                         <p class="text-xs text-secondary">Tag-tag penegas di bawah headline CTA (cth: "⚡ Slot Terbatas", "📊 Dashboard Pantau").</p>
                     </div>
-                    <button @click="openAddModal('cta_chip')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
+                    <button @click="openAddModal('cta_chip')" class="self-start sm:self-auto shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Tambah Chip
                     </button>
                 </div>
 
-                <div class="flex flex-wrap gap-3">
+                <div class="flex flex-wrap gap-2 sm:gap-3">
                     @forelse($ctaChips as $item)
                         <div class="px-3.5 py-2 rounded-xl bg-body border border-border flex items-center gap-3">
                             <span class="text-xs font-bold text-primary">{{ $item->title }}</span>

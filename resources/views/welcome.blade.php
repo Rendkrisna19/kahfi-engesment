@@ -325,50 +325,53 @@
         <!-- ================= SECTION 2: CLIENT / BRAND PARTNERS ================= -->
         <section id="klien" class="relative z-10 py-12 lg:py-16 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header with Clean Lines (Matching Image 2 Style) -->
-                <div class="flex items-center justify-center gap-3 sm:gap-6 mb-8">
-                    <div class="h-[1px] w-10 sm:w-28 bg-gradient-to-r from-transparent to-indigo-300"></div>
-                    <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-indigo-700 bg-indigo-50/80 border border-indigo-200/60 px-3.5 py-1 rounded-full shadow-2xs">
-                        {{ $settings['client_badge'] ?? 'DIPERCAYA BRAND & PRODUCTION HOUSE NASIONAL' }}
-                    </span>
-                    <div class="h-[1px] w-10 sm:w-28 bg-gradient-to-l from-transparent to-indigo-300"></div>
-                </div>
+                <!-- Sleek Card Container (Matching Image 2 Style with Purple-Blue-White Palette) -->
+                <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-6 sm:p-10 overflow-hidden text-center">
+                    <!-- Subtle Central Glow -->
+                    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-48 bg-indigo-600/10 blur-[90px] pointer-events-none"></div>
 
-                <!-- Sleek Card Container (Matching Image 2 with Purple-Blue-White theme) -->
-                <div class="relative max-w-5xl mx-auto rounded-3xl bg-white/80 backdrop-blur-md border border-indigo-100 shadow-xl shadow-indigo-500/5 p-6 sm:p-10 overflow-hidden text-center">
+                    <!-- Header with Clean Lines (Inside the Card, Matching Image 2 Style) -->
+                    <div class="flex items-center justify-center gap-3 sm:gap-6 mb-6 sm:mb-8">
+                        <div class="h-[1px] w-10 sm:w-28 bg-slate-800"></div>
+                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+                            {{ $settings['client_badge'] ?? 'DIPERCAYA BRAND & PRODUCTION HOUSE NASIONAL' }}
+                        </span>
+                        <div class="h-[1px] w-10 sm:w-28 bg-slate-800"></div>
+                    </div>
+
                     <!-- Brand Logos Infinite Carousel -->
                     <div class="relative w-full overflow-hidden py-2">
-                        <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-                        <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
 
                         <div class="animate-marquee gap-8 sm:gap-14 items-center py-2">
                             @php
                                 $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients)->concat($clients) : ($clients ?? collect());
                             @endphp
                             @foreach($allClients as $client)
-                                <div class="h-12 sm:h-14 px-4 py-1 flex items-center justify-center shrink-0 grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition duration-300">
+                                <div class="h-12 sm:h-14 px-4 py-1 flex items-center justify-center shrink-0 brightness-0 invert opacity-75 hover:opacity-100 transition duration-300">
                                     @if($client->image_url)
                                         <img src="{{ $client->image_url }}" alt="{{ $client->title ?? 'Client' }}" class="h-7 sm:h-9 max-w-[130px] object-contain">
                                     @else
-                                        <span class="text-sm font-extrabold text-slate-700 tracking-wide">{{ $client->title }}</span>
+                                        <span class="text-sm font-extrabold text-white tracking-wide">{{ $client->title }}</span>
                                     @endif
                                 </div>
                             @endforeach
                         </div>
                     </div>
 
-                    <!-- Inner Divider Line -->
-                    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200 to-transparent my-8"></div>
+                    <!-- Inner Divider Line (Matching Image 2) -->
+                    <div class="w-full h-[1px] bg-slate-800/80 my-7 sm:my-9"></div>
 
                     <!-- For Client / Brand Text Block (Matching Image 2) -->
                     <div class="max-w-3xl mx-auto space-y-3">
-                        <span class="inline-block text-[11px] sm:text-xs font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-3.5 py-1 rounded-full">
+                        <span class="inline-block text-[11px] sm:text-xs font-black uppercase tracking-widest text-indigo-400">
                             FOR CLIENT / BRAND
                         </span>
-                        <h3 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+                        <h3 class="text-2xl sm:text-4xl font-black text-white tracking-tight leading-snug">
                             {{ $settings['client_title'] ?? 'Efisiensi Budget Marketing di Era Short-Form Video' }}
                         </h3>
-                        <p class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
+                        <p class="text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
                             {{ $settings['client_subtitle'] ?? 'Kami membantu mendistribusikan konten Anda menjadi puluhan konten kreatif yang siap mendominasi FYP secara organik.' }}
                         </p>
                     </div>
@@ -395,8 +398,8 @@
                     <div class="p-6 sm:p-7 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
                         <div>
                             <!-- Icon Ceklis Kecil & Rapi (Matching Image 1) -->
-                            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mb-4 shadow-sm group-hover:scale-105 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M5 13l4 4L19 7"></path></svg>
+                            <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mb-3.5 shadow-xs group-hover:scale-105 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                             <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
                                 {{ $item->title }}
@@ -485,7 +488,17 @@
                 <div class="animate-marquee-portfolio gap-5 items-center py-2">
                     @php
                         $loopPortfolios = $portfolios;
-                        if ($loopPortfolios->count() > 0 && $loopPortfolios->count() < 8) {
+                        if ($loopPortfolios->isEmpty()) {
+                            $dummyPortfolios = collect([
+                                (object)['id' => 1, 'title' => 'F&B Brand Campaign', 'image_url' => null, 'subtitle' => '4.2M Views', 'extra_meta' => ['views' => '4.2M Views']],
+                                (object)['id' => 2, 'title' => 'Fashion & Apparel Viral', 'image_url' => null, 'subtitle' => '8.7M Views', 'extra_meta' => ['views' => '8.7M Views']],
+                                (object)['id' => 3, 'title' => 'Skincare Launch Boom', 'image_url' => null, 'subtitle' => '12.5M Views', 'extra_meta' => ['views' => '12.5M Views']],
+                                (object)['id' => 4, 'title' => 'Tech & Gadget Review', 'image_url' => null, 'subtitle' => '6.1M Views', 'extra_meta' => ['views' => '6.1M Views']],
+                                (object)['id' => 5, 'title' => 'Consumer Goods Organik', 'image_url' => null, 'subtitle' => '19.8M Views', 'extra_meta' => ['views' => '19.8M Views']],
+                                (object)['id' => 6, 'title' => 'Lifestyle & Experience', 'image_url' => null, 'subtitle' => '5.4M Views', 'extra_meta' => ['views' => '5.4M Views']],
+                            ]);
+                            $loopPortfolios = $dummyPortfolios->concat($dummyPortfolios);
+                        } elseif ($loopPortfolios->count() < 8) {
                             $loopPortfolios = $loopPortfolios->concat($loopPortfolios)->concat($loopPortfolios);
                         } else {
                             $loopPortfolios = $loopPortfolios->concat($loopPortfolios);
