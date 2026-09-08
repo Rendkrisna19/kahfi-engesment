@@ -12,6 +12,9 @@ class LandingCmsController extends Controller
     /**
      * Display public landing page.
      */
+    /**
+     * Display public landing page.
+     */
     public function welcome()
     {
         $settings = LandingSetting::allKeyValues();
@@ -19,22 +22,30 @@ class LandingCmsController extends Controller
         $whyJoins = LandingItem::ofType('why_join')->active()->ordered()->get();
         $notFors = LandingItem::ofType('not_for')->active()->ordered()->get();
         $howSteps = LandingItem::ofType('how_step')->active()->ordered()->get();
-        $efficiencyCards = LandingItem::ofType('efficiency_card')->active()->ordered()->get();
         $ctaChips = LandingItem::ofType('cta_chip')->active()->ordered()->get();
         $clients = LandingItem::ofType('client_logo')->active()->ordered()->get();
         $portfolios = LandingItem::ofType('portfolio')->active()->ordered()->get();
-        $paymentProofs = LandingItem::ofType('payment_proof')->active()->ordered()->get();
+
+        // Real dynamic database metrics (from links, creators, campaigns)
+        $totalViews = \App\Models\Link::sum('views') ?: 0;
+        $totalCreators = \App\Models\Link::whereNotNull('username')->where('username', '!=', '')->distinct('username')->count('username');
+        if ($totalCreators === 0) {
+            $totalCreators = \App\Models\User::where('role', 'Creator')->count() ?: 1;
+        }
+        $totalCampaigns = \App\Models\Campaign::count() ?: 0;
+        $totalBrands = max($totalCampaigns, \App\Models\User::where('role', 'Client')->count(), 1);
 
         return view('welcome', compact(
             'settings',
             'whyJoins',
             'notFors',
             'howSteps',
-            'efficiencyCards',
             'ctaChips',
             'clients',
             'portfolios',
-            'paymentProofs'
+            'totalViews',
+            'totalCreators',
+            'totalBrands'
         ));
     }
 
@@ -48,22 +59,18 @@ class LandingCmsController extends Controller
         $whyJoins = LandingItem::ofType('why_join')->ordered()->get();
         $notFors = LandingItem::ofType('not_for')->ordered()->get();
         $howSteps = LandingItem::ofType('how_step')->ordered()->get();
-        $efficiencyCards = LandingItem::ofType('efficiency_card')->ordered()->get();
         $ctaChips = LandingItem::ofType('cta_chip')->ordered()->get();
         $clients = LandingItem::ofType('client_logo')->ordered()->get();
         $portfolios = LandingItem::ofType('portfolio')->ordered()->get();
-        $paymentProofs = LandingItem::ofType('payment_proof')->ordered()->get();
 
         return view('admin.cms.index', compact(
             'settings',
             'whyJoins',
             'notFors',
             'howSteps',
-            'efficiencyCards',
             'ctaChips',
             'clients',
-            'portfolios',
-            'paymentProofs'
+            'portfolios'
         ));
     }
 

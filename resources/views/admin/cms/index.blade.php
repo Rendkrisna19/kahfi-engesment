@@ -83,14 +83,6 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     Cara Kerja
                 </button>
-                <button @click="tab = 'efficiency'" :class="tab === 'efficiency' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    Analisis Efisiensi
-                </button>
-                <button @click="tab = 'payments'" :class="tab === 'payments' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Bukti Payment
-                </button>
                 <button @click="tab = 'cta'" :class="tab === 'cta' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                     Siap Banjir Views & CTA
@@ -197,28 +189,11 @@
                         <input type="text" name="hero_secondary_cta_url" value="{{ $settings['hero_secondary_cta_url'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue">
                     </div>
 
-                    <!-- Hero Stats -->
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-2">Stat 1: Angka & Label</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="hero_stats_creators" placeholder="500+" value="{{ $settings['hero_stats_creators'] ?? '' }}" class="w-1/3 rounded-xl border-border bg-body text-primary text-sm">
-                            <input type="text" name="hero_stats_creators_label" placeholder="Kreator Aktif" value="{{ $settings['hero_stats_creators_label'] ?? '' }}" class="w-2/3 rounded-xl border-border bg-body text-primary text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-2">Stat 2: Angka & Label</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="hero_stats_views" placeholder="150M+" value="{{ $settings['hero_stats_views'] ?? '' }}" class="w-1/3 rounded-xl border-border bg-body text-primary text-sm">
-                            <input type="text" name="hero_stats_views_label" placeholder="Total Views Terdistribusi" value="{{ $settings['hero_stats_views_label'] ?? '' }}" class="w-2/3 rounded-xl border-border bg-body text-primary text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-secondary mb-2">Stat 3: Angka & Label</label>
-                        <div class="flex gap-2">
-                            <input type="text" name="hero_stats_brands" placeholder="120+" value="{{ $settings['hero_stats_brands'] ?? '' }}" class="w-1/3 rounded-xl border-border bg-body text-primary text-sm">
-                            <input type="text" name="hero_stats_brands_label" placeholder="Brand Puas" value="{{ $settings['hero_stats_brands_label'] ?? '' }}" class="w-2/3 rounded-xl border-border bg-body text-primary text-sm">
+                    <!-- Real-Time Hero Stats Sync Notification -->
+                    <div class="md:col-span-2 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 text-xs flex items-center gap-3">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <span class="font-bold">Statistik Hero Real-Time:</span> Angka <strong>Kreator Aktif</strong>, <strong>Total Views Terdistribusi</strong>, dan <strong>Brand & Campaign</strong> sekarang otomatis dihitung dari database (mengikuti data link & kampanye aktual di dashboard Admin Master) sehingga selalu akurat tanpa perlu diinput manual.
                         </div>
                     </div>
 
@@ -595,189 +570,7 @@
             </div>
         </div>
 
-        <!-- TAB 7: ANALISIS EFISIENSI -->
-        <div x-show="tab === 'efficiency'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
-                @csrf
-                <input type="hidden" name="active_tab" value="efficiency">
-                <div class="flex items-center justify-between border-b border-border pb-3">
-                    <h3 class="text-base font-bold text-primary">Header & Footnote Analisis Efisiensi</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-secondary mb-1">Badge</label>
-                        <input type="text" name="efficiency_badge" value="{{ $settings['efficiency_badge'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-secondary mb-1">Judul Section</label>
-                        <input type="text" name="efficiency_title" value="{{ $settings['efficiency_title'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm font-bold">
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-secondary mb-1">Subjudul Section</label>
-                        <textarea name="efficiency_subtitle" rows="2" class="w-full rounded-xl border-border bg-body text-primary text-sm">{{ $settings['efficiency_subtitle'] ?? '' }}</textarea>
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-secondary mb-1">Catatan Kaki (*Footnote)</label>
-                        <input type="text" name="efficiency_footnote" value="{{ $settings['efficiency_footnote'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm">
-                    </div>
-                </div>
-            </form>
-
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h4 class="font-bold text-primary">Kartu Komparasi Biaya (Meta Ads vs TikTok Ads vs Kahfi Engagement)</h4>
-                        <p class="text-xs text-secondary">Sesuaikan perbandingan biaya, estimasi CPM, kelebihan & kekurangan tiap metode.</p>
-                    </div>
-                    <button @click="openAddModal('efficiency_card')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Tambah Kartu Komparasi
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    @forelse($efficiencyCards as $item)
-                        @php
-                            $isWin = !empty($item->extra_meta['is_winner']);
-                        @endphp
-                        <div class="p-5 rounded-2xl border {{ $isWin ? 'border-brand-blue ring-2 ring-brand-blue/30 bg-blue-50/20 dark:bg-blue-950/20' : 'border-border bg-body' }} flex flex-col justify-between relative">
-                            <div>
-                                @if($isWin)
-                                    <span class="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-[11px] mb-3 shadow-md shadow-blue-500/20">
-                                        {{ $item->extra_meta['badge'] ?? '⭐ REKOMENDASI' }}
-                                    </span>
-                                @endif
-                                <h5 class="font-bold text-primary text-lg">{{ $item->title }}</h5>
-                                <p class="text-xs text-secondary mt-0.5">{{ $item->subtitle }}</p>
-
-                                <div class="my-4 p-3 rounded-xl bg-surface border border-border space-y-1">
-                                    <div class="text-xs text-secondary">Estimasi Biaya:</div>
-                                    <div class="text-base font-extrabold text-primary">{{ $item->extra_meta['cost_range'] ?? '-' }}</div>
-                                    <div class="text-xs font-semibold text-brand-blue">CPM: {{ $item->extra_meta['cpm'] ?? '-' }}</div>
-                                </div>
-
-                                @if(!empty($item->extra_meta['pros']))
-                                    <div class="space-y-1.5 mb-3">
-                                        <div class="text-[11px] font-bold text-emerald-600 uppercase">Kelebihan:</div>
-                                        @foreach($item->extra_meta['pros'] as $pro)
-                                            <div class="text-xs text-secondary flex items-start gap-1.5">
-                                                <span class="text-emerald-500 font-bold">✓</span>
-                                                <span>{{ $pro }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                @if(!empty($item->extra_meta['cons']))
-                                    <div class="space-y-1.5">
-                                        <div class="text-[11px] font-bold text-rose-600 uppercase">Kekurangan:</div>
-                                        @foreach($item->extra_meta['cons'] as $con)
-                                            <div class="text-xs text-secondary flex items-start gap-1.5">
-                                                <span class="text-rose-500 font-bold">✕</span>
-                                                <span>{{ $con }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="flex items-center justify-end gap-2 mt-6 pt-3 border-t border-border">
-                                <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-semibold text-brand-blue hover:underline">Edit Kartu</button>
-                                <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus kartu komparasi ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs font-semibold text-rose-500 hover:underline">Hapus</button>
-                                </form>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-full text-center py-8 text-secondary text-sm">Belum ada kartu komparasi.</div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 8: BUKTI PAYMENT -->
-        <div x-show="tab === 'payments'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
-                @csrf
-                <input type="hidden" name="active_tab" value="payments">
-                <div class="flex items-center justify-between border-b border-border pb-3">
-                    <h3 class="text-base font-bold text-primary">Header Section "Bukti Payment"</h3>
-                    <button type="submit" class="px-4 py-1.5 bg-brand-blue text-white text-xs font-bold rounded-lg shadow-sm hover:opacity-90">Simpan Header</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-secondary mb-1">Badge</label>
-                        <input type="text" name="payment_badge" value="{{ $settings['payment_badge'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-secondary mb-1">Judul Section</label>
-                        <input type="text" name="payment_title" value="{{ $settings['payment_title'] ?? '' }}" class="w-full rounded-xl border-border bg-body text-primary text-sm">
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-xs font-bold text-secondary mb-1">Subjudul Section</label>
-                        <textarea name="payment_subtitle" rows="2" class="w-full rounded-xl border-border bg-body text-primary text-sm">{{ $settings['payment_subtitle'] ?? '' }}</textarea>
-                    </div>
-                </div>
-            </form>
-
-            <div class="bg-surface border border-border rounded-2xl p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h4 class="font-bold text-primary">Daftar Bukti Payment (Mendukung Upload Screenshot / Kwitansi)</h4>
-                        <p class="text-xs text-secondary">Upload screenshot mutasi bank / transfer pembayaran kreator untuk carousel transparansi.</p>
-                    </div>
-                    <button @click="openAddModal('payment_proof')" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Tambah Bukti Payment
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    @forelse($paymentProofs as $item)
-                        <div class="rounded-2xl border border-border bg-body overflow-hidden flex flex-col justify-between group hover:shadow-md transition">
-                            <div class="h-40 bg-slate-900 relative overflow-hidden flex items-center justify-center">
-                                @if($item->image_url)
-                                    <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="flex flex-col items-center justify-center text-slate-500 p-4 text-center">
-                                        <svg class="w-8 h-8 mb-1 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span class="text-[11px]">Screenshot Belum Diupload</span>
-                                    </div>
-                                @endif
-                                <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-emerald-600 text-white font-mono font-bold text-xs">
-                                    {{ $item->extra_meta['amount'] ?? 'Lunas' }}
-                                </div>
-                            </div>
-                            <div class="p-4 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h5 class="font-bold text-primary text-xs">{{ $item->title }}</h5>
-                                    <p class="text-[11px] text-secondary mt-0.5">{{ $item->subtitle }}</p>
-                                    <p class="text-[11px] text-secondary mt-1 line-clamp-2">{{ $item->description }}</p>
-                                </div>
-                                <div class="flex items-center justify-between mt-4 pt-2 border-t border-border">
-                                    <span class="text-[10px] text-emerald-600 font-bold">{{ $item->extra_meta['status'] ?? 'Berhasil' }}</span>
-                                    <div class="flex items-center gap-2">
-                                        <button @click="openEditModal({{ json_encode($item) }})" class="text-xs font-semibold text-brand-blue hover:underline">Edit</button>
-                                        <form action="{{ route('admin.cms.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus bukti payment ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-xs font-semibold text-rose-500 hover:underline">Hapus</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-full text-center py-8 text-secondary text-sm">Belum ada bukti payment.</div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 9: CTA SECTION -->
+        <!-- TAB 7: CTA SECTION -->
         <div x-show="tab === 'cta'" class="space-y-6">
             <form action="{{ route('admin.cms.settings.update') }}" method="POST" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
                 @csrf
@@ -870,9 +663,9 @@
                         <textarea name="description" rows="3" class="w-full rounded-xl border-border bg-body text-primary text-sm"></textarea>
                     </div>
 
-                    <!-- File Upload Image (Support Client, Portfolio, Payment) -->
-                    <div x-show="modalType === 'client_logo' || modalType === 'portfolio' || modalType === 'payment_proof'">
-                        <label class="block text-xs font-bold text-secondary mb-1">Upload Gambar / Logo / Screenshot</label>
+                    <!-- File Upload Image (Support Client, Portfolio) -->
+                    <div x-show="modalType === 'client_logo' || modalType === 'portfolio'">
+                        <label class="block text-xs font-bold text-secondary mb-1">Upload Gambar / Logo / Thumbnail</label>
                         <input type="file" name="image" accept="image/*" class="w-full text-xs text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-blue file:text-white hover:file:opacity-90">
                         <p class="text-[11px] text-secondary mt-1">Format: JPG, PNG, WEBP, SVG (Maks. 4MB).</p>
                     </div>
@@ -886,42 +679,6 @@
                         <div>
                             <label class="block text-[11px] font-bold text-secondary mb-1">Jumlah Kreator (cth: 30 Kreator)</label>
                             <input type="text" name="extra_meta[creators]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                    </div>
-
-                    <!-- Extra Meta for Payment Proof -->
-                    <div x-show="modalType === 'payment_proof'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Nominal Transfer (cth: Rp 25.000.000)</label>
-                            <input type="text" name="extra_meta[amount]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Status (cth: Lunas / Berhasil)</label>
-                            <input type="text" name="extra_meta[status]" value="Lunas / Berhasil" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                    </div>
-
-                    <!-- Extra Meta for Efficiency Card -->
-                    <div x-show="modalType === 'efficiency_card'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Rentang Biaya (cth: Rp 3.000.000 - Rp 8.000.000)</label>
-                            <input type="text" name="extra_meta[cost_range]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">CPM (cth: Rp 5.000 - Rp 10.000)</label>
-                            <input type="text" name="extra_meta[cpm]" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Kelebihan (1 baris per poin)</label>
-                            <textarea name="extra_meta[pros_text]" rows="2" class="w-full rounded-lg border-border bg-surface text-primary text-xs"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Kekurangan (1 baris per poin)</label>
-                            <textarea name="extra_meta[cons_text]" rows="2" class="w-full rounded-lg border-border bg-surface text-primary text-xs"></textarea>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" name="extra_meta[is_winner]" value="1" id="add_is_winner" class="rounded border-border text-brand-blue focus:ring-brand-blue">
-                            <label for="add_is_winner" class="text-xs font-bold text-primary">Tandai Sebagai Rekomendasi Pemenang (Highlight Hijau/Biru)</label>
                         </div>
                     </div>
 
@@ -972,7 +729,7 @@
                     </div>
 
                     <!-- File Upload Image -->
-                    <div x-show="currentItem.type === 'client_logo' || currentItem.type === 'portfolio' || currentItem.type === 'payment_proof'">
+                    <div x-show="currentItem.type === 'client_logo' || currentItem.type === 'portfolio'">
                         <label class="block text-xs font-bold text-secondary mb-1">Ganti Gambar / Logo</label>
                         <template x-if="currentItem.image">
                             <div class="mb-2 p-2 border border-border rounded-xl flex items-center justify-between bg-body">
@@ -995,42 +752,6 @@
                         <div>
                             <label class="block text-[11px] font-bold text-secondary mb-1">Jumlah Kreator</label>
                             <input type="text" name="extra_meta[creators]" :value="currentItem.extra_meta?.creators ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                    </div>
-
-                    <!-- Extra Meta for Payment Proof -->
-                    <div x-show="currentItem.type === 'payment_proof'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Nominal Transfer</label>
-                            <input type="text" name="extra_meta[amount]" :value="currentItem.extra_meta?.amount ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Status</label>
-                            <input type="text" name="extra_meta[status]" :value="currentItem.extra_meta?.status ?? 'Lunas'" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                    </div>
-
-                    <!-- Extra Meta for Efficiency Card -->
-                    <div x-show="currentItem.type === 'efficiency_card'" class="space-y-3 p-3 bg-body rounded-xl border border-border">
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Rentang Biaya</label>
-                            <input type="text" name="extra_meta[cost_range]" :value="currentItem.extra_meta?.cost_range ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">CPM</label>
-                            <input type="text" name="extra_meta[cpm]" :value="currentItem.extra_meta?.cpm ?? ''" class="w-full rounded-lg border-border bg-surface text-primary text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Kelebihan (1 baris per poin)</label>
-                            <textarea name="extra_meta[pros_text]" rows="2" class="w-full rounded-lg border-border bg-surface text-primary text-xs" :value="currentItem.extra_meta?.pros ? currentItem.extra_meta.pros.join('\n') : ''"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-secondary mb-1">Kekurangan (1 baris per poin)</label>
-                            <textarea name="extra_meta[cons_text]" rows="2" class="w-full rounded-lg border-border bg-surface text-primary text-xs" :value="currentItem.extra_meta?.cons ? currentItem.extra_meta.cons.join('\n') : ''"></textarea>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" name="extra_meta[is_winner]" value="1" :checked="currentItem.extra_meta?.is_winner" id="edit_is_winner" class="rounded border-border text-brand-blue focus:ring-brand-blue">
-                            <label for="edit_is_winner" class="text-xs font-bold text-primary">Tandai Sebagai Rekomendasi Pemenang</label>
                         </div>
                     </div>
 
