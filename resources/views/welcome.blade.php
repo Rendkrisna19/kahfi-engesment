@@ -59,6 +59,18 @@
             .animate-marquee:hover {
                 animation-play-state: paused;
             }
+            @keyframes marqueePortfolio {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-marquee-portfolio {
+                display: flex;
+                width: max-content;
+                animation: marqueePortfolio 45s linear infinite;
+            }
+            .animate-marquee-portfolio:hover {
+                animation-play-state: paused;
+            }
             .text-gradient-purple-blue {
                 background: linear-gradient(135deg, #2563eb 0%, #6366f1 50%, #7c3aed 100%);
                 -webkit-background-clip: text;
@@ -310,35 +322,56 @@
             </div>
         </section>
 
-        <!-- ================= SECTION 2: CLIENT / BRAND PARTNERS MARQUEE ================= -->
-        <section id="klien" class="relative z-10 py-10 border-y border-slate-200/80 bg-white/70 backdrop-blur-sm overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-5 text-center">
-                <p class="text-[11px] font-extrabold uppercase tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-                    {{ $settings['client_badge'] ?? 'BRAND TERPERCAYA' }}
-                </p>
-                <h3 class="text-lg sm:text-2xl font-black text-slate-900 mt-1">
-                    {{ $settings['client_title'] ?? 'Dipercaya Oleh Brand & Pebisnis Terkemuka' }}
-                </h3>
-            </div>
+        <!-- ================= SECTION 2: CLIENT / BRAND PARTNERS ================= -->
+        <section id="klien" class="relative z-10 py-12 lg:py-16 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Header with Clean Lines (Matching Image 2 Style) -->
+                <div class="flex items-center justify-center gap-3 sm:gap-6 mb-8">
+                    <div class="h-[1px] w-10 sm:w-28 bg-gradient-to-r from-transparent to-indigo-300"></div>
+                    <span class="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-indigo-700 bg-indigo-50/80 border border-indigo-200/60 px-3.5 py-1 rounded-full shadow-2xs">
+                        {{ $settings['client_badge'] ?? 'DIPERCAYA BRAND & PRODUCTION HOUSE NASIONAL' }}
+                    </span>
+                    <div class="h-[1px] w-10 sm:w-28 bg-gradient-to-l from-transparent to-indigo-300"></div>
+                </div>
 
-            <div class="relative w-full overflow-hidden">
-                <!-- Clean Fade Borders Left & Right -->
-                <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none"></div>
-                <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none"></div>
+                <!-- Sleek Card Container (Matching Image 2 with Purple-Blue-White theme) -->
+                <div class="relative max-w-5xl mx-auto rounded-3xl bg-white/80 backdrop-blur-md border border-indigo-100 shadow-xl shadow-indigo-500/5 p-6 sm:p-10 overflow-hidden text-center">
+                    <!-- Brand Logos Infinite Carousel -->
+                    <div class="relative w-full overflow-hidden py-2">
+                        <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-                <div class="animate-marquee gap-6 items-center py-2">
-                    @php
-                        $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients) : ($clients ?? collect());
-                    @endphp
-                    @foreach($allClients as $client)
-                        <div class="px-6 py-3 rounded-2xl bg-white/90 border border-slate-200/80 flex items-center justify-center shrink-0 hover:border-purple-400 hover:shadow-md hover:shadow-purple-500/5 transition shadow-sm h-14 min-w-[130px]">
-                            @if($client->image_url)
-                                <img src="{{ $client->image_url }}" alt="{{ $client->title ?? 'Client' }}" class="h-8 max-h-8 max-w-[120px] object-contain">
-                            @else
-                                <span class="text-xs font-bold text-slate-700 tracking-wide">{{ $client->title }}</span>
-                            @endif
+                        <div class="animate-marquee gap-8 sm:gap-14 items-center py-2">
+                            @php
+                                $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients)->concat($clients) : ($clients ?? collect());
+                            @endphp
+                            @foreach($allClients as $client)
+                                <div class="h-12 sm:h-14 px-4 py-1 flex items-center justify-center shrink-0 grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition duration-300">
+                                    @if($client->image_url)
+                                        <img src="{{ $client->image_url }}" alt="{{ $client->title ?? 'Client' }}" class="h-7 sm:h-9 max-w-[130px] object-contain">
+                                    @else
+                                        <span class="text-sm font-extrabold text-slate-700 tracking-wide">{{ $client->title }}</span>
+                                    @endif
+                                </div>
+                            @endforeach
                         </div>
-                    @endforeach
+                    </div>
+
+                    <!-- Inner Divider Line -->
+                    <div class="w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-200 to-transparent my-8"></div>
+
+                    <!-- For Client / Brand Text Block (Matching Image 2) -->
+                    <div class="max-w-3xl mx-auto space-y-3">
+                        <span class="inline-block text-[11px] sm:text-xs font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-3.5 py-1 rounded-full">
+                            FOR CLIENT / BRAND
+                        </span>
+                        <h3 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+                            {{ $settings['client_title'] ?? 'Efisiensi Budget Marketing di Era Short-Form Video' }}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
+                            {{ $settings['client_subtitle'] ?? 'Kami membantu mendistribusikan konten Anda menjadi puluhan konten kreatif yang siap mendominasi FYP secara organik.' }}
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -359,10 +392,11 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($whyJoins as $idx => $item)
-                    <div class="p-7 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
+                    <div class="p-6 sm:p-7 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
                         <div>
-                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-center font-black text-lg mb-5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            <!-- Icon Ceklis Kecil & Rapi (Matching Image 1) -->
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mb-4 shadow-sm group-hover:scale-105 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                             <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
                                 {{ $item->title }}
@@ -442,32 +476,46 @@
                 </div>
             </div>
 
-            <!-- Portfolio Cards Grid (Potret / Movie Poster Style - Hanya Gambar & Badge Views) -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                @foreach($portfolios as $portfolio)
-                    <div class="rounded-2xl bg-slate-900 border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:border-purple-500 transition duration-300 group relative">
-                        <div class="relative w-full aspect-[2/3] bg-slate-950 overflow-hidden flex items-center justify-center">
-                            @if($portfolio->image_url)
-                                <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            @else
-                                <div class="w-full h-full bg-slate-900 flex flex-col items-center justify-center p-4 text-center text-white">
-                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center mb-2 text-white shadow">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    </div>
-                                    <span class="text-xs font-bold mt-1 text-white">{{ $portfolio->title ?: 'Portofolio' }}</span>
-                                    <span class="text-[10px] text-slate-400 mt-1">Upload gambar di CMS</span>
-                                </div>
-                            @endif
+            <!-- Portfolio Infinite Carousel (Requested by User) -->
+            <div class="relative w-full overflow-hidden py-4">
+                <!-- Fade Masks Left & Right -->
+                <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent z-10 pointer-events-none"></div>
+                <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#F8FAFC] via-[#F8FAFC]/80 to-transparent z-10 pointer-events-none"></div>
 
-                            {{-- Clean Views Pill Badge matching Movie Poster style --}}
-                            @if(!empty($portfolio->extra_meta['views']) || !empty($portfolio->subtitle))
-                                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg bg-white/95 text-slate-950 font-extrabold text-[11px] sm:text-xs tracking-wider shadow-lg whitespace-nowrap z-10 border border-slate-200">
-                                    {{ $portfolio->extra_meta['views'] ?? $portfolio->subtitle }}
-                                </div>
-                            @endif
+                <div class="animate-marquee-portfolio gap-5 items-center py-2">
+                    @php
+                        $loopPortfolios = $portfolios;
+                        if ($loopPortfolios->count() > 0 && $loopPortfolios->count() < 8) {
+                            $loopPortfolios = $loopPortfolios->concat($loopPortfolios)->concat($loopPortfolios);
+                        } else {
+                            $loopPortfolios = $loopPortfolios->concat($loopPortfolios);
+                        }
+                    @endphp
+                    @foreach($loopPortfolios as $portfolio)
+                        <div class="w-48 sm:w-60 shrink-0 rounded-2xl bg-slate-900 border border-slate-200 overflow-hidden shadow-sm hover:shadow-2xl hover:border-purple-500 transition duration-300 group relative">
+                            <div class="relative w-full aspect-[2/3] bg-slate-950 overflow-hidden flex items-center justify-center">
+                                @if($portfolio->image_url)
+                                    <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                @else
+                                    <div class="w-full h-full bg-slate-900 flex flex-col items-center justify-center p-4 text-center text-white">
+                                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center mb-2 text-white shadow">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                        <span class="text-xs font-bold mt-1 text-white">{{ $portfolio->title ?: 'Portofolio' }}</span>
+                                        <span class="text-[10px] text-slate-400 mt-1">Upload gambar di CMS</span>
+                                    </div>
+                                @endif
+
+                                {{-- Clean Views Pill Badge --}}
+                                @if(!empty($portfolio->extra_meta['views']) || !empty($portfolio->subtitle))
+                                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg bg-white/95 text-slate-950 font-extrabold text-[11px] sm:text-xs tracking-wider shadow-lg whitespace-nowrap z-10 border border-slate-200">
+                                        {{ $portfolio->extra_meta['views'] ?? $portfolio->subtitle }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </section>
 

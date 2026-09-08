@@ -62,17 +62,19 @@
 
         <div class="sm:ml-64 min-h-screen flex flex-col">
             <!-- Topbar -->
-            <nav class="bg-surface border-b border-border px-4 py-3 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-sm transition-colors duration-200">
-                <div class="flex-1 flex items-center pr-4">
-                    <button @click="sidebarOpen = true" class="p-2 mr-3 text-secondary rounded-lg sm:hidden hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700">
+            <nav class="bg-surface border-b border-border px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm transition-colors duration-200">
+                <div class="flex-1 flex items-center pr-2 min-w-0">
+                    <button @click="sidebarOpen = true" class="p-1.5 mr-2 sm:mr-3 text-secondary rounded-lg sm:hidden hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 shrink-0" aria-label="Open Sidebar">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     @isset($header)
-                        {{ $header }}
+                        <div class="min-w-0 truncate">
+                            {{ $header }}
+                        </div>
                     @endisset
                 </div>
                 
-                <div class="flex items-center gap-3 shrink-0">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     @can('operasional-konten.view')
                     <!-- Apify Quota & Balance Status Badge -->
                     <div x-data="{
@@ -233,7 +235,7 @@
             </nav>
 
             <!-- Page Content -->
-            <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 p-3 sm:p-6 lg:p-8">
                 {{ $slot }}
             </main>
         </div>

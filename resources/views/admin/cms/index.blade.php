@@ -1,19 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-                <h2 class="font-bold text-2xl text-primary leading-tight flex items-center gap-2">
-                    <span>Kelola Konten Landing Page (CMS)</span>
-                    <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20">
+                <h2 class="font-bold text-lg sm:text-2xl text-primary leading-tight flex items-center gap-2 truncate">
+                    <span class="truncate">Kelola Konten Landing Page (CMS)</span>
+                    <span class="px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-full bg-brand-blue/10 text-brand-blue border border-brand-blue/20 shrink-0">
                         Live Editor
                     </span>
                 </h2>
-                <p class="text-sm text-secondary mt-1">
+                <p class="text-xs sm:text-sm text-secondary mt-1">
                     Sesuaikan seluruh teks, gambar, portofolio, dan section landing page dari satu dashboard terpadu.
                 </p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="{{ url('/') }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-surface border border-border text-primary rounded-xl text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition shadow-sm">
+            <div class="flex items-center gap-3 self-start sm:self-auto">
+                <a href="{{ url('/') }}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 bg-surface border border-border text-primary rounded-xl text-xs sm:text-sm font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition shadow-sm">
                     <svg class="w-4 h-4 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     Lihat Landing Page
                 </a>
@@ -22,15 +22,15 @@
     </x-slot>
 
     @if(session('success'))
-        <div class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center gap-3 shadow-sm">
+        <div class="mb-4 sm:mb-6 p-3.5 sm:p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center gap-3 shadow-sm">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            <span class="text-sm font-medium">{{ session('success') }}</span>
+            <span class="text-xs sm:text-sm font-medium">{{ session('success') }}</span>
         </div>
     @endif
 
     @if(isset($errors) && $errors->any())
-        <div class="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 shadow-sm">
-            <div class="font-bold text-sm mb-1">Ada kesalahan penginputan:</div>
+        <div class="mb-4 sm:mb-6 p-3.5 sm:p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 shadow-sm">
+            <div class="font-bold text-xs sm:text-sm mb-1">Ada kesalahan penginputan:</div>
             <ul class="list-disc list-inside text-xs space-y-0.5">
                 @foreach($errors->all() as $err)
                     <li>{{ $err }}</li>
@@ -54,36 +54,36 @@
             this.currentItem = JSON.parse(JSON.stringify(item));
             this.editModalOpen = true;
         }
-    }" class="space-y-6">
+    }" class="space-y-4 sm:space-y-6">
 
-        <!-- Navigation Tabs -->
-        <div class="bg-surface border border-border rounded-2xl p-2 shadow-sm overflow-x-auto">
-            <div class="flex items-center gap-1.5 min-w-max">
-                <button @click="tab = 'hero'" :class="tab === 'hero' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+        <!-- Navigation Tabs (Smooth Horizontal Scroll on Mobile) -->
+        <div class="bg-surface border border-border rounded-2xl p-1.5 sm:p-2 shadow-sm overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
+            <div class="flex items-center gap-1 sm:gap-1.5 min-w-max">
+                <button @click="tab = 'hero'" :class="tab === 'hero' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Hero & Brand
                 </button>
-                <button @click="tab = 'why_join'" :class="tab === 'why_join' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'why_join'" :class="tab === 'why_join' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Kenapa Gabung
                 </button>
-                <button @click="tab = 'not_for'" :class="tab === 'not_for' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'not_for'" :class="tab === 'not_for' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                     Bukan Untuk Semua Orang
                 </button>
-                <button @click="tab = 'portfolios'" :class="tab === 'portfolios' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'portfolios'" :class="tab === 'portfolios' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     Portofolio
                 </button>
-                <button @click="tab = 'clients'" :class="tab === 'clients' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'clients'" :class="tab === 'clients' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     Client / Mitra
                 </button>
-                <button @click="tab = 'how_it_works'" :class="tab === 'how_it_works' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'how_it_works'" :class="tab === 'how_it_works' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     Cara Kerja
                 </button>
-                <button @click="tab = 'cta'" :class="tab === 'cta' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2">
+                <button @click="tab = 'cta'" :class="tab === 'cta' ? 'bg-brand-blue text-white shadow-md' : 'text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary'" class="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                     Siap Banjir Views & CTA
                 </button>
@@ -91,8 +91,8 @@
         </div>
 
         <!-- TAB 1: HERO & BRAND -->
-        <div x-show="tab === 'hero'" class="space-y-6">
-            <form action="{{ route('admin.cms.settings.update') }}" method="POST" enctype="multipart/form-data" class="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-6">
+        <div x-show="tab === 'hero'" class="space-y-4 sm:space-y-6">
+            <form action="{{ route('admin.cms.settings.update') }}" method="POST" enctype="multipart/form-data" class="bg-surface border border-border rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
                 @csrf
                 <input type="hidden" name="active_tab" value="hero">
 
@@ -625,11 +625,11 @@
         </div>
 
         <!-- ================= MODAL TAMBAH ITEM ================= -->
-        <div x-show="addModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div @click.away="addModalOpen = false" class="bg-surface border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+        <div x-show="addModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div @click.away="addModalOpen = false" class="bg-surface border border-border rounded-2xl w-full max-w-lg p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto my-auto">
                 <div class="flex items-center justify-between border-b border-border pb-3">
-                    <h4 class="font-bold text-lg text-primary">Tambah Item Baru</h4>
-                    <button @click="addModalOpen = false" class="text-secondary hover:text-primary text-lg font-bold">✕</button>
+                    <h4 class="font-bold text-base sm:text-lg text-primary">Tambah Item Baru</h4>
+                    <button @click="addModalOpen = false" class="text-secondary hover:text-primary text-lg font-bold p-1">✕</button>
                 </div>
 
                 <form action="{{ route('admin.cms.items.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -686,11 +686,11 @@
         </div>
 
         <!-- ================= MODAL EDIT ITEM ================= -->
-        <div x-show="editModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-            <div @click.away="editModalOpen = false" class="bg-surface border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+        <div x-show="editModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+            <div @click.away="editModalOpen = false" class="bg-surface border border-border rounded-2xl w-full max-w-lg p-4 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto my-auto">
                 <div class="flex items-center justify-between border-b border-border pb-3">
-                    <h4 class="font-bold text-lg text-primary">Edit Item</h4>
-                    <button @click="editModalOpen = false" class="text-secondary hover:text-primary text-lg font-bold">✕</button>
+                    <h4 class="font-bold text-base sm:text-lg text-primary">Edit Item</h4>
+                    <button @click="editModalOpen = false" class="text-secondary hover:text-primary text-lg font-bold p-1">✕</button>
                 </div>
 
                 <form action="{{ route('admin.cms.items.update_direct') }}" method="POST" enctype="multipart/form-data" class="space-y-4">

@@ -1,19 +1,22 @@
 <aside :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0 bg-surface border-r border-border flex flex-col" aria-label="Sidebar" id="logo-sidebar">
-    <div class="px-6 py-8">
-        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 group">
+    <div class="px-6 py-6 sm:py-8 flex items-center justify-between">
+        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 group min-w-0">
             @php
                 $sidebarLogo = \App\Models\LandingSetting::brandLogoUrl();
                 $sidebarBrand = \App\Models\LandingSetting::get('brand_name', 'Kahfi Engagement');
             @endphp
             @if($sidebarLogo)
-                <img src="{{ $sidebarLogo }}" alt="{{ $sidebarBrand }}" class="w-8 h-8 rounded-lg object-contain shadow-md shadow-brand-blue/20 group-hover:scale-105 transition-transform">
+                <img src="{{ $sidebarLogo }}" alt="{{ $sidebarBrand }}" class="w-8 h-8 rounded-lg object-contain shadow-md shadow-brand-blue/20 group-hover:scale-105 transition-transform shrink-0">
             @else
-                <div class="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform">
+                <div class="w-8 h-8 rounded-lg bg-brand-gradient flex items-center justify-center shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform shrink-0">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
             @endif
             <span class="text-lg font-extrabold text-primary tracking-tight truncate">{{ $sidebarBrand }}</span>
         </a>
+        <button type="button" @click="sidebarOpen = false" class="sm:hidden p-1.5 rounded-lg text-secondary hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition" aria-label="Tutup Menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
     </div>
 
     <div class="flex-1 px-4 overflow-y-auto space-y-2">

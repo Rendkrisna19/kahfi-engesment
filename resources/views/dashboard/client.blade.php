@@ -1,18 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-primary leading-tight flex items-center gap-2">
-            <span>Halo {{ explode(' ', Auth::user()->name)[0] }}, Selamat Datang Kembali!</span>
-            <svg class="w-6 h-6 text-amber-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5a1.5 1.5 0 113 0m-3 0V11m3-5.5a1.5 1.5 0 113 0m-3 0V11"></path></svg>
+        <h2 class="font-bold text-lg sm:text-2xl text-primary leading-tight flex items-center gap-2 truncate">
+            <span class="truncate">Halo {{ explode(' ', Auth::user()->name)[0] }}, Selamat Datang!</span>
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5a1.5 1.5 0 113 0m-3 0V11m3-5.5a1.5 1.5 0 113 0m-3 0V11"></path></svg>
         </h2>
     </x-slot>
 
-    <div class="space-y-6">
+    <div class="space-y-4 sm:space-y-6">
         <!-- Interactive Real-time Filters -->
-        <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-wrap gap-4 items-center justify-between">
-            <form method="GET" action="{{ route('dashboard.client') }}" class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div class="bg-surface p-3.5 sm:p-6 rounded-2xl border border-border shadow-sm">
+            <form method="GET" action="{{ route('dashboard.client') }}" class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 sm:gap-3 w-full">
                 <!-- Dropdown Platform -->
-                <div>
-                    <select name="platform" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue">
+                <div class="w-full sm:w-auto">
+                    <select name="platform" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
                         <option value="">-- Platform --</option>
                         <option value="TikTok" {{ request('platform') == 'TikTok' ? 'selected' : '' }}>TikTok</option>
                         <option value="Instagram" {{ request('platform') == 'Instagram' ? 'selected' : '' }}>Instagram</option>
@@ -20,8 +20,8 @@
                 </div>
 
                 <!-- Dropdown Campaign -->
-                <div>
-                    <select name="campaign_id" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue max-w-[200px] truncate">
+                <div class="col-span-2 sm:col-span-1 w-full sm:w-auto">
+                    <select name="campaign_id" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue max-w-full sm:max-w-[200px] truncate">
                         <option value="">-- Semua Campaign Anda --</option>
                         @foreach($campaigns as $camp)
                             <option value="{{ $camp->id }}" {{ request('campaign_id') == $camp->id ? 'selected' : '' }}>
@@ -32,8 +32,8 @@
                 </div>
 
                 <!-- Dropdown Tahun -->
-                <div>
-                    <select name="year" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue">
+                <div class="w-full sm:w-auto">
+                    <select name="year" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
                         <option value="">-- Tahun --</option>
                         @foreach($availableYears as $yr)
                             <option value="{{ $yr }}" {{ request('year') == $yr ? 'selected' : '' }}>{{ $yr }}</option>
@@ -42,8 +42,8 @@
                 </div>
 
                 <!-- Dropdown Bulan -->
-                <div>
-                    <select name="month" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue">
+                <div class="w-full sm:w-auto">
+                    <select name="month" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
                         <option value="">-- Bulan --</option>
                         @php
                             $months = [
@@ -59,8 +59,8 @@
                 </div>
 
                 <!-- Dropdown Hari -->
-                <div>
-                    <select name="day" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-sm focus:border-brand-blue focus:ring-brand-blue">
+                <div class="col-span-2 sm:col-span-1 w-full sm:w-auto">
+                    <select name="day" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
                         <option value="">-- Hari --</option>
                         @for($d = 1; $d <= 31; $d++)
                             <option value="{{ $d }}" {{ request('day') == $d ? 'selected' : '' }}>{{ $d }}</option>
@@ -69,13 +69,15 @@
                 </div>
 
                 @if(request('platform') || request('campaign_id') || request('year') || request('month') || request('day'))
-                    <a href="{{ route('dashboard.client') }}" class="text-xs text-brand-blue hover:underline font-semibold">Reset Filter</a>
+                    <div class="col-span-2 sm:col-span-1 text-center sm:text-left py-1">
+                        <a href="{{ route('dashboard.client') }}" class="text-xs text-brand-blue hover:underline font-semibold">Reset Filter</a>
+                    </div>
                 @endif
             </form>
         </div>
 
         <!-- Main Highlight & Compact KPIs Grid (8 Cards) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-2.5 sm:gap-4">
             <!-- Campaign & Links -->
             <div class="bg-brand-gradient rounded-2xl p-4 text-white shadow-md flex flex-col justify-between hover:shadow-lg transition">
                 <div class="flex items-center justify-between">
@@ -209,36 +211,36 @@
         </div>
 
         <!-- Individual Metric Charts Row -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <!-- Views per Platform -->
-            <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
+            <div class="bg-surface p-4 sm:p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
                 <div>
-                    <h3 class="text-md font-bold text-primary mb-1">Views per Platform</h3>
+                    <h3 class="text-sm sm:text-md font-bold text-primary mb-1">Views per Platform</h3>
                     <p class="text-xs text-secondary mb-4">Total views untuk setiap platform</p>
                 </div>
-                <div class="relative h-48 w-full flex items-center justify-center">
+                <div class="relative h-44 sm:h-48 w-full flex items-center justify-center">
                     <canvas id="viewsChart"></canvas>
                 </div>
             </div>
 
             <!-- Likes per Platform -->
-            <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
+            <div class="bg-surface p-4 sm:p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
                 <div>
-                    <h3 class="text-md font-bold text-primary mb-1">Likes per Platform</h3>
+                    <h3 class="text-sm sm:text-md font-bold text-primary mb-1">Likes per Platform</h3>
                     <p class="text-xs text-secondary mb-4">Total likes untuk setiap platform</p>
                 </div>
-                <div class="relative h-48 w-full flex items-center justify-center">
+                <div class="relative h-44 sm:h-48 w-full flex items-center justify-center">
                     <canvas id="likesChart"></canvas>
                 </div>
             </div>
 
             <!-- Comments per Platform -->
-            <div class="bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
+            <div class="bg-surface p-4 sm:p-6 rounded-2xl border border-border shadow-sm flex flex-col justify-between">
                 <div>
-                    <h3 class="text-md font-bold text-primary mb-1">Comments per Platform</h3>
+                    <h3 class="text-sm sm:text-md font-bold text-primary mb-1">Comments per Platform</h3>
                     <p class="text-xs text-secondary mb-4">Total comments untuk setiap platform</p>
                 </div>
-                <div class="relative h-48 w-full flex items-center justify-center">
+                <div class="relative h-44 sm:h-48 w-full flex items-center justify-center">
                     <canvas id="commentsChart"></canvas>
                 </div>
             </div>
@@ -246,31 +248,31 @@
 
         <!-- Top Content Ranking Section -->
         <div class="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-border flex justify-between items-center bg-body/25">
+            <div class="p-4 sm:p-6 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-body/25">
                 <div>
-                    <h3 class="text-lg font-bold text-primary flex items-center gap-2">
+                    <h3 class="text-base sm:text-lg font-bold text-primary flex items-center gap-2">
                         <span>Top 20 Content Ranking</span>
                         <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                     </h3>
                     <p class="text-xs text-secondary mt-1">Konten teratas berdasarkan performa tayangan</p>
                 </div>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-lg">
+                <span class="text-xs font-semibold px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-lg self-start sm:self-auto">
                     Menampilkan {{ $topContent->count() }} Konten Teratas
                 </span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-body/50 text-xs uppercase text-secondary">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead class="bg-body/50 text-[11px] sm:text-xs uppercase text-secondary">
                         <tr>
-                            <th class="px-6 py-4 font-semibold">Rank</th>
-                            <th class="px-6 py-4 font-semibold">Platform</th>
-                            <th class="px-6 py-4 font-semibold">Campaign</th>
-                            <th class="px-6 py-4 font-semibold">Akun</th>
-                            <th class="px-6 py-4 font-semibold text-right">Views</th>
-                            <th class="px-6 py-4 font-semibold text-right">Likes</th>
-                            <th class="px-6 py-4 font-semibold text-right">Comments</th>
-                            <th class="px-6 py-4 font-semibold text-right">ER (%)</th>
-                            <th class="px-6 py-4 font-semibold text-center">Detail</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Rank</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Platform</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Campaign</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Akun</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Views</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Likes</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Comments</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Detail</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
@@ -318,30 +320,30 @@
 
         <!-- Export & Data Table Section -->
         <div class="bg-surface rounded-2xl border border-border overflow-hidden shadow-sm mt-6">
-            <div class="px-6 py-5 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-body/25">
-                <h3 class="text-lg font-bold text-primary">Daftar Link Konten (Laporan)</h3>
-                <div class="flex gap-2">
-                    <a href="{{ route('export.client.pdf') }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-status-danger/10 text-status-danger border border-transparent rounded-lg font-semibold text-xs uppercase tracking-widest hover:bg-status-danger/20 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="p-4 sm:px-6 sm:py-5 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-body/25">
+                <h3 class="text-base sm:text-lg font-bold text-primary">Daftar Link Konten (Laporan)</h3>
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <a href="{{ route('export.client.pdf') }}" target="_blank" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-danger/10 text-status-danger border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-danger/20 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Export PDF
                     </a>
-                    <a href="{{ route('export.client.excel') }}" class="inline-flex items-center px-4 py-2 bg-status-success/10 text-status-success border border-transparent rounded-lg font-semibold text-xs uppercase tracking-widest hover:bg-status-success/20 transition-colors shadow-sm">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <a href="{{ route('export.client.excel') }}" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-success/10 text-status-success border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-success/20 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Export Excel
                     </a>
                 </div>
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-body/50 text-xs uppercase text-secondary">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                    <thead class="bg-body/50 text-[11px] sm:text-xs uppercase text-secondary">
                         <tr>
-                            <th class="px-6 py-4 font-semibold">Platform</th>
-                            <th class="px-6 py-4 font-semibold">Campaign</th>
-                            <th class="px-6 py-4 font-semibold text-right">Views</th>
-                            <th class="px-6 py-4 font-semibold text-right">ER (%)</th>
-                            <th class="px-6 py-4 font-semibold text-center">Status</th>
-                            <th class="px-6 py-4 font-semibold text-center">Aksi</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Platform</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Campaign</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Views</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Status</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
