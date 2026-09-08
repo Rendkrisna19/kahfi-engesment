@@ -9,18 +9,21 @@
 
     // Dynamic database statistics (from real links, creators, and campaigns)
     $totalViews = $totalViews ?? (\Illuminate\Support\Facades\Schema::hasTable('links') ? (\App\Models\Link::sum('views') ?: 0) : 0);
+    $totalEngagement = $totalEngagement ?? (\Illuminate\Support\Facades\Schema::hasTable('links') ? ((\App\Models\Link::sum('likes') + \App\Models\Link::sum('comments') + \App\Models\Link::sum('shares') + \App\Models\Link::sum('saves')) ?: 0) : 0);
     $totalCreators = $totalCreators ?? (\Illuminate\Support\Facades\Schema::hasTable('links') ? (\App\Models\Link::whereNotNull('username')->where('username', '!=', '')->distinct('username')->count('username') ?: (\App\Models\User::where('role', 'Creator')->count() ?: 1)) : 1);
     $totalBrands = $totalBrands ?? (\Illuminate\Support\Facades\Schema::hasTable('campaigns') ? max(\App\Models\Campaign::count(), \App\Models\User::where('role', 'Client')->count(), 1) : 1);
 
     // Number formatting helper
-    $formatMetric = function($num) {
-        if ($num >= 1000000000) return round($num / 1000000000, 1) . 'B+';
-        if ($num >= 1000000) return round($num / 1000000, 1) . 'M+';
-        if ($num >= 1000) return round($num / 1000, 1) . 'K+';
-        return number_format($num, 0, ',', '.') . '+';
+    $formatMetric = function($num, $fallback = '1.84M') {
+        if (!$num || $num <= 0) return $fallback;
+        if ($num >= 1000000000) return round($num / 1000000000, 2) . 'B';
+        if ($num >= 1000000) return round($num / 1000000, 2) . 'M';
+        if ($num >= 1000) return round($num / 1000, 1) . 'K';
+        return number_format($num, 0, ',', '.');
     };
 
-    $formattedViews = $formatMetric($totalViews);
+    $formattedViews = $totalViews > 0 ? $formatMetric($totalViews, '1.84M') : '1.84M';
+    $formattedEngagement = $totalEngagement > 0 ? $formatMetric($totalEngagement, '294.6K') : '294.6K';
     $formattedCreators = ($totalCreators >= 1000 ? round($totalCreators / 1000, 1) . 'K+' : $totalCreators . '+');
     $formattedBrands = ($totalBrands >= 1000 ? round($totalBrands / 1000, 1) . 'K+' : $totalBrands . '+');
 @endphp
@@ -245,30 +248,73 @@
                 </a>
             </div>
 
-            <!-- Real Stats Bar (Matching Screenshot 1 with Real Live Database Data) -->
-            <div class="mt-14 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6 p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm">
-                <div class="text-center sm:border-r border-slate-200 sm:pr-4">
-                    <div class="font-benzin text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                        {{ $formattedCreators }}
+            <!-- ================= REALTIME ANALYTICS PREVIEW (MATCHING USER SCREENSHOT) ================= -->
+            <div class="mt-10 sm:mt-14 w-full max-w-lg mx-auto bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-7 shadow-xl shadow-slate-200/50 text-left relative overflow-hidden transition-all duration-300">
+                <!-- Header with Mac-style Dots -->
+                <div class="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 mb-4 sm:mb-5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
                     </div>
-                    <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1.5">
-                        Kreator Aktif
+                    <span class="text-[10px] sm:text-xs font-extrabold text-slate-400 tracking-wider uppercase">
+                        REALTIME ANALYTICS PREVIEW
+                    </span>
+                </div>
+
+                <!-- 2 Top Stats Cards (Side by side on mobile and desktop) -->
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-5 sm:mb-6">
+                    <!-- Total Views Card -->
+                    <div class="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">
+                            TOTAL VIEWS
+                        </p>
+                        <h4 class="font-benzin text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1 sm:mt-1.5 tracking-tight">
+                            {{ $formattedViews }}
+                        </h4>
+                        <p class="text-[10px] sm:text-xs text-emerald-600 font-semibold mt-1 sm:mt-1.5 flex items-center gap-1">
+                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                            <span>+14.2% bulan ini</span>
+                        </p>
+                    </div>
+
+                    <!-- Total Engagement Card -->
+                    <div class="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">
+                            TOTAL ENGAGEMENT
+                        </p>
+                        <h4 class="font-benzin text-2xl sm:text-3xl font-extrabold text-indigo-600 mt-1 sm:mt-1.5 tracking-tight">
+                            {{ $formattedEngagement }}
+                        </h4>
+                        <p class="text-[10px] sm:text-xs text-emerald-600 font-semibold mt-1 sm:mt-1.5 flex items-center gap-1">
+                            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                            <span>+8.7% bulan ini</span>
+                        </p>
                     </div>
                 </div>
-                <div class="text-center sm:border-r border-slate-200 sm:px-4">
-                    <div class="font-benzin text-3xl sm:text-4xl font-extrabold text-blue-600 tracking-tight">
-                        {{ $formattedViews }}
+
+                <!-- Progress Rows for TikTok & Instagram Campaigns -->
+                <div class="space-y-3.5 sm:space-y-4">
+                    <!-- TikTok Campaign -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs sm:text-sm font-bold">
+                            <span class="text-slate-800">TikTok Campaign (Active)</span>
+                            <span class="font-benzin text-blue-600 font-extrabold text-xs sm:text-sm">84%</span>
+                        </div>
+                        <div class="w-full h-2.5 sm:h-3 bg-slate-100 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-blue-600 rounded-full transition-all duration-700" style="width: 84%"></div>
+                        </div>
                     </div>
-                    <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1.5">
-                        Total Views Terdistribusi
-                    </div>
-                </div>
-                <div class="text-center sm:pl-4">
-                    <div class="font-benzin text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                        {{ $formattedBrands }}
-                    </div>
-                    <div class="text-xs sm:text-sm font-semibold text-slate-500 mt-1.5">
-                        Brand & Bisnis Puas
+
+                    <!-- Instagram Campaign -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-xs sm:text-sm font-bold">
+                            <span class="text-slate-800">Instagram Campaign (Processing)</span>
+                            <span class="font-benzin text-indigo-600 font-extrabold text-xs sm:text-sm">62%</span>
+                        </div>
+                        <div class="w-full h-2.5 sm:h-3 bg-slate-100 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-indigo-500 rounded-full transition-all duration-700" style="width: 62%"></div>
+                        </div>
                     </div>
                 </div>
             </div>

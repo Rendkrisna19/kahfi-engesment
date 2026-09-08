@@ -28,6 +28,7 @@ class LandingCmsController extends Controller
 
         // Real dynamic database metrics (from links, creators, campaigns)
         $totalViews = \App\Models\Link::sum('views') ?: 0;
+        $totalEngagement = (\App\Models\Link::sum('likes') + \App\Models\Link::sum('comments') + \App\Models\Link::sum('shares') + \App\Models\Link::sum('saves')) ?: 0;
         $totalCreators = \App\Models\Link::whereNotNull('username')->where('username', '!=', '')->distinct('username')->count('username');
         if ($totalCreators === 0) {
             $totalCreators = \App\Models\User::where('role', 'Creator')->count() ?: 1;
@@ -44,6 +45,7 @@ class LandingCmsController extends Controller
             'clients',
             'portfolios',
             'totalViews',
+            'totalEngagement',
             'totalCreators',
             'totalBrands'
         ));
