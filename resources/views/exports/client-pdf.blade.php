@@ -63,10 +63,13 @@
                 <th>No</th>
                 <th>Platform</th>
                 <th>Campaign</th>
+                <th>Akun</th>
                 <th>URL</th>
                 <th class="text-right">Views</th>
                 <th class="text-right">Likes</th>
                 <th class="text-right">Comments</th>
+                <th class="text-right">Shares</th>
+                <th class="text-right">Saves</th>
                 <th class="text-right">ER (%)</th>
                 <th class="text-center">Status</th>
             </tr>
@@ -77,13 +80,16 @@
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ ucfirst($link->platform) }}</td>
                 <td>{{ $link->campaign->nama_campaign ?? '-' }}</td>
-                <td>{{ \Illuminate\Support\Str::limit($link->url, 40) }}</td>
+                <td>{{ $link->username ? (str_starts_with($link->username, '@') ? $link->username : '@'.$link->username) : '-' }}</td>
+                <td>{{ \Illuminate\Support\Str::limit($link->url, 35) }}</td>
                 <td class="text-right">{{ number_format($link->views ?? 0, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($link->likes ?? 0, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($link->comments ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($link->shares ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">{{ number_format($link->saves ?? 0, 0, ',', '.') }}</td>
                 <td class="text-right">{{ number_format($link->engagement_rate ?? 0, 2) }}%</td>
                 <td class="text-center">
-                    @if($link->status_scraping == 'Completed')
+                    @if($link->status_scraping == 'Completed' || $link->status_scraping == 'Berhasil')
                         <span class="badge success">Selesai</span>
                     @elseif($link->status_scraping == 'Pending')
                         <span class="badge pending">Antrean</span>

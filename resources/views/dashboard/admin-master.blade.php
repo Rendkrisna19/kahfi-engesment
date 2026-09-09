@@ -290,6 +290,8 @@
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Views</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Likes</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Comments</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Shares</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Saves</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Detail</th>
                         </tr>
@@ -320,6 +322,8 @@
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-bold text-brand-blue">{{ number_format($content->views) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right text-secondary">{{ number_format($content->likes) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right text-secondary">{{ number_format($content->comments) }}</td>
+                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-indigo-600 dark:text-indigo-400">{{ number_format($content->shares ?? 0) }}</td>
+                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-amber-600 dark:text-amber-400">{{ number_format($content->saves ?? 0) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-bold text-status-success">{{ number_format($content->engagement_rate, 2) }}%</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
                                 <a href="{{ route('laporan.show', $content->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20 rounded-xl text-xs font-bold transition-colors">
@@ -329,7 +333,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
+                            <td colspan="11" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
                         </tr>
                         @endforelse
                     </tbody>

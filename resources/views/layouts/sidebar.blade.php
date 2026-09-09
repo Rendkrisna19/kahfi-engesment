@@ -72,7 +72,6 @@
                 @can('master-data.view')
                 <a href="{{ route('kategori-konten.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('kategori-konten.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kategori Konten</a>
                 <a href="{{ route('kategori-creator.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('kategori-creator.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kategori Creator</a>
-                <a href="{{ route('admin.cms.index') }}" class="block px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.cms.*') ? 'bg-brand-blue/10 text-brand-blue dark:bg-brand-blue/20 font-bold' : 'text-secondary hover:text-primary hover:bg-gray-100/80 dark:hover:bg-gray-800/80 dark:hover:text-gray-100' }}">Kelola Landing Page</a>
                 @endcan
             </div>
         </div>

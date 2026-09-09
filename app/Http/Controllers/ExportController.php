@@ -76,23 +76,30 @@ class ExportController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['Platform', 'Campaign', 'Kategori', 'URL', 'Views', 'Likes', 'Comments', 'Engagement Rate (%)', 'Status'];
+        $columns = ['No', 'Platform', 'Campaign', 'Akun', 'Kategori', 'URL', 'Views', 'Likes', 'Comments', 'Shares', 'Saves', 'Engagement Rate (%)', 'Status'];
 
         $callback = function() use($links, $columns) {
             $file = fopen('php://output', 'w');
+            // Write UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
             fputcsv($file, $columns);
 
-            foreach ($links as $link) {
+            foreach ($links as $index => $link) {
                 fputcsv($file, [
+                    $index + 1,
                     $link->platform,
                     $link->campaign->nama_campaign ?? '-',
+                    $link->username ? (str_starts_with($link->username, '@') ? $link->username : '@' . $link->username) : '-',
                     $link->kategoriKonten->nama ?? '-',
                     $link->url,
-                    $link->views,
-                    $link->likes,
-                    $link->comments,
-                    $link->engagement_rate,
-                    $link->status_scraping
+                    $link->views ?? 0,
+                    $link->likes ?? 0,
+                    $link->comments ?? 0,
+                    $link->shares ?? 0,
+                    $link->saves ?? 0,
+                    number_format($link->engagement_rate ?? 0, 2, '.', ''),
+                    $link->status_scraping ?? '-'
                 ]);
             }
 

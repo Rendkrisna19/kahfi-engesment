@@ -271,6 +271,8 @@
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Views</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Likes</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Comments</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Shares</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Saves</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
                             <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Detail</th>
                         </tr>
@@ -301,6 +303,8 @@
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-primary">{{ number_format($content->views) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right text-secondary">{{ number_format($content->likes) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right text-secondary">{{ number_format($content->comments) }}</td>
+                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-indigo-600 dark:text-indigo-400">{{ number_format($content->shares ?? 0) }}</td>
+                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-amber-600 dark:text-amber-400">{{ number_format($content->saves ?? 0) }}</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-bold text-status-success">{{ number_format($content->engagement_rate, 2) }}%</td>
                             <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
                                 <a href="{{ route('laporan.show', $content->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20 rounded-xl text-xs font-bold transition-colors">
@@ -310,7 +314,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
+                            <td colspan="11" class="px-6 py-12 text-center text-secondary">Belum ada data ranking konten.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -338,24 +342,42 @@
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead class="bg-body/50 text-[11px] sm:text-xs uppercase text-secondary">
                         <tr>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Platform</th>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold">Campaign</th>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">Views</th>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Status</th>
-                            <th class="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-center">Aksi</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Platform</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Campaign</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Akun</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Views</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Likes</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Comments</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Shares</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Saves</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">ER (%)</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-center">Status</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-border">
                         @forelse($links as $link)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 whitespace-nowrap">
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                 <span class="px-2 py-1 bg-body border border-border rounded-md text-xs font-semibold">{{ ucfirst($link->platform) }}</span>
                             </td>
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm font-medium text-primary">{{ $link->campaign->nama_campaign ?? '-' }}</td>
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-medium text-primary">{{ number_format($link->views) }}</td>
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-right font-bold {{ $link->engagement_rate > 5 ? 'text-status-success' : 'text-status-warning' }}">{{ number_format($link->engagement_rate, 2) }}%</td>
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium text-primary">{{ $link->campaign->nama_campaign ?? '-' }}</td>
+                            @php
+                                $uName = trim($link->username ?? '');
+                                if (empty($uName) || str_contains($uName, '{') || str_contains($uName, '$')) {
+                                    $displayAccount = '-';
+                                } else {
+                                    $displayAccount = str_starts_with($uName, '@') ? $uName : '@' . $uName;
+                                }
+                            @endphp
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-secondary font-bold">{{ $displayAccount }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right font-medium text-primary">{{ number_format($link->views ?? 0) }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right text-secondary">{{ number_format($link->likes ?? 0) }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right text-secondary">{{ number_format($link->comments ?? 0) }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right font-medium text-indigo-600 dark:text-indigo-400">{{ number_format($link->shares ?? 0) }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right font-medium text-amber-600 dark:text-amber-400">{{ number_format($link->saves ?? 0) }}</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm text-right font-bold {{ ($link->engagement_rate ?? 0) > 5 ? 'text-status-success' : 'text-status-warning' }}">{{ number_format($link->engagement_rate ?? 0, 2) }}%</td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-center">
                                 @if(in_array($link->status_scraping, ['Completed', 'Berhasil']))
                                     <span class="inline-flex px-2 py-1 rounded bg-status-success/10 text-status-success text-xs font-bold">Selesai</span>
                                 @elseif($link->status_scraping === 'Pending')
@@ -364,7 +386,7 @@
                                     <span class="inline-flex px-2 py-1 rounded bg-status-danger/10 text-status-danger text-xs font-bold">Gagal</span>
                                 @endif
                             </td>
-                            <td class="px-3 sm:px-6 py-2.5 sm:py-4 text-center">
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-center">
                                 <a href="{{ route('laporan.show', $link->id) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-blue/10 text-brand-blue hover:bg-brand-blue/20 rounded-xl text-xs font-bold transition-colors">
                                     Detail
                                 </a>
@@ -372,7 +394,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-secondary">Belum ada data link.</td>
+                            <td colspan="11" class="px-6 py-8 text-center text-secondary">Belum ada data link.</td>
                         </tr>
                         @endforelse
                     </tbody>

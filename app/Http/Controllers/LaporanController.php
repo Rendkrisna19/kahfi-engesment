@@ -54,9 +54,11 @@ class LaporanController extends Controller
         $totalViews = (clone $query)->sum('views');
         $totalLikes = (clone $query)->sum('likes');
         $totalComments = (clone $query)->sum('comments');
+        $totalShares = (clone $query)->sum('shares');
+        $totalSaves = (clone $query)->sum('saves');
         $avgER = (clone $query)->where('engagement_rate', '>', 0)->avg('engagement_rate') ?? 0;
 
-        return view('laporan.index', compact('campaigns', 'links', 'totalViews', 'totalLikes', 'totalComments', 'avgER'));
+        return view('laporan.index', compact('campaigns', 'links', 'totalViews', 'totalLikes', 'totalComments', 'totalShares', 'totalSaves', 'avgER'));
     }
 
     public function show($id)
