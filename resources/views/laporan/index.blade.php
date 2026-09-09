@@ -63,7 +63,14 @@
                     </select>
                 </div>
 
-                @if(request('campaign_id') || request('platform'))
+                <!-- Date Range Filter -->
+                <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue" title="Dari Tanggal">
+                    <span class="text-xs text-secondary font-medium">s/d</span>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" onchange="this.form.submit()" class="rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue" title="Sampai Tanggal">
+                </div>
+
+                @if(request('campaign_id') || request('platform') || request('start_date') || request('end_date'))
                     <div class="col-span-2 sm:col-span-1 text-center sm:text-left py-1">
                         <a href="{{ route('laporan.index') }}" class="text-xs text-brand-blue hover:underline font-semibold">Reset Filter</a>
                     </div>
@@ -88,6 +95,7 @@
                 <table class="w-full text-left border-collapse text-xs sm:text-sm">
                     <thead class="bg-body/50 text-[11px] sm:text-xs uppercase text-secondary">
                         <tr>
+                            <th class="px-3 sm:px-4 py-3 font-semibold">Tanggal</th>
                             <th class="px-3 sm:px-4 py-3 font-semibold">Platform</th>
                             <th class="px-3 sm:px-4 py-3 font-semibold">Campaign</th>
                             <th class="px-3 sm:px-4 py-3 font-semibold">Akun</th>
@@ -105,6 +113,9 @@
                     <tbody class="divide-y divide-border">
                         @forelse($links as $link)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td class="px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium text-secondary whitespace-nowrap">
+                                {{ $link->tanggal_upload ? \Carbon\Carbon::parse($link->tanggal_upload)->format('d/m/Y') : ($link->updated_at ? \Carbon\Carbon::parse($link->updated_at)->format('d/m/Y') : '-') }}
+                            </td>
                             <td class="px-3 sm:px-4 py-3 whitespace-nowrap">
                                 <span class="px-2 py-0.5 bg-body border border-border rounded-lg text-xs font-semibold">{{ ucfirst($link->platform) }}</span>
                             </td>
@@ -147,7 +158,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="12" class="px-6 py-12 text-center text-secondary">Belum ada data laporan yang cocok.</td>
+                            <td colspan="13" class="px-6 py-12 text-center text-secondary">Belum ada data laporan yang cocok.</td>
                         </tr>
                         @endforelse
                     </tbody>

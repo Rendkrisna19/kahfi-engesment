@@ -43,6 +43,14 @@ class ExportController extends Controller
             $query->where('platform', request()->platform);
         }
 
+        if (request()->filled('start_date')) {
+            $query->whereDate('tanggal_upload', '>=', request()->start_date);
+        }
+
+        if (request()->filled('end_date')) {
+            $query->whereDate('tanggal_upload', '<=', request()->end_date);
+        }
+
         return $query->orderBy('id', 'desc')->get();
     }
 
@@ -50,9 +58,17 @@ class ExportController extends Controller
     {
         $links = $this->getExportLinks();
         
+        $period = null;
+        if (request()->filled('start_date') || request()->filled('end_date')) {
+            $startStr = request('start_date') ? \Carbon\Carbon::parse(request('start_date'))->format('d/m/Y') : 'Awal';
+            $endStr = request('end_date') ? \Carbon\Carbon::parse(request('end_date'))->format('d/m/Y') : 'Sekarang';
+            $period = "Periode: {$startStr} s/d {$endStr}";
+        }
+
         $data = [
             'title' => 'Laporan Engagement Konten - ' . Auth::user()->name,
             'date' => date('d M Y'),
+            'period' => $period,
             'links' => $links,
         ];
 
@@ -76,7 +92,7 @@ class ExportController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['No', 'Platform', 'Campaign', 'Akun', 'Kategori', 'URL', 'Views', 'Likes', 'Comments', 'Shares', 'Saves', 'Engagement Rate (%)', 'Status'];
+        $columns = ['No', 'Tanggal', 'Platform', 'Campaign', 'Akun', 'Kategori', 'URL', 'Views', 'Likes', 'Comments', 'Shares', 'Saves', 'Engagement Rate (%)', 'Status'];
 
         $callback = function() use($links, $columns) {
             $file = fopen('php://output', 'w');
@@ -88,6 +104,7 @@ class ExportController extends Controller
             foreach ($links as $index => $link) {
                 fputcsv($file, [
                     $index + 1,
+                    $link->tanggal_upload ? \Carbon\Carbon::parse($link->tanggal_upload)->format('d/m/Y') : ($link->updated_at ? \Carbon\Carbon::parse($link->updated_at)->format('d/m/Y') : '-'),
                     $link->platform,
                     $link->campaign->nama_campaign ?? '-',
                     $link->username ? (str_starts_with($link->username, '@') ? $link->username : '@' . $link->username) : '-',

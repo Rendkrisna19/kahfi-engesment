@@ -54,13 +54,14 @@
 
     <div class="header">
         <h1>{{ $title }}</h1>
-        <p>Tanggal Cetak: {{ $date }}</p>
+        <p>Tanggal Cetak: {{ $date }} @if(!empty($period)) | <strong>{{ $period }}</strong> @endif</p>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>No</th>
+                <th>Tanggal</th>
                 <th>Platform</th>
                 <th>Campaign</th>
                 <th>Akun</th>
@@ -78,6 +79,7 @@
             @foreach($links as $index => $link)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $link->tanggal_upload ? \Carbon\Carbon::parse($link->tanggal_upload)->format('d/m/Y') : ($link->updated_at ? \Carbon\Carbon::parse($link->updated_at)->format('d/m/Y') : '-') }}</td>
                 <td>{{ ucfirst($link->platform) }}</td>
                 <td>{{ $link->campaign->nama_campaign ?? '-' }}</td>
                 <td>{{ $link->username ? (str_starts_with($link->username, '@') ? $link->username : '@'.$link->username) : '-' }}</td>

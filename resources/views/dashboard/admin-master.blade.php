@@ -31,44 +31,19 @@
                     </select>
                 </div>
 
-                <!-- Dropdown Tahun -->
-                <div class="w-full sm:w-auto">
-                    <select name="year" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Tahun --</option>
-                        @foreach($availableYears as $yr)
-                            <option value="{{ $yr }}" {{ request('year') == $yr ? 'selected' : '' }}>{{ $yr }}</option>
-                        @endforeach
-                    </select>
+                <!-- Date Range (Dari Tanggal s/d Sampai Tanggal) -->
+                <div class="col-span-2 sm:col-span-auto flex items-center gap-1.5 bg-body px-2.5 py-1.5 rounded-xl border border-border">
+                    <span class="text-[11px] text-secondary font-medium whitespace-nowrap">Dari:</span>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="bg-transparent text-primary text-xs focus:outline-none border-0 p-0" title="Dari Tanggal">
+                    <span class="text-[11px] text-secondary font-medium">s/d</span>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="bg-transparent text-primary text-xs focus:outline-none border-0 p-0" title="Sampai Tanggal">
                 </div>
 
-                <!-- Dropdown Bulan -->
-                <div class="w-full sm:w-auto">
-                    <select name="month" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Bulan --</option>
-                        @php
-                            $months = [
-                                '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
-                                '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
-                                '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-                            ];
-                        @endphp
-                        @foreach($months as $num => $name)
-                            <option value="{{ $num }}" {{ request('month') == $num ? 'selected' : '' }}>{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <button type="submit" class="col-span-2 sm:col-span-auto px-3 py-2 bg-brand-blue text-white rounded-xl text-xs font-semibold hover:bg-brand-blue/90 transition shadow-xs">
+                    Filter
+                </button>
 
-                <!-- Dropdown Hari -->
-                <div class="col-span-2 sm:col-span-1 w-full sm:w-auto">
-                    <select name="day" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Hari --</option>
-                        @for($d = 1; $d <= 31; $d++)
-                            <option value="{{ $d }}" {{ request('day') == $d ? 'selected' : '' }}>{{ $d }}</option>
-                        @endfor
-                    </select>
-                </div>
-
-                @if(request('platform') || request('campaign_id') || request('year') || request('month') || request('day'))
+                @if(request('platform') || request('campaign_id') || request('start_date') || request('end_date') || request('year') || request('month') || request('day'))
                     <div class="col-span-2 sm:col-span-1 text-center sm:text-left py-1">
                         <a href="{{ route('dashboard.admin-master') }}" class="text-xs text-brand-blue hover:underline font-semibold">Reset Filter</a>
                     </div>

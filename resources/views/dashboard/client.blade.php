@@ -31,44 +31,19 @@
                     </select>
                 </div>
 
-                <!-- Dropdown Tahun -->
-                <div class="w-full sm:w-auto">
-                    <select name="year" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Tahun --</option>
-                        @foreach($availableYears as $yr)
-                            <option value="{{ $yr }}" {{ request('year') == $yr ? 'selected' : '' }}>{{ $yr }}</option>
-                        @endforeach
-                    </select>
+                <!-- Date Range (Dari Tanggal s/d Sampai Tanggal) -->
+                <div class="col-span-2 sm:col-span-auto flex items-center gap-1.5 bg-body px-2.5 py-1.5 rounded-xl border border-border">
+                    <span class="text-[11px] text-secondary font-medium whitespace-nowrap">Dari:</span>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}" class="bg-transparent text-primary text-xs focus:outline-none border-0 p-0" title="Dari Tanggal">
+                    <span class="text-[11px] text-secondary font-medium">s/d</span>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}" class="bg-transparent text-primary text-xs focus:outline-none border-0 p-0" title="Sampai Tanggal">
                 </div>
 
-                <!-- Dropdown Bulan -->
-                <div class="w-full sm:w-auto">
-                    <select name="month" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Bulan --</option>
-                        @php
-                            $months = [
-                                '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
-                                '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
-                                '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-                            ];
-                        @endphp
-                        @foreach($months as $num => $name)
-                            <option value="{{ $num }}" {{ request('month') == $num ? 'selected' : '' }}>{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <button type="submit" class="col-span-2 sm:col-span-auto px-3 py-2 bg-brand-blue text-white rounded-xl text-xs font-semibold hover:bg-brand-blue/90 transition shadow-xs">
+                    Filter
+                </button>
 
-                <!-- Dropdown Hari -->
-                <div class="col-span-2 sm:col-span-1 w-full sm:w-auto">
-                    <select name="day" onchange="this.form.submit()" class="w-full rounded-xl border-border bg-body text-primary text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:border-brand-blue focus:ring-brand-blue">
-                        <option value="">-- Hari --</option>
-                        @for($d = 1; $d <= 31; $d++)
-                            <option value="{{ $d }}" {{ request('day') == $d ? 'selected' : '' }}>{{ $d }}</option>
-                        @endfor
-                    </select>
-                </div>
-
-                @if(request('platform') || request('campaign_id') || request('year') || request('month') || request('day'))
+                @if(request('platform') || request('campaign_id') || request('start_date') || request('end_date') || request('year') || request('month') || request('day'))
                     <div class="col-span-2 sm:col-span-1 text-center sm:text-left py-1">
                         <a href="{{ route('dashboard.client') }}" class="text-xs text-brand-blue hover:underline font-semibold">Reset Filter</a>
                     </div>
@@ -327,11 +302,11 @@
             <div class="p-4 sm:px-6 sm:py-5 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-body/25">
                 <h3 class="text-base sm:text-lg font-bold text-primary">Daftar Link Konten (Laporan)</h3>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <a href="{{ route('export.client.pdf') }}" target="_blank" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-danger/10 text-status-danger border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-danger/20 transition-colors shadow-sm">
+                    <a href="{{ route('export.client.pdf', request()->all()) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-danger/10 text-status-danger border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-danger/20 transition-colors shadow-sm">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Export PDF
                     </a>
-                    <a href="{{ route('export.client.excel') }}" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-success/10 text-status-success border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-success/20 transition-colors shadow-sm">
+                    <a href="{{ route('export.client.excel', request()->all()) }}" class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-status-success/10 text-status-success border border-transparent rounded-lg font-semibold text-xs uppercase tracking-wider hover:bg-status-success/20 transition-colors shadow-sm">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Export Excel
                     </a>
@@ -343,6 +318,7 @@
                     <thead class="bg-body/50 text-[11px] sm:text-xs uppercase text-secondary">
                         <tr>
                             <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Platform</th>
+                            <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Tanggal</th>
                             <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Campaign</th>
                             <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold">Akun</th>
                             <th class="px-3 sm:px-4 py-3 sm:py-4 font-semibold text-right">Views</th>
@@ -360,6 +336,9 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                             <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap">
                                 <span class="px-2 py-1 bg-body border border-border rounded-md text-xs font-semibold">{{ ucfirst($link->platform) }}</span>
+                            </td>
+                            <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 whitespace-nowrap text-xs text-secondary">
+                                {{ $link->tanggal_upload ? \Carbon\Carbon::parse($link->tanggal_upload)->translatedFormat('d M Y') : '-' }}
                             </td>
                             <td class="px-3 sm:px-4 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium text-primary">{{ $link->campaign->nama_campaign ?? '-' }}</td>
                             @php
@@ -394,7 +373,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="11" class="px-6 py-8 text-center text-secondary">Belum ada data link.</td>
+                            <td colspan="12" class="px-6 py-8 text-center text-secondary">Belum ada data link.</td>
                         </tr>
                         @endforelse
                     </tbody>

@@ -49,6 +49,14 @@ class LaporanController extends Controller
             $query->where('platform', $request->platform);
         }
 
+        // Filter by Date Range (Tanggal Mulai & Selesai)
+        if ($request->filled('start_date')) {
+            $query->whereDate('tanggal_upload', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('tanggal_upload', '<=', $request->end_date);
+        }
+
         $links = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
         $totalViews = (clone $query)->sum('views');

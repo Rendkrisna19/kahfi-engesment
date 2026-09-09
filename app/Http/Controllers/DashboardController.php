@@ -46,6 +46,12 @@ class DashboardController extends Controller
             $query->where('platform', $request->platform);
         }
 
+        if ($request->filled('start_date')) {
+            $query->whereDate('tanggal_upload', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('tanggal_upload', '<=', $request->end_date);
+        }
         if ($request->filled('year')) {
             $query->whereYear('tanggal_upload', $request->year);
         }
@@ -63,7 +69,7 @@ class DashboardController extends Controller
         $totalComments = (clone $query)->sum('comments');
         $totalShares = (clone $query)->sum('shares');
         $totalSaves = (clone $query)->sum('saves');
-        $avgER = $totalViews > 0 ? (($totalLikes + $totalComments + $totalShares) / $totalViews) * 100 : 0;
+        $avgER = $totalViews > 0 ? (($totalLikes + $totalComments + $totalShares + $totalSaves) / $totalViews) * 100 : 0;
 
         // Hitung total kenaikan views pasca update / re-scraping
         $totalViewsIncrease = (clone $query)->whereNotNull('prev_views')->get()->sum(fn($l) => max(0, $l->views - $l->prev_views));
@@ -72,6 +78,8 @@ class DashboardController extends Controller
         $topCampaigns = Campaign::whereIn('id', $campaignIds)
             ->withSum(['links' => function($q) use($request) {
                 if ($request->filled('platform')) $q->where('platform', $request->platform);
+                if ($request->filled('start_date')) $q->whereDate('tanggal_upload', '>=', $request->start_date);
+                if ($request->filled('end_date')) $q->whereDate('tanggal_upload', '<=', $request->end_date);
                 if ($request->filled('year')) $q->whereYear('tanggal_upload', $request->year);
                 if ($request->filled('month')) $q->whereMonth('tanggal_upload', $request->month);
                 if ($request->filled('day')) $q->whereDay('tanggal_upload', $request->day);
