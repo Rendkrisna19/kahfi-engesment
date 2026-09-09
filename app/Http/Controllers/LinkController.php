@@ -44,7 +44,7 @@ class LinkController extends Controller
  
         // Scope data link sesuai campaign yang bisa diakses user
         if (!($user->hasRole('Admin Master') || $user->role === 'Admin Master')) {
-            $query->whereIn('campaign_id', $campaignIds);
+            $query->whereIn('links.campaign_id', $campaignIds);
         }
 
         $sortDir = strtolower($request->query('sort_dir', 'desc'));
@@ -53,17 +53,17 @@ class LinkController extends Controller
         }
 
         // Urutkan otomatis berdasarkan Tanggal Upload (default: dari terbaru ke terlama)
-        $query->orderByRaw("COALESCE(tanggal_upload, DATE(updated_at)) {$sortDir}")
-              ->orderBy('id', $sortDir);
+        $query->orderByRaw("COALESCE(links.tanggal_upload, DATE(links.updated_at)) {$sortDir}")
+              ->orderBy('links.id', $sortDir);
 
         // Filter Campaign jika dipilih
         if ($request->filled('campaign_id')) {
-            $query->where('campaign_id', $request->campaign_id);
+            $query->where('links.campaign_id', $request->campaign_id);
         }
 
         // Filter Platform jika dipilih
         if ($request->filled('platform')) {
-            $query->where('platform', $request->platform);
+            $query->where('links.platform', $request->platform);
         }
 
         // Filter Search / Pencarian jika ada

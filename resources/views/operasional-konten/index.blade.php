@@ -467,7 +467,7 @@
                 </div>
                 
                 <!-- Filter & Search Form -->
-                <form method="GET" action="{{ route('operasional-konten.index') }}" class="flex flex-wrap items-center gap-2.5">
+                <form method="GET" action="{{ route('operasional-konten.index') }}" id="operasionalFilterForm" class="flex flex-wrap items-center gap-2.5">
                     @if(request('sort_dir'))
                         <input type="hidden" name="sort_dir" value="{{ request('sort_dir') }}">
                     @endif
@@ -476,6 +476,7 @@
                     <div class="w-28 shrink-0">
                         <x-custom-select 
                             name="per_page" 
+                            id="filter_per_page"
                             :options="[
                                 '10' => '10 Data',
                                 '15' => '15 Data',
@@ -485,18 +486,34 @@
                             ]" 
                             :selected="request('per_page', 15)" 
                             placeholder="15 Data" 
-                            onChange="this.form.submit()" 
+                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
                         />
                     </div>
 
                     <!-- Campaign Filter -->
                     <div class="w-40 sm:w-48 shrink-0">
-                        <x-custom-select name="campaign_id" :options="$campaigns" :selected="request('campaign_id')" placeholder="-- Semua Campaign --" :disabled="$campaigns->isEmpty()" disabledText="-- Belum Ada Campaign --" onChange="this.form.submit()" />
+                        <x-custom-select 
+                            name="campaign_id" 
+                            id="filter_campaign_id"
+                            :options="$campaigns" 
+                            :selected="request('campaign_id')" 
+                            placeholder="-- Semua Campaign --" 
+                            :disabled="$campaigns->isEmpty()" 
+                            disabledText="-- Belum Ada Campaign --" 
+                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
+                        />
                     </div>
 
                     <!-- Platform Filter -->
                     <div class="w-36 shrink-0">
-                        <x-custom-select name="platform" :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" :selected="request('platform')" placeholder="-- Semua Platform --" onChange="this.form.submit()" />
+                        <x-custom-select 
+                            name="platform" 
+                            id="filter_platform"
+                            :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" 
+                            :selected="request('platform')" 
+                            placeholder="-- Semua Platform --" 
+                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
+                        />
                     </div>
 
                     <!-- Date Range Filter -->
