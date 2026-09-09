@@ -220,7 +220,7 @@
         </header>
 
         <!-- ================= SECTION 1: HERO SECTION ================= -->
-        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 sm:pt-12 sm:pb-6 text-center">
+        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 sm:pt-12 sm:pb-10 text-center">
             <!-- Badge Hook Pill (No Emojis, Clean SVG Icon) -->
             <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-200/80 text-indigo-900 text-xs sm:text-sm font-bold mb-6 shadow-sm">
                 <span class="flex h-2 w-2 relative">
