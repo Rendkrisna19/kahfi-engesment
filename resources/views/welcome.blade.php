@@ -220,7 +220,7 @@
         </header>
 
         <!-- ================= SECTION 1: HERO SECTION ================= -->
-        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16 lg:pt-20 lg:pb-24 text-center">
+        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 sm:pt-12 sm:pb-6 text-center">
             <!-- Badge Hook Pill (No Emojis, Clean SVG Icon) -->
             <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-200/80 text-indigo-900 text-xs sm:text-sm font-bold mb-6 shadow-sm">
                 <span class="flex h-2 w-2 relative">
@@ -263,7 +263,7 @@
             </div>
 
             <!-- ================= REALTIME ANALYTICS PREVIEW ================= -->
-            <div class="mt-10 sm:mt-14 w-full max-w-lg mx-auto bg-white/95 backdrop-blur-md border border-indigo-100/90 rounded-3xl p-5 sm:p-7 shadow-2xl shadow-indigo-500/10 text-left relative overflow-hidden transition-all duration-300">
+            <div class="mt-6 sm:mt-8 w-full max-w-lg mx-auto bg-white/95 backdrop-blur-md border border-indigo-100/90 rounded-3xl p-5 sm:p-7 shadow-2xl shadow-indigo-500/10 text-left relative overflow-hidden transition-all duration-300">
                 <!-- Header with Mac-style Dots -->
                 <div class="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 mb-4 sm:mb-5">
                     <div class="flex items-center gap-1.5">
@@ -335,22 +335,22 @@
         </section>
 
         <!-- ================= SECTION: KENAPA KAMU HARUS GABUNG ================= -->
-        <section id="kenapa-gabung" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div class="text-center max-w-3xl mx-auto mb-14">
+        <section id="kenapa-gabung" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-6 sm:pt-4 sm:pb-10">
+            <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
                 <span class="inline-block px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-wider border border-purple-200/80 mb-3">
                     {{ $settings['why_join_badge'] ?? 'KEUNGGULAN KAMI' }}
                 </span>
                 <h2 class="text-2xl sm:text-4xl font-black text-slate-900 leading-tight">
                     {{ $settings['why_join_title'] ?? 'Kenapa Kamu Harus Gabung Kahfi Engagement?' }}
                 </h2>
-                <p class="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed font-medium">
+                <p class="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3 leading-relaxed font-medium">
                     {{ $settings['why_join_subtitle'] ?? 'Kami merevolusi cara brand berpromosi: dari iklan berbayar yang kian mahal ke gelombang konten organik yang autentik dan dipercaya audiens.' }}
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 @foreach($whyJoins as $idx => $item)
-                    <div class="p-6 sm:p-7 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
+                    <div class="p-5 sm:p-7 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
                         <div>
                             <!-- Icon Ceklis Kecil & Rapi (Matching Image 1) -->
                             <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center mb-3.5 shadow-xs group-hover:scale-105 transition">
@@ -363,7 +363,7 @@
                                 {{ $item->description }}
                             </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-600">
+                        <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-600">
                             <span>Fitur Terverifikasi</span>
                             <span class="text-slate-400 font-mono">0{{ $idx + 1 }}</span>
                         </div>
@@ -373,10 +373,10 @@
         </section>
 
         <!-- ================= SECTION 4: BUKAN UNTUK SEMUA ORANG ================= -->
-        <section id="bukan-untuk-semua" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-            <div class="p-6 sm:p-12 rounded-3xl bg-white/95 border-2 border-rose-200/80 shadow-sm">
-                <div class="text-center max-w-3xl mx-auto mb-10">
-                    <span class="inline-block px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold uppercase tracking-wider border border-rose-200 mb-3">
+        <section id="bukan-untuk-semua" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="p-5 sm:p-8 rounded-3xl bg-white/95 border-2 border-rose-200/80 shadow-sm">
+                <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
+                    <span class="inline-block px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold uppercase tracking-wider border border-rose-200 mb-2.5">
                         {{ $settings['not_for_badge'] ?? 'KUALIFIKASI KLIEN' }}
                     </span>
                     <h2 class="text-2xl sm:text-4xl font-black text-slate-900 leading-tight">
@@ -390,14 +390,14 @@
                     </p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                     @foreach($notFors as $item)
-                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-4 hover:border-rose-300 transition">
-                            <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-base shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-3.5 sm:gap-4 hover:border-rose-300 transition">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-sm sm:text-base shrink-0">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </div>
                             <div>
-                                <h4 class="text-sm font-bold text-slate-900">
+                                <h4 class="text-xs sm:text-sm font-bold text-slate-900">
                                     {{ $item->title }}
                                 </h4>
                                 <p class="text-xs text-slate-600 mt-1 leading-relaxed font-medium">
@@ -411,7 +411,7 @@
         </section>
 
         <!-- ================= SECTION: PORTOFOLIO KAMI (DUAL CAROUSEL IN ENCLOSED CARD) ================= -->
-        <section id="portofolio" class="relative z-10 pt-8 pb-3 overflow-hidden">
+        <section id="portofolio" class="relative z-10 pt-4 pb-3 sm:pt-6 sm:pb-4 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Enclosed Box / Card matching Reference Screenshot -->
                 <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-8 overflow-hidden text-center"
@@ -633,22 +633,22 @@
         </section>
 
         <!-- ================= SECTION 6: BAGAIMANA KAMI BEKERJA ================= -->
-        <section id="cara-kerja" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div class="text-center max-w-3xl mx-auto mb-14">
+        <section id="cara-kerja" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
                 <span class="inline-block px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200 mb-3">
                     {{ $settings['how_badge'] ?? 'PROSES KERJA' }}
                 </span>
                 <h2 class="text-2xl sm:text-4xl font-black text-slate-900 leading-tight">
                     {{ $settings['how_title'] ?? 'Bagaimana Kami Bekerja' }}
                 </h2>
-                <p class="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed font-medium">
+                <p class="text-sm sm:text-base text-slate-600 mt-2 sm:mt-3 leading-relaxed font-medium">
                     {{ $settings['how_subtitle'] ?? 'Sistem 4 langkah teruji yang memastikan konten Anda viral tepat sasaran tanpa membuang waktu dan energi Anda.' }}
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 @foreach($howSteps as $idx => $step)
-                    <div class="p-6 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
+                    <div class="p-5 sm:p-6 rounded-2xl bg-white/95 border border-slate-200 shadow-sm hover:shadow-xl hover:border-purple-300 hover:shadow-purple-500/5 transition duration-200 flex flex-col justify-between group">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-mono font-bold text-xs">
@@ -677,8 +677,8 @@
         </section>
 
         <!-- ================= SECTION 7: SIAP BANJIR JUTAAN VIEWS? (CTA CONVERSION) ================= -->
-        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div class="p-8 sm:p-14 lg:p-16 rounded-[2.5rem] bg-gradient-to-br from-[#080D1D] via-[#0E163B] to-[#1D1042] text-white border border-indigo-500/30 shadow-2xl shadow-indigo-950/60 relative overflow-hidden text-center">
+        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="p-6 sm:p-12 lg:p-14 rounded-[2.5rem] bg-gradient-to-br from-[#080D1D] via-[#0E163B] to-[#1D1042] text-white border border-indigo-500/30 shadow-2xl shadow-indigo-950/60 relative overflow-hidden text-center">
                 <!-- Ambient Internal Glows (Ungu Biru) -->
                 <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-purple-600/30 blur-[100px] pointer-events-none"></div>
                 <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-blue-600/30 blur-[100px] pointer-events-none"></div>
