@@ -410,49 +410,8 @@
             </div>
         </section>
 
-        <!-- ================= SECTION: KLIEN BRAND NASIONAL (DI ATAS PORTO) ================= -->
-        <section id="klien" class="relative z-10 pt-8 pb-3 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Sleek Card Container -->
-                <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-7 overflow-hidden text-center">
-                    <!-- Subtle Central Glow -->
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-600/10 blur-[80px] pointer-events-none"></div>
-
-                    <!-- Header with Clean Lines -->
-                    <div class="flex items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-5">
-                        <div class="h-[1px] w-8 sm:w-24 bg-slate-800"></div>
-                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
-                            {{ $settings['client_badge'] ?? 'DIPERCAYA BRAND & PRODUCTION HOUSE NASIONAL' }}
-                        </span>
-                        <div class="h-[1px] w-8 sm:w-24 bg-slate-800"></div>
-                    </div>
-
-                    <!-- Brand Logos Infinite Carousel -->
-                    <div class="relative w-full overflow-hidden py-1">
-                        <div class="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
-                        <div class="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
-
-                        <div class="animate-marquee gap-8 sm:gap-12 items-center py-1">
-                            @php
-                                $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients)->concat($clients) : ($clients ?? collect());
-                            @endphp
-                            @foreach($allClients as $client)
-                                <div class="h-10 sm:h-12 px-3 sm:px-4 py-1 flex items-center justify-center shrink-0 brightness-0 invert opacity-75 hover:opacity-100 transition duration-300">
-                                    @if($client->image_url)
-                                        <img src="{{ $client->image_url }}" alt="{{ $client->title ?? 'Client' }}" class="h-6 sm:h-8 max-w-[120px] object-contain">
-                                    @else
-                                        <span class="text-xs sm:text-sm font-extrabold text-white tracking-wide">{{ $client->title }}</span>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- ================= SECTION: PORTOFOLIO KAMI (DUAL CAROUSEL IN ENCLOSED CARD) ================= -->
-        <section id="portofolio" class="relative z-10 pt-3 pb-12 sm:pb-16 overflow-hidden">
+        <section id="portofolio" class="relative z-10 pt-8 pb-3 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Enclosed Box / Card matching Reference Screenshot -->
                 <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-8 overflow-hidden text-center"
@@ -627,6 +586,47 @@
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.579 4.178 1.594 5.91l-1.693 6.183 6.356-1.667c1.677.915 3.599 1.438 5.643 1.438 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/></svg>
                             <span>Konsultasi Campaign Sekarang</span>
                         </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: KLIEN BRAND NASIONAL (DI BAWAH PORTO) ================= -->
+        <section id="klien" class="relative z-10 pt-3 pb-12 sm:pb-16 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Sleek Card Container -->
+                <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-7 overflow-hidden text-center">
+                    <!-- Subtle Central Glow -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-indigo-600/10 blur-[80px] pointer-events-none"></div>
+
+                    <!-- Header with Clean Lines -->
+                    <div class="flex items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-5">
+                        <div class="h-[1px] w-8 sm:w-24 bg-slate-800"></div>
+                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-400">
+                            {{ $settings['client_badge'] ?? 'DIPERCAYA BRAND & PRODUCTION HOUSE NASIONAL' }}
+                        </span>
+                        <div class="h-[1px] w-8 sm:w-24 bg-slate-800"></div>
+                    </div>
+
+                    <!-- Brand Logos Infinite Carousel -->
+                    <div class="relative w-full overflow-hidden py-1">
+                        <div class="absolute left-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-r from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
+                        <div class="absolute right-0 top-0 bottom-0 w-12 sm:w-20 bg-gradient-to-l from-[#0a0e1c] to-transparent z-10 pointer-events-none"></div>
+
+                        <div class="animate-marquee gap-8 sm:gap-12 items-center py-1">
+                            @php
+                                $allClients = ($clients && $clients->isNotEmpty()) ? $clients->concat($clients)->concat($clients) : ($clients ?? collect());
+                            @endphp
+                            @foreach($allClients as $client)
+                                <div class="h-10 sm:h-12 px-3 sm:px-4 py-1 flex items-center justify-center shrink-0 brightness-0 invert opacity-75 hover:opacity-100 transition duration-300">
+                                    @if($client->image_url)
+                                        <img src="{{ $client->image_url }}" alt="{{ $client->title ?? 'Client' }}" class="h-6 sm:h-8 max-w-[120px] object-contain">
+                                    @else
+                                        <span class="text-xs sm:text-sm font-extrabold text-white tracking-wide">{{ $client->title }}</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
