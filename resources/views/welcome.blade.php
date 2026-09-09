@@ -458,21 +458,24 @@
                 <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-8 overflow-hidden text-center"
                      style="background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 24px 24px;">
                     
-                    <!-- Ambient Glow -->
-                    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-80 h-36 bg-lime-500/10 blur-[85px] pointer-events-none"></div>
+                    <!-- Ambient Glow (Ungu Biru) -->
+                    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-44 bg-gradient-to-r from-blue-600/15 via-indigo-600/20 to-purple-600/20 blur-[90px] pointer-events-none"></div>
 
                     <!-- Header -->
                     <div class="relative z-10 max-w-2xl mx-auto">
-                        <h2 class="text-2xl sm:text-4xl font-black text-[#76ff03] tracking-tight">
+                        <span class="inline-block px-3.5 py-1 rounded-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20 border border-purple-400/40 text-purple-200 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3 backdrop-blur-md">
+                            {{ $settings['portfolio_badge'] ?? 'HASIL NYATA' }}
+                        </span>
+                        <h2 class="text-2xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-purple-200 tracking-tight">
                             {{ $settings['portfolio_title'] ?? 'Portofolio Kami' }}
                         </h2>
                         <p class="text-xs sm:text-sm text-slate-300 mt-1 sm:mt-2 font-medium">
-                            {{ $settings['portfolio_subtitle'] ?? 'Jangkau Jutaan Audiens Bareng Kahfi Engagement!' }}
+                            {{ $settings['portfolio_subtitle'] ?? 'Bukti distribusi video organik dengan jutaan views di TikTok dan Instagram Reels tanpa biaya ads.' }}
                         </p>
 
-                        <!-- Big Highlight Views Counter (as in Screenshot) -->
+                        <!-- Big Highlight Views Counter (Ungu Biru Putih) -->
                         <div class="mt-4 mb-5 sm:mb-7">
-                            <div class="text-3xl sm:text-5xl lg:text-6xl font-black text-[#76ff03] tracking-tight font-mono">
+                            <div class="text-3xl sm:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-200 to-purple-300 tracking-tight font-mono">
                                 {{ $totalViews > 10000000 ? number_format($totalViews, 0, ',', '.') . '+' : '680.225.190+' }}
                             </div>
                             <div class="text-[10px] sm:text-xs font-black uppercase tracking-[0.25em] text-slate-400 mt-1">
@@ -530,13 +533,13 @@
                                 @php
                                     $displayViews = !empty($portfolio->extra_meta['views']) ? $portfolio->extra_meta['views'] : (!empty($portfolio->subtitle) ? $portfolio->subtitle : '120.569.023');
                                 @endphp
-                                <div class="w-36 sm:w-44 shrink-0 rounded-2xl bg-slate-900 border border-slate-700/60 overflow-hidden shadow-lg hover:border-[#76ff03]/80 transition duration-300 group relative">
+                                <div class="w-36 sm:w-44 shrink-0 rounded-2xl bg-slate-900 border border-slate-700/60 overflow-hidden shadow-lg hover:border-purple-400/80 transition duration-300 group relative">
                                     <div class="relative w-full aspect-[2/3] bg-slate-950 overflow-hidden flex items-center justify-center">
                                         @if($portfolio->image_url)
                                             <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                                         @else
                                             <div class="w-full h-full bg-gradient-to-b from-slate-800 to-slate-950 flex flex-col items-center justify-center p-3 text-center text-white">
-                                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-lime-500 to-emerald-600 flex items-center justify-center mb-1 text-slate-950 font-black shadow">
+                                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center mb-1 text-white font-black shadow">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                                 </div>
                                                 <span class="text-xs font-bold text-white line-clamp-2">{{ $portfolio->title ?: 'Portofolio' }}</span>
@@ -545,12 +548,12 @@
 
                                         <!-- Trending Upward Arrow Glass Overlay (Matching Reference Screenshot) -->
                                         <div class="absolute inset-0 flex flex-col items-center justify-center p-2 pointer-events-none">
-                                            <div class="backdrop-blur-md bg-black/45 border border-white/20 rounded-xl px-2.5 py-2 flex flex-col items-center shadow-lg">
+                                            <div class="backdrop-blur-md bg-slate-900/80 border border-white/20 rounded-xl px-2.5 py-2 flex flex-col items-center shadow-lg">
                                                 <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                                                 </svg>
                                                 <div class="flex items-center gap-1 text-[10px] sm:text-[11px] text-white font-extrabold mt-1">
-                                                    <svg class="w-3 h-3 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-3 h-3 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                     </svg>
@@ -579,13 +582,13 @@
                                 @php
                                     $displayViews = !empty($portfolio->extra_meta['views']) ? $portfolio->extra_meta['views'] : (!empty($portfolio->subtitle) ? $portfolio->subtitle : '90.233.887');
                                 @endphp
-                                <div class="w-36 sm:w-44 shrink-0 rounded-2xl bg-slate-900 border border-slate-700/60 overflow-hidden shadow-lg hover:border-[#76ff03]/80 transition duration-300 group relative">
+                                <div class="w-36 sm:w-44 shrink-0 rounded-2xl bg-slate-900 border border-slate-700/60 overflow-hidden shadow-lg hover:border-purple-400/80 transition duration-300 group relative">
                                     <div class="relative w-full aspect-[2/3] bg-slate-950 overflow-hidden flex items-center justify-center">
                                         @if($portfolio->image_url)
                                             <img src="{{ $portfolio->image_url }}" alt="{{ $portfolio->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                                         @else
                                             <div class="w-full h-full bg-gradient-to-b from-slate-800 to-slate-950 flex flex-col items-center justify-center p-3 text-center text-white">
-                                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-lime-500 to-emerald-600 flex items-center justify-center mb-1 text-slate-950 font-black shadow">
+                                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center mb-1 text-white font-black shadow">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                                 </div>
                                                 <span class="text-xs font-bold text-white line-clamp-2">{{ $portfolio->title ?: 'Portofolio' }}</span>
@@ -594,12 +597,12 @@
 
                                         <!-- Trending Upward Arrow Glass Overlay (Matching Reference Screenshot) -->
                                         <div class="absolute inset-0 flex flex-col items-center justify-center p-2 pointer-events-none">
-                                            <div class="backdrop-blur-md bg-black/45 border border-white/20 rounded-xl px-2.5 py-2 flex flex-col items-center shadow-lg">
+                                            <div class="backdrop-blur-md bg-slate-900/80 border border-white/20 rounded-xl px-2.5 py-2 flex flex-col items-center shadow-lg">
                                                 <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                                                 </svg>
                                                 <div class="flex items-center gap-1 text-[10px] sm:text-[11px] text-white font-extrabold mt-1">
-                                                    <svg class="w-3 h-3 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="w-3 h-3 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                     </svg>
@@ -618,11 +621,11 @@
                         </div>
                     </div>
 
-                    <!-- WhatsApp CTA Button (Matching Reference Screenshot) -->
+                    <!-- Consultation WhatsApp CTA Button (Ungu Biru Gradient Glow) -->
                     <div class="mt-6 sm:mt-8 flex justify-center relative z-20">
-                        <a href="https://wa.me/{{ $settings['contact_whatsapp'] ?? '6281234567890' }}?text={{ urlencode('Halo Admin ' . ($settings['brand_name'] ?? 'Kahfi Engagement') . ', saya tertarik dengan portofolio Anda dan ingin konsultasi campaign') }}" target="_blank" class="inline-flex items-center gap-2.5 px-7 py-3 sm:py-3.5 rounded-full bg-[#76ff03] hover:bg-[#64dd17] text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-lime-500/20 hover:scale-105 active:scale-95 transition-all">
+                        <a href="https://wa.me/{{ $settings['contact_whatsapp'] ?? '6281234567890' }}?text={{ urlencode('Halo Admin ' . ($settings['brand_name'] ?? 'Kahfi Engagement') . ', saya tertarik dengan portofolio Anda dan ingin konsultasi campaign') }}" target="_blank" class="inline-flex items-center gap-2.5 px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-indigo-600/40 hover:shadow-2xl hover:shadow-indigo-600/50 hover:scale-105 active:scale-95 transition-all">
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.173.086.275.071.376-.043.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.579 4.178 1.594 5.91l-1.693 6.183 6.356-1.667c1.677.915 3.599 1.438 5.643 1.438 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12z"/></svg>
-                            <span>Chat WhatsApp</span>
+                            <span>Konsultasi Campaign Sekarang</span>
                         </a>
                     </div>
                 </div>
