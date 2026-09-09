@@ -62,49 +62,31 @@
     isDisabled: {{ $disabled ? 'true' : 'false' }},
     options: {{ json_encode($formattedOptions) }},
 
-    get form() {
-        return (this.$refs && this.$refs.hiddenInput && this.$refs.hiddenInput.form) 
-            ? this.$refs.hiddenInput.form 
-            : (this.$el ? this.$el.closest('form') : null);
-    },
-
     selectOption(opt) {
         if (this.isDisabled) return;
         this.selectedValue = String(opt.value);
         this.selectedLabel = String(opt.label);
         this.open = false;
         
-        // Immediately sync the hidden input value
-        const input = (this.$refs && this.$refs.hiddenInput) ? this.$refs.hiddenInput : this.$el.querySelector('input[type=hidden]');
-        if (input) {
-            input.value = opt.value;
-        }
-
-        const runAction = () => {
+        $nextTick(() => {
+            const input = $refs.hiddenInput;
             if (input) {
+                input.value = opt.value;
                 input.dispatchEvent(new Event('input', { bubbles: true }));
                 input.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            @if($onChange)
-                const targetForm = (input && input.form) ? input.form : (this.$el ? this.$el.closest('form') : null);
-                try {
-                    (function(form, input, el) {
-                        {!! $onChange !!};
-                    }).call(input || this, targetForm, input, this.$el);
-                } catch(e) {
-                    console.error('Error executing custom-select onChange:', e);
-                    if (targetForm && typeof {!! json_encode($onChange) !!} === 'string' && {!! json_encode($onChange) !!}.includes('submit')) {
-                        targetForm.submit();
+                @if($onChange)
+                    try {
+                        (function() {
+                            {!! $onChange !!};
+                        }).call(input);
+                    } catch(e) {
+                        if (input.form) {
+                            input.form.submit();
+                        }
                     }
-                }
-            @endif
-        };
-
-        if (typeof this.$nextTick === 'function') {
-            this.$nextTick(runAction);
-        } else {
-            setTimeout(runAction, 0);
-        }
+                @endif
+            }
+        });
     }
 }" @click.outside="open = false" class="relative {{ preg_match('/\b(w-|max-w-)/', $class) ? '' : 'w-full' }} {{ $class }}">
 

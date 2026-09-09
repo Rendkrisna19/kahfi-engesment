@@ -486,7 +486,7 @@
                             ]" 
                             :selected="request('per_page', 15)" 
                             placeholder="15 Data" 
-                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
+                            onChange="this.form.submit()" 
                         />
                     </div>
 
@@ -500,7 +500,7 @@
                             placeholder="-- Semua Campaign --" 
                             :disabled="$campaigns->isEmpty()" 
                             disabledText="-- Belum Ada Campaign --" 
-                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
+                            onChange="this.form.submit()" 
                         />
                     </div>
 
@@ -512,7 +512,7 @@
                             :options="['TikTok' => 'TikTok', 'Instagram' => 'Instagram']" 
                             :selected="request('platform')" 
                             placeholder="-- Semua Platform --" 
-                            onChange="this.form ? this.form.submit() : document.getElementById('operasionalFilterForm').submit()" 
+                            onChange="this.form.submit()" 
                         />
                     </div>
 
