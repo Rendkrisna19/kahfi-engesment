@@ -220,7 +220,7 @@
         </header>
 
         <!-- ================= SECTION 1: HERO SECTION ================= -->
-        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 sm:pt-12 sm:pb-10 text-center">
+        <section class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pt-12 sm:pb-12 text-center">
             <!-- Badge Hook Pill (No Emojis, Clean SVG Icon) -->
             <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 border border-indigo-200/80 text-indigo-900 text-xs sm:text-sm font-bold mb-6 shadow-sm">
                 <span class="flex h-2 w-2 relative">
@@ -335,7 +335,7 @@
         </section>
 
         <!-- ================= SECTION: KENAPA KAMU HARUS GABUNG ================= -->
-        <section id="kenapa-gabung" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-6 sm:pt-4 sm:pb-10">
+        <section id="kenapa-gabung" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pt-12 sm:pb-14">
             <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
                 <span class="inline-block px-3.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold uppercase tracking-wider border border-purple-200/80 mb-3">
                     {{ $settings['why_join_badge'] ?? 'KEUNGGULAN KAMI' }}
@@ -373,7 +373,7 @@
         </section>
 
         <!-- ================= SECTION 4: BUKAN UNTUK SEMUA ORANG ================= -->
-        <section id="bukan-untuk-semua" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <section id="bukan-untuk-semua" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
             <div class="p-5 sm:p-8 rounded-3xl bg-white/95 border-2 border-rose-200/80 shadow-sm">
                 <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
                     <span class="inline-block px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold uppercase tracking-wider border border-rose-200 mb-2.5">
@@ -411,7 +411,7 @@
         </section>
 
         <!-- ================= SECTION: PORTOFOLIO KAMI (DUAL CAROUSEL IN ENCLOSED CARD) ================= -->
-        <section id="portofolio" class="relative z-10 pt-4 pb-3 sm:pt-6 sm:pb-4 overflow-hidden">
+        <section id="portofolio" class="relative z-10 pt-8 pb-4 sm:pt-10 sm:pb-5 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <!-- Enclosed Box / Card matching Reference Screenshot -->
                 <div class="relative max-w-5xl mx-auto rounded-3xl bg-[#0a0e1c] border border-indigo-950/80 shadow-2xl p-5 sm:p-8 overflow-hidden text-center"
