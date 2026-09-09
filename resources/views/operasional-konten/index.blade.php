@@ -561,7 +561,7 @@
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Shares</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Saves</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">ER (%)</th>
-                            <th scope="col" class="px-4 py-3.5 font-semibold text-center">Status</th>
+                            <th scope="col" class="px-4 py-3.5 font-semibold text-center whitespace-nowrap">Status / Tanggal</th>
                             <th scope="col" class="px-4 py-3.5 font-semibold text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -639,22 +639,35 @@
                                 {{ number_format($link->engagement_rate ?? 0, 2) }}%
                             </td>
 
-                            <!-- Status Scraping -->
+                            <!-- Status Scraping & Tanggal Update -->
                             <td class="px-4 py-3.5 text-center whitespace-nowrap">
                                 @if($link->status_scraping === 'Pending')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-status-warning/10 text-status-warning">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-status-warning/10 text-status-warning mb-0.5">
                                         <svg class="w-3 h-3 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                         Pending
                                     </span>
                                 @elseif(in_array($link->status_scraping, ['Completed', 'Berhasil']))
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-status-success/10 text-status-success">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-status-success/10 text-status-success mb-0.5">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                         Completed
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-status-danger/10 text-status-danger">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-status-danger/10 text-status-danger mb-0.5">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                         Gagal
+                                    </span>
+                                @endif
+
+                                @php
+                                    $tz = config('app.timezone', 'Asia/Jakarta');
+                                    $lastUpdatedTime = $link->last_rescraped_at ?? $link->updated_at;
+                                @endphp
+                                @if($lastUpdatedTime)
+                                    <span class="text-[10px] font-semibold text-primary block mt-0.5">
+                                        {{ \Carbon\Carbon::parse($lastUpdatedTime)->timezone($tz)->format('d/m/Y H:i') }}
+                                    </span>
+                                    <span class="text-[9px] text-brand-blue block font-medium">
+                                        ({{ \Carbon\Carbon::parse($lastUpdatedTime)->timezone($tz)->diffForHumans() }})
                                     </span>
                                 @endif
                             </td>
