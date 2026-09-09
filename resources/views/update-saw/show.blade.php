@@ -143,6 +143,8 @@
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Views</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Likes</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">Comments</th>
+                                <th scope="col" class="px-4 py-3.5 font-semibold text-right">Shares</th>
+                                <th scope="col" class="px-4 py-3.5 font-semibold text-right">Saves</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-right">ER (%)</th>
                                 <th scope="col" class="px-4 py-3.5 font-semibold text-center whitespace-nowrap">
                                     @php
@@ -167,7 +169,10 @@
                             @forelse($links as $link)
                             @php
                                 $viewsDiff = ($link->prev_views !== null) ? ($link->views - $link->prev_views) : 0;
+                                $sharesDiff = ($link->prev_shares !== null) ? ($link->shares - $link->prev_shares) : 0;
+                                $savesDiff = ($link->prev_saves !== null) ? ($link->saves - $link->prev_saves) : 0;
                                 $erDiff = ($link->prev_engagement_rate !== null) ? ($link->engagement_rate - $link->prev_engagement_rate) : 0;
+                                $tz = config('app.timezone', 'Asia/Jakarta');
                             @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                                 <!-- Checkbox Column -->
@@ -226,6 +231,38 @@
                                     </span>
                                 </td>
 
+                                <!-- Shares -->
+                                <td class="px-4 py-3.5 text-right whitespace-nowrap">
+                                    <span class="font-medium text-xs text-indigo-600 dark:text-indigo-400 block">
+                                        {{ number_format($link->shares ?? 0) }}
+                                    </span>
+                                    @if($sharesDiff > 0)
+                                        <span class="text-[10px] text-status-success font-bold inline-flex items-center">
+                                            ▲ +{{ number_format($sharesDiff) }}
+                                        </span>
+                                    @elseif($sharesDiff < 0)
+                                        <span class="text-[10px] text-status-danger font-medium inline-flex items-center">
+                                            ▼ {{ number_format($sharesDiff) }}
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <!-- Saves -->
+                                <td class="px-4 py-3.5 text-right whitespace-nowrap">
+                                    <span class="font-medium text-xs text-amber-600 dark:text-amber-400 block">
+                                        {{ number_format($link->saves ?? 0) }}
+                                    </span>
+                                    @if($savesDiff > 0)
+                                        <span class="text-[10px] text-status-success font-bold inline-flex items-center">
+                                            ▲ +{{ number_format($savesDiff) }}
+                                        </span>
+                                    @elseif($savesDiff < 0)
+                                        <span class="text-[10px] text-status-danger font-medium inline-flex items-center">
+                                            ▼ {{ number_format($savesDiff) }}
+                                        </span>
+                                    @endif
+                                </td>
+
                                 <!-- ER (%) -->
                                 <td class="px-4 py-3.5 text-right whitespace-nowrap">
                                     <span class="font-semibold text-xs text-brand-blue block">
@@ -244,17 +281,17 @@
                                     </span>
                                     <span class="text-[10px] font-semibold text-primary block">
                                         @if($link->last_rescraped_at)
-                                            {{ \Carbon\Carbon::parse($link->last_rescraped_at)->format('d/m/Y H:i') }}
-                                            <span class="text-[9px] text-brand-blue block font-medium">({{ \Carbon\Carbon::parse($link->last_rescraped_at)->diffForHumans() }})</span>
+                                            {{ \Carbon\Carbon::parse($link->last_rescraped_at)->timezone($tz)->format('d/m/Y H:i') }}
+                                            <span class="text-[9px] text-brand-blue block font-medium">({{ \Carbon\Carbon::parse($link->last_rescraped_at)->timezone($tz)->diffForHumans() }})</span>
                                         @else
-                                            {{ \Carbon\Carbon::parse($link->updated_at)->format('d/m/Y H:i') }}
+                                            {{ \Carbon\Carbon::parse($link->updated_at)->timezone($tz)->format('d/m/Y H:i') }}
                                         @endif
                                     </span>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-8 text-center text-secondary">
+                                <td colspan="9" class="px-6 py-8 text-center text-secondary">
                                     Tidak ada link konten dalam Campaign ini.
                                 </td>
                             </tr>

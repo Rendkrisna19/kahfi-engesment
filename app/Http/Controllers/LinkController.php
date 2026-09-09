@@ -784,23 +784,24 @@ class LinkController extends Controller
                         $postType = null;
 
                         if ($isTikTok) {
-                            $views = $item['playCount'] ?? $item['viewsCount'] ?? 0;
-                            $likes = $item['diggCount'] ?? $item['likesCount'] ?? 0;
-                            $comments = $item['commentCount'] ?? $item['commentsCount'] ?? 0;
-                            $shares = $item['shareCount'] ?? $item['sharesCount'] ?? 0;
-                            $saves = $item['collectCount'] ?? $item['bookmarksCount'] ?? 0;
-                            $reposts = $item['repostCount'] ?? 0;
+                            $stats = $item['stats'] ?? $item['statsV2'] ?? [];
+                            $views = (int) ($item['playCount'] ?? $item['viewsCount'] ?? $item['viewCount'] ?? $stats['playCount'] ?? $stats['viewCount'] ?? 0);
+                            $likes = (int) ($item['diggCount'] ?? $item['likesCount'] ?? $item['likeCount'] ?? $stats['diggCount'] ?? $stats['likeCount'] ?? 0);
+                            $comments = (int) ($item['commentCount'] ?? $item['commentsCount'] ?? $stats['commentCount'] ?? 0);
+                            $shares = (int) ($item['shareCount'] ?? $item['sharesCount'] ?? $item['share'] ?? $item['shares'] ?? $stats['shareCount'] ?? $stats['sharesCount'] ?? 0);
+                            $saves = (int) ($item['collectCount'] ?? $item['bookmarksCount'] ?? $item['bookmarkCount'] ?? $item['savesCount'] ?? $item['saveCount'] ?? $stats['collectCount'] ?? $stats['savesCount'] ?? 0);
+                            $reposts = (int) ($item['repostCount'] ?? $item['repostsCount'] ?? $stats['repostCount'] ?? 0);
                             $username = $item['authorMeta']['name'] ?? $item['authorMeta']['nickName'] ?? ($item['author']['uniqueId'] ?? 'TikTok User');
                             $caption = $item['text'] ?? null;
                             $postDate = isset($item['createTime']) ? date('Y-m-d H:i:s', is_numeric($item['createTime']) ? $item['createTime'] : strtotime($item['createTime'])) : null;
                             $postType = 'Video';
                         } else {
                             // Instagram Logic
-                            $views = $item['playCount'] ?? $item['videoViewCount'] ?? $item['videoPlayCount'] ?? $item['viewCount'] ?? 0;
-                            $likes = $item['likesCount'] ?? $item['likeCount'] ?? 0;
-                            $comments = $item['commentsCount'] ?? $item['commentCount'] ?? 0;
-                            $shares = $item['sharesCount'] ?? 0;
-                            $saves = $item['savesCount'] ?? 0;
+                            $views = (int) ($item['playCount'] ?? $item['videoViewCount'] ?? $item['videoPlayCount'] ?? $item['viewCount'] ?? $item['views'] ?? 0);
+                            $likes = (int) ($item['likesCount'] ?? $item['likeCount'] ?? $item['likes'] ?? 0);
+                            $comments = (int) ($item['commentsCount'] ?? $item['commentCount'] ?? $item['comments'] ?? 0);
+                            $shares = (int) ($item['sharesCount'] ?? $item['shareCount'] ?? $item['shares'] ?? 0);
+                            $saves = (int) ($item['savesCount'] ?? $item['saveCount'] ?? $item['saves'] ?? $item['bookmarkCount'] ?? 0);
                             
                             $postType = $item['type'] ?? $item['product_type'] ?? null;
                             $caption = $item['caption'] ?? $item['text'] ?? null;
@@ -814,13 +815,21 @@ class LinkController extends Controller
                             $username = $item['ownerUsername'] ?? $item['ownerFullName'] ?? 'IG User';
                         }
 
-                        // Hitung Engagement Rate: (Likes + Comments + Shares) / Views * 100
-                        $er = 0;
-                        if ($views > 0) {
-                            $er = (($likes + $comments + $shares) / $views) * 100;
+                        // Jaga agar data share/save yang sudah ada tidak hilang jika scraper tidak mengembalikan field tersebut
+                        if ($shares === 0 && ($link->shares ?? 0) > 0 && !isset($item['shareCount']) && !isset($item['sharesCount']) && !isset($stats['shareCount'])) {
+                            $shares = (int) $link->shares;
+                        }
+                        if ($saves === 0 && ($link->saves ?? 0) > 0 && !isset($item['collectCount']) && !isset($item['bookmarksCount']) && !isset($item['savesCount']) && !isset($stats['collectCount'])) {
+                            $saves = (int) $link->saves;
                         }
 
-                        // Calculate SAW Score (dummy logic)
+                        // Hitung Engagement Rate: (Likes + Comments + Shares + Saves) / Views * 100
+                        $er = 0;
+                        if ($views > 0) {
+                            $er = (($likes + $comments + $shares + $saves) / $views) * 100;
+                        }
+
+                        // Calculate SAW Score
                         $sawScore = ($er * 0.5) + (($likes > 100 ? 10 : ($likes / 10)) * 0.3) + (($comments > 50 ? 10 : ($comments / 5)) * 0.2);
 
                         $link->update([
@@ -838,6 +847,7 @@ class LinkController extends Controller
                             'caption' => $caption,
                             'post_date' => $postDate,
                             'tanggal_upload' => $postDate ? date('Y-m-d', strtotime($postDate)) : date('Y-m-d'),
+                            'last_rescraped_at' => now(),
                             'updated_at' => now(),
                         ]);
 
