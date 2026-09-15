@@ -92,6 +92,26 @@ class UpdateSawController extends Controller
             });
         }
 
+        if ($request->filled('start_date')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereDate('tanggal_upload', '>=', $request->start_date)
+                  ->orWhere(function ($sub) use ($request) {
+                      $sub->whereNull('tanggal_upload')
+                          ->whereDate('updated_at', '>=', $request->start_date);
+                  });
+            });
+        }
+
+        if ($request->filled('end_date')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereDate('tanggal_upload', '<=', $request->end_date)
+                  ->orWhere(function ($sub) use ($request) {
+                      $sub->whereNull('tanggal_upload')
+                          ->whereDate('updated_at', '<=', $request->end_date);
+                  });
+            });
+        }
+
         $sortDir = strtolower($request->query('sort_dir', 'asc'));
         if (!in_array($sortDir, ['asc', 'desc'])) {
             $sortDir = 'asc';

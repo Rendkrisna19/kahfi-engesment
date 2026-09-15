@@ -114,7 +114,15 @@
                                 />
                             </div>
 
-                            @if(request('search') || request('platform') || request('per_page'))
+                            <!-- Date Range Filter -->
+                            <div class="flex items-center gap-1.5 bg-body border border-border rounded-xl px-2.5 py-1.5 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <input type="date" id="startDateFilter" value="{{ request('start_date') }}" onchange="applyFilter()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Mulai">
+                                <span class="text-xs text-secondary font-bold">-</span>
+                                <input type="date" id="endDateFilter" value="{{ request('end_date') }}" onchange="applyFilter()" class="text-xs bg-transparent border-0 text-primary focus:ring-0 p-0 cursor-pointer" title="Tanggal Selesai">
+                            </div>
+
+                            @if(request('search') || request('platform') || request('per_page') || request('start_date') || request('end_date'))
                                 <button type="button" onclick="resetFilter()" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors" title="Reset Filter">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
@@ -323,6 +331,9 @@
         const perPageInput = document.querySelector('input[name="per_page_filter"]');
         const perPageVal = perPageInput ? perPageInput.value : '';
 
+        const startDateVal = document.getElementById('startDateFilter')?.value;
+        const endDateVal = document.getElementById('endDateFilter')?.value;
+
         if (searchVal) {
             url.searchParams.set('search', searchVal);
         } else {
@@ -341,6 +352,18 @@
             url.searchParams.delete('per_page');
         }
 
+        if (startDateVal) {
+            url.searchParams.set('start_date', startDateVal);
+        } else {
+            url.searchParams.delete('start_date');
+        }
+
+        if (endDateVal) {
+            url.searchParams.set('end_date', endDateVal);
+        } else {
+            url.searchParams.delete('end_date');
+        }
+
         url.searchParams.set('page', '1');
         window.location.href = url.toString();
     }
@@ -350,6 +373,8 @@
         url.searchParams.delete('search');
         url.searchParams.delete('platform');
         url.searchParams.delete('per_page');
+        url.searchParams.delete('start_date');
+        url.searchParams.delete('end_date');
         url.searchParams.set('page', '1');
         window.location.href = url.toString();
     }
